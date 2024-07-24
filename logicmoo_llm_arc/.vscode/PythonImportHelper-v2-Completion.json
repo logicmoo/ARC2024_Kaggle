@@ -1,0 +1,20 @@
+[
+    {
+        "label": "c",
+        "kind": 5,
+        "importPath": "jupyterhub_config",
+        "description": "jupyterhub_config",
+        "peekOfCode": "c = get_config()  #noqa\n#------------------------------------------------------------------------------\n# Application(SingletonConfigurable) configuration\n#------------------------------------------------------------------------------\n## This is an application.\n## The date format used by logging formatters for %(asctime)s\n#  Default: '%Y-%m-%d %H:%M:%S'\n# c.Application.log_datefmt = '%Y-%m-%d %H:%M:%S'\n## The Logging format template\n#  Default: '[%(name)s]%(highlevel)s %(message)s'",
+        "detail": "jupyterhub_config",
+        "documentation": {}
+    },
+    {
+        "label": "c.JupyterHub.bind_url",
+        "kind": 5,
+        "importPath": "jupyterhub_config",
+        "description": "jupyterhub_config",
+        "peekOfCode": "c.JupyterHub.bind_url = 'http://:8880/'",
+        "detail": "jupyterhub_config",
+        "documentation": {}
+    }
+]
