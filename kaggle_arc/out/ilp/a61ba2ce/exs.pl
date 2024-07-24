@@ -1,0 +1,15 @@
+pos(rhs(out0_cyan3_1_1_2_2,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(1,1),txy(1,1),cyan)). 
+pos(rhs(out0_green3_1_3_2_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(1,4),txy(1,4),green)). 
+pos(rhs(out0_red3_3_1_4_2,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(4,1),txy(4,1),red)). 
+pos(rhs(out0_blue3_3_3_4_4,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(4,4),txy(4,4),blue)). 
+pos(rhs(out0_black0_2_2_3_3,sameR,sid_1x1,cxy(3,3),txy(2,2),black)). 
+pos(rhs(out1_blue3_1_1_2_2,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(1,1),txy(1,1),blue)). 
+pos(rhs(out1_yellow3_1_3_2_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(1,4),txy(1,4),yellow)). 
+pos(rhs(out1_cyan3_3_1_4_2,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(4,1),txy(4,1),cyan)). 
+pos(rhs(out1_red3_3_3_4_4,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(4,4),txy(4,4),red)). 
+pos(rhs(out1_black0_2_2_3_3,sameR,sid_1x1,cxy(3,3),txy(2,2),black)). 
+pos(rhs(out0_green3_1_1_2_2,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(1,1),txy(1,1),green)). 
+pos(rhs(out0_blue3_1_3_2_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(1,4),txy(1,4),blue)). 
+pos(rhs(out0_cyan3_3_1_4_2,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(4,1),txy(4,1),cyan)). 
+pos(rhs(out0_purple3_3_3_4_4,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(4,4),txy(4,4),purple)). 
+pos(rhs(out0_black0_2_2_3_3,sameR,sid_1x1,cxy(3,3),txy(2,2),black)). 
