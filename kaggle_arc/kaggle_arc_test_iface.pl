@@ -1295,7 +1295,7 @@ is_valid_atom_testname(TestID):- atom(TestID), once(is_arc_task(t(TestID));is_ar
 
 report_test:- report_suite_test_count, print_qtest.
 
-get_current_test(TestID):- luser_getval(task,TestID),is_valid_testname(TestID),!.
+get_current_test(TestID):- luser_getval(task_id,TestID),is_valid_testname(TestID),!.
 get_current_test(TestID):- get_next_test(TestID,_),!.
 get_current_test(TestID):- get_current_test_fb(TestID),is_arc_task(TestID),!.
 get_current_test(TestID):- is_arc_task(TestID),!.
@@ -1361,8 +1361,8 @@ set_current_test(Name):-
     ignore((nonvar(Example),set_example_num(Example+NumE))))).
 
 really_set_current_test(TestID):-
-  once(luser_getval(task,WTestID);WTestID=[]),
-  ignore((WTestID\==TestID,luser_setval(task,TestID),save_last_test_name(TestID),
+  once(luser_getval(task_id,WTestID);WTestID=[]),
+  ignore((WTestID\==TestID,luser_setval(task_id,TestID),save_last_test_name(TestID),
         test_id_atom(TestID,Atom),set_html_component(task,Atom))),
   once(luser_getval(last_test_name,WasTestID);WasTestID=[]),
   ignore((WasTestID\==TestID, new_current_test_info(WasTestID,TestID))).

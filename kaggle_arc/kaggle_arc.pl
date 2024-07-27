@@ -437,12 +437,30 @@ arc_user(ID):- thread_self(ID).
 
 :- dynamic(arc_user_prop/3).
 
+
+show_luser:- 
+  show_all(arc_user(_ID)),
+  show_all(get_current_test(_)),
+  show_all(luser_getval(_,_)).
+
+show_luser2:- 
+  show_luser,
+  solve_via_scene_change.
+
+
+writeq_ln(Q):- writeq(Q),nl.
+
+show_all(G):- catch(forall(G,writeq_ln(G)),_,writeq_ln(noneAt(G))).
+  
+
 %luser_setval(N,V):- nb_setval(N,V),!.
 luser_setval(N,V):- arc_user(ID),luser_setval(ID,N,V),!.
+%luser_setval(_ID,N,V):- N == test, set_current_test(V),fail.
 luser_setval(ID,N,V):- \+ (arc_sensical_term(N),arc_sensical_term(V)),
   warn_skip(not_arc_sensical_term(luser_setval(ID,N,V))).
 luser_setval(ID,N,V):-
   (atom(N)->nb_setval(N,V);true),
+  (atom(N)->asserta_if_new(luser_var(N));true),  
   retractall(arc_user_prop(ID,N,_)),asserta(arc_user_prop(ID,N,V)).
 
 
@@ -455,7 +473,7 @@ luser_default(N,V):- set_luser_default(N,V).
 
 luser_linkval(N,V):- arc_user(ID),luser_linkval(ID,N,V),!.
 luser_linkval(ID,N,V):- \+ var(V), \+ (arc_sensical_term(N),arc_sensical_term(V)),
- trace,
+ %trace,
  warn_skip(not_arc_sensical_term(luser_linkval(ID,N,V))).
 luser_linkval(ID,N,V):-
   (atom(N)->nb_linkval(N,V);true),
@@ -473,8 +491,20 @@ with_luser(N,V,Goal):-
     once(Goal),
     luser_setval(N,OV)).
 
+:- dynamic(luser_var/1).
+luser_var(arc_user).
+luser_var(task).
+%luser_var(test_id).
+%luser_var(test).
+luser_var(test_suite_name).
+luser_var(cmd).
+luser_var(webcmd).
+luser_var(cmd2).
+luser_var(icmd).
+
 %luser_getval(N,V):- nb_current(N,VVV),arc_sensical_term(VVV,VV),!,V=VV.
 % caches the valuetemp on this thread
+luser_getval(N,V):- var(N),!,luser_var(N),luser_getval(N,V).
 luser_getval(N,V):-  luser_getval_0(N,VV),VV=V,arc_sensical_term(V),!.
 
 luser_getval_0(arc_user,V):- arc_user(V).
@@ -487,8 +517,9 @@ luser_getval_1(N,V):- get_luser_default(N,V), \+ (luser_getval_3(N,VV), nop(VV\=
 %luser_getval_0(N,V):- luser_getval_2(N,V), \+ luser_getval_1(N,_).
 %luser_getval_0(N,V):- luser_getval_3(N,V), \+ luser_getval_2(N,_), \+ luser_getval_1(N,_).
 %luser_getval_3(N,V):- is_cgi, current_predicate(get_param_req/2),get_param_req(N,M),url_decode_term(M,V).
-luser_getval_2(N,V):- \+ main_thread, atom(N), httpd_wrapper:http_current_request(Request), member(search(List),Request),member(N=VV,List),url_decode_term(VV,V),arc_sensical_term(V),!.
 luser_getval_2(N,V):- atom(N), nb_current(N,ValV),arc_sensical_term(ValV,Val),Val=V.
+luser_getval_2(N,V):- \+ main_thread, atom(N), httpd_wrapper:http_current_request(Request), 
+   member(search(List),Request),member(N=VV,List),url_decode_term(VV,V),arc_sensical_term(V),!.
 
 luser_getval_3(N,V):- arc_user(ID), arc_user_prop(ID,N,V).
 luser_getval_3(_,_):- \+ is_cgi, !, fail.

@@ -89,16 +89,16 @@ function toEle(name) {
     var node = null;
     if (name == null)
         return node;
-	if( name.jquery ) {
-		node = name.get(0);
-		if (isElement(node))
-			return node;
-	}
-	if( name.nodeType ) {
-		return name;
-	}
-	if (isElement(name))
-		return name;
+    if (name.jquery) {
+        node = name.get(0);
+        if (isElement(node))
+            return node;
+    }
+    if (name.nodeType) {
+        return name;
+    }
+    if (isElement(name))
+        return name;
     if (typeof name !== 'string') return name;
     if (typeof name === "string") {
         node = document.getElementById(name);
@@ -184,68 +184,73 @@ function getSomeElementById(Name, P) {
 var TwoFiftyPx = "250px";
 
 function toggleNavL(nameE) {
-	var nameE = top.document.getElementById(nameE);
-	var mainE = top.document.getElementById('main');
+    var nameE = top.document.getElementById(nameE);
+    var mainE = top.document.getElementById('main');
     if (nameE.style.width != "0px") {
         nameE.style.width = "0px";
     } else {
         nameE.style.width = TwoFiftyPx;
     }
-	
-    try {everyoneScrollLeft();} catch (err) {}
-	mainE.style.left = nameE.style.width;
+
+    try { everyoneScrollLeft(); } catch (err) {}
+    mainE.style.left = nameE.style.width;
 }
 
 
 function toggleNavR(Name) {
-	var nameE = top.document.getElementById(Name);
-	if (nameE.style.width != "0px") {
-		nameE.style.width = "0px";
-		//mainE.style.width = "200vh";
-	} else {
-		nameE.style.width = TwoFiftyPx;
-	}
-    try {everyoneScrollLeft();} catch (err) {};
+    var nameE = top.document.getElementById(Name);
+    if (nameE.style.width != "0px") {
+        nameE.style.width = "0px";
+        //mainE.style.width = "200vh";
+    } else {
+        nameE.style.width = TwoFiftyPx;
+    }
+    try { everyoneScrollLeft(); } catch (err) {};
 }
 
 function likeMain(mainE) {
-	var mySideNavL = top.document.getElementById('mySideNavL');
-	var mySideNavR = top.document.getElementById('mySideNavR');
-	//mainE.style.marginLeft = mySideNavL.style.width;
-	mainE.style.left = mySideNavL.style.width; mainE.style.marginLeft = "0px";
-	mainE.style.marginRight = mySideNavR.style.width;  mainE.style.right = "0px";
-	//mainE.style.right = mySideNavR.style.width; mainE.style.marginRight ="0px";
-	mainE.style.width = `calc(100% - ${mySideNavL.style.width} - ${mySideNavR.style.width})`
+    var mySideNavL = top.document.getElementById('mySideNavL');
+    var mySideNavR = top.document.getElementById('mySideNavR');
+    //mainE.style.marginLeft = mySideNavL.style.width;
+    mainE.style.left = mySideNavL.style.width;
+    mainE.style.marginLeft = "0px";
+    mainE.style.marginRight = mySideNavR.style.width;
+    mainE.style.right = "0px";
+    //mainE.style.right = mySideNavR.style.width; mainE.style.marginRight ="0px";
+    mainE.style.width = `calc(100% - ${mySideNavL.style.width} - ${mySideNavR.style.width})`
     mainE.style.height = "calc(100%- 1px)";
 }
+
 function likeIFrame(mainE) {
-	var mySideNavL = top.document.getElementById('mySideNavL');
-	var mySideNavR = top.document.getElementById('mySideNavR');
-	//mainE.style.marginLeft = mySideNavL.style.width;
-	mainE.style.left = mySideNavL.style.width; mainE.style.marginLeft = "0px";
-	mainE.style.marginRight = mySideNavR.style.width;  mainE.style.right = "0px";
-	//mainE.style.right = mySideNavR.style.width; mainE.style.marginRight ="0px";
-	mainE.style.width = `calc(100% - ${mySideNavL.style.width} - ${mySideNavR.style.width})`
+    var mySideNavL = top.document.getElementById('mySideNavL');
+    var mySideNavR = top.document.getElementById('mySideNavR');
+    //mainE.style.marginLeft = mySideNavL.style.width;
+    mainE.style.left = mySideNavL.style.width;
+    mainE.style.marginLeft = "0px";
+    mainE.style.marginRight = mySideNavR.style.width;
+    mainE.style.right = "0px";
+    //mainE.style.right = mySideNavR.style.width; mainE.style.marginRight ="0px";
+    mainE.style.width = `calc(100% - ${mySideNavL.style.width} - ${mySideNavR.style.width})`
     mainE.style.height = "calc(100%- 1px)";
 }
 
 function everyoneScrollLeft() {
 
-	if (top == window) {
+    if (top == window) {
 
-		$("body").scrollLeft(0);
-		$("#main").scrollLeft(0);
+        $("body").scrollLeft(0);
+        $("#main").scrollLeft(0);
 
-		var mainE = top.document.getElementById("main");
-		if (mainE != null) {
-			likeMain(mainE);
-			$(mainE).scrollLeft(0);
-		}
-		var iframeE = top.document.getElementById('lm_xref');
-		if (iframeE != null) { 
-			likeIFrame(iframeE);
-			$(iframeE).scrollLeft(0);
-		}
+        var mainE = top.document.getElementById("main");
+        if (mainE != null) {
+            likeMain(mainE);
+            $(mainE).scrollLeft(0);
+        }
+        var iframeE = top.document.getElementById('lm_xref');
+        if (iframeE != null) {
+            likeIFrame(iframeE);
+            $(iframeE).scrollLeft(0);
+        }
 
         if (iframeE != null) {
             var contentWindow = iframeE.contentWindow;
@@ -254,16 +259,16 @@ function everyoneScrollLeft() {
                 contentWindow.everyoneScrollLeftFrame();
             } catch (err) {};
         }
-    } else {
-    }
+    } else {}
 }
+
 function everyoneScrollLeftFrame() {
-	$("body").scrollLeft(0);
-	$(".panel").scrollLeft(0);
-	$("pre").scrollLeft(0);
-	$(".wrappable").scrollLeft(0);
-	$(".scrollable").scrollLeft(0);
-	$("iframe").scrollLeft(0);
+    $("body").scrollLeft(0);
+    $(".panel").scrollLeft(0);
+    $("pre").scrollLeft(0);
+    $(".wrappable").scrollLeft(0);
+    $(".scrollable").scrollLeft(0);
+    $("iframe").scrollLeft(0);
 }
 
 function navCmd(target) {
@@ -583,10 +588,10 @@ function getFormDicts() {
 }
 
 function ignoredData(key) {
-	if (key === "action" ) return true;
-	if (key === "icmd" || key === "webcmd" ) return true;
+    if (key === "action") return true;
+    if (key === "icmd" || key === "webcmd") return true;
     if (key == null || key == undefined || key == [] || key == {} || key == 'nothing') return true;
-    if (key == 'undefined' || key === "" || key == " " ) return true;
+    if (key == 'undefined' || key === "" || key == " ") return true;
     if ((typeof key === 'string') && key.includes("accord")) return true;
     return false;
 }
@@ -757,6 +762,9 @@ function navToParams(jsonDict) {
     if (iframe == null) {
         iframe = window.parent.document.getElementById("lm_xref");
     }
+    //iframe.setAttribute("src", nsrc);
+    nav.location.assign(nsrc);
+    return
     if (iframe.src == "about:blank" || !sameSrch(ooldSrch, newSrch)) {
 
         // setMainQueryParams(newSrchStr);
@@ -764,6 +772,7 @@ function navToParams(jsonDict) {
         //iframe.style.width = document.getElementById("main").style.width;
         if (iframe.src == "about:blank") {
             iframe.setAttribute("src", nsrc);
+            nav.location.assign(nsrc);
         } else {
             nav.location.assign(nsrc);
         }
@@ -817,7 +826,7 @@ function clickAccordian(target_name, scrollTo) {
     }
 
     if (scrollTo) {
-        try {everyoneScrollLeft();} catch (err) {}
+        try { everyoneScrollLeft(); } catch (err) {}
     }
 
 }
@@ -960,7 +969,7 @@ function scrollToPanel(panel) {
 }
 
 function scrollToVertically(scrl) {
-  scrl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
+    scrl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
 }
 
 
@@ -1300,20 +1309,21 @@ function intoNamedImg(useCache, replace, nodespec, nodeid, h, w) {
         return replaceNode(replace, node, nodeid, waz, h, w);
     }
     if (isBlank(waz) || useCache == false) {
-		return htmlToImage.
+        return htmlToImage.
             //domtoimage.       
-		toJpeg(node, {
+        toJpeg(node, {
             quality: 1.0
         }).then(function(dataUrl) {
-			waz = dataUrl;
-            if(false) if (!isBlank(nodeid) && !isBlank(dataUrl)) { window.top.milledImages[nodeid] = dataUrl; }
+            waz = dataUrl;
+            if (false)
+                if (!isBlank(nodeid) && !isBlank(dataUrl)) { window.top.milledImages[nodeid] = dataUrl; }
             return replaceNode(replace, node, nodeid, dataUrl, h, w);
         }).catch((error) => {
             console.error(`intoNamedImg(${pp(top.milledImages.count)},
                ${pp(top.milledImages)},
                ${pp(node)},${pp(nodeid)}`, error);
             //   debugger;
-			return null;
+            return null;
         });
     }
 }
@@ -1342,7 +1352,7 @@ function replaceNode(replace, node, nodeid, dataUrl, h, w) {
         }
     }
     if (node != null) {
-		copyStylesInline(img,node);
+        copyStylesInline(img, node);
         img.title = node.title;
         img.name = node.name;
         if (replace) img.id = nodeid || node.id;
@@ -1354,30 +1364,30 @@ function replaceNode(replace, node, nodeid, dataUrl, h, w) {
 }
 
 function copyStylesInline(destinationNode, sourceNode) {
-   var containerElements = ["svg","g"];
-   for (var cd = 0; cd < destinationNode.childNodes.length; cd++) {
-       var child = destinationNode.childNodes[cd];
-       if (containerElements.indexOf(child.tagName) != -1) {
+    var containerElements = ["svg", "g"];
+    for (var cd = 0; cd < destinationNode.childNodes.length; cd++) {
+        var child = destinationNode.childNodes[cd];
+        if (containerElements.indexOf(child.tagName) != -1) {
             copyStylesInline(child, sourceNode.childNodes[cd]);
             continue;
-       }
-       var style = sourceNode.childNodes[cd].currentStyle || window.getComputedStyle(sourceNode.childNodes[cd]);
-       if (style == "undefined" || style == null) continue;
-       for (var st = 0; st < style.length; st++){
+        }
+        var style = sourceNode.childNodes[cd].currentStyle || window.getComputedStyle(sourceNode.childNodes[cd]);
+        if (style == "undefined" || style == null) continue;
+        for (var st = 0; st < style.length; st++) {
             child.style.setProperty(style[st], style.getPropertyValue(style[st]));
-       }
-   }
+        }
+    }
 }
 
-function alreadyRan(currentScript,prev) {
+function alreadyRan(currentScript, prev) {
     var tagName = "MISSING";
-	if (prev != null) tagName = prev.tagName;
+    if (prev != null) tagName = prev.tagName;
     if (tagName !== 'TABLE') {
         currentScript.remove();
     } else {
-       /* var ss = "<!-- " +
-            tagName + " " + currentScript.outerHTML + " -->";
-        currentScript.replaceWith($(ss)[0]);*/
+        /* var ss = "<!-- " +
+             tagName + " " + currentScript.outerHTML + " -->";
+         currentScript.replaceWith($(ss)[0]);*/
     }
 }
 
@@ -2878,7 +2888,7 @@ function topReady() {
         if (top.lastScoller != null) {
             $(top.lastScoller).scrollLeft(sl);
         }
-		window.top.$("#lm_xref").contents().find("#main_in_iframe").scrollLeft(sl);
+        window.top.$("#lm_xref").contents().find("#main_in_iframe").scrollLeft(sl);
         syncScroll(top.divToScroll, sl, undefined);
     });
     if (false) {
@@ -2913,9 +2923,9 @@ function xframeReady() {
         document.removeEventListener('scroll', interceptScrollEvent);
         document.addEventListener('scroll', interceptScrollEvent);
     }
-	window.top.$('#top_scoller').scroll(function() {
+    window.top.$('#top_scoller').scroll(function() {
         var sl = window.top.$('#top_scoller').scrollLeft();
-		window.top.$("#lm_xref").contents().find("#main_in_iframe").scrollLeft(sl);
+        window.top.$("#lm_xref").contents().find("#main_in_iframe").scrollLeft(sl);
     });
     console.log("XFrame Ready End: " + window.location.href);
 }

@@ -172,8 +172,8 @@ w_section_html_real(Title,Goal,_Spyable,Class,Showing):-
  format('</label>',[]),flush_output,
  format('</button><br>'),flush_output,
  format('<div id="~w_panel" onmouseover="top.activateMenu(`~w_link`);" class="~w , panel ">',[Sym,Sym,Class]), flush_output,
- format('<div class="wtopscroller11"><div class="dtopscroller1"></div></div>'),
- format('<div id="~w_scroller" class="wtopscroller22"><div class="dtopscroller2">',[Sym]),
+ %format('<div class="wtopscroller11"><div class="dtopscroller1"></div></div>'),
+ %format('<div id="~w_scroller" class="wtopscroller22"><div class="dtopscroller2">',[Sym]),
  format('<script>top.add_top_scroller(document.currentScript)</script>',[]),flush_output,
  format('<script>top.addAccordian(document.getElementById("~w"),~w);</script>',[Sym,X]),
 
@@ -388,8 +388,10 @@ no_web_dbg:-
 %:- no_web_dbg.
 
 intern_arc_request_data(Request):-
-  intern_request_data(Request),
-  save_in_luser(Request).
+  wdmsg(intern_request_data(Request)),
+  ignore(save_in_luser(Request)),
+  set_current_arc_cmds,
+  ignore(if_t(luser_getval(precmd,G),catch(invoke_arc_cmd(G),_,fail))).
 
 save_in_luser(NV):- \+ compound(NV),!.
 save_in_luser(NV):- is_list(NV),!,must_maplist(save_in_luser,NV),!.
@@ -399,14 +401,16 @@ save_in_luser(N=V):- save_in_luser(N,V),!.
 save_in_luser(NV):- dmsg(not_save_in_luser(NV)),!.
 
 
-save_in_luser(_,V):- is_list(V),save_in_luser(V).
+save_in_luser(_,V):- is_list(V),!,save_in_luser(V).
 %save_in_luser(session,V):- !, save_in_luser(V).
-save_in_luser(N,V):- decode_luser(V,VV),save_in_luser2(N,VV).
+save_in_luser(N,V):- decode_luser(V,VV),!,save_in_luser2(N,VV).
+save_in_luser(N,V):- save_in_luser2(N,V).
 
-save_in_luser2(task,V):- !, set_current_test(V),get_current_test(CT),dmsg(current_test(V-->CT)).
-save_in_luser2(test_suite_name,V):- !, nop(maybe_set_suite(V)).
+%save_in_luser2(test_suite_name,V):- !, nop(maybe_set_suite(V)).
 %save_in_luser2(cmd,V):-  !, ignore(set_test_cmd(V)),!.
-save_in_luser2(N,V):- luser_setval(N,V), set_luser_default(N,V),
+save_in_luser2(task,V):- set_current_test(V),luser_setval(task,V),set_luser_default(task_atom,V),get_current_test(CT),wdmsg(current_test(V-->CT)),!.
+save_in_luser2(N,V):- 
+  luser_setval(N,V), set_luser_default(N,V),
   ignore((is_list(V),last(V,E),compound(E),save_in_luser(V))).
 
 decode_luser(V,O):- url_decode_term(V,VV,_),VV\==V,decode_luser(VV,O),!.
@@ -416,9 +420,11 @@ decode_luser(V,V).
 begin_arc_html_request(LR,Request):- var(Request), current_predicate(get_http_current_request/1),call(call,get_http_current_request,Request),
   nonvar(Request),!, begin_arc_html_request(LR,Request).
 begin_arc_html_request(LR,Request):-
+ intern_arc_request_data(Request),
  notrace(as_if_webui(begin_arc_html(LR,Request))).
+
 begin_arc_html(LR,Request):-
-  ignore((member(search(List),Request),member(task=Task,List),  atom_id(Task,ID), nop((dmsg(Task-> ID))), set_current_test(ID))),
+  %ignore((member(search(List),Request),member(task=Task,List),  atom_id(Task,ID), nop((dmsg(Task-> ID))), set_current_test(ID))),
   %ignore((current_output(Out), arc_set_stream(Out,buffer(false)))), flush_output,
 %  format('<!DOCTYPE html>',[]),
   ignore((LR==right,write_begin_html('ARC Solver',true))),
@@ -430,8 +436,7 @@ begin_arc_html(LR,Request):-
   arc_set_stream(Out,close_on_abort(true)),
   arc_set_stream(Out,encoding(octet)),
   arc_set_stream(Out,write_errors(ignore)))),*/
-  %ignore(set_test_param),
-
+  %ignore(set_test_param),  
   nop(ensure_readable_html),
   flush_output,
   intern_arc_request_data(Request).
@@ -1177,11 +1182,12 @@ arcproc_main(Request):- % update_changed_files1,
  with_toplevel_pp(http,handler_arcproc_iframe(Request)),!.
 
 
-handler_arcproc_iframe(_Request):- Var = icmd,
-  get_now_cmd(Var,Prolog),!, dmsg(call_current_arc_cmd(Var)=Prolog),
+handler_arcproc_iframe(_Request):- Var = icmd, 
+  get_now_cmd(Var,Prolog), not_is_task_id(Prolog), !, dmsg(call_current_arc_cmd(Var)=Prolog),
   ignore(invoke_arc_cmd(Prolog)),!.
 handler_arcproc_iframe(Request):-
   wots(_,intern_arc_request_data(Request)),
+
   handler_arcproc_main(Request),!.
 
 handler_arcproc_main(_Request):-
@@ -1273,7 +1279,9 @@ nop((format_s(`
   sccs(true,arcproc_now_main, write_arc_end(Where)).
 
 % ansi
-arcproc_now_main :- set_current_arc_cmds, call_current_arc_cmd(webcmd),!.
+arcproc_now_main :- 
+  set_current_arc_cmds, 
+  call_current_arc_cmd(webcmd),!.
 arcproc_now_main :- show_selected_object,!.
 
 arcproc_right(Request):-
@@ -1422,10 +1430,28 @@ call_current_arc_cmds_pp:- with_toplevel_pp(http,call_current_arc_cmds).
 
 %call_current_arc_cmds:- get_now_cmd('webcmd',Prolog), dmsg(call_current_arc_cmds(webcmd)=Prolog), trace, !,invoke_arc_cmd(Prolog).
 
-set_current_arc_cmds:- get_now_cmd('task',TaskID),set_current_test(TaskID),luser_setval('webcmd',TaskID),fail.
+is_task_id(Name):- testid_name_num_io_0(Name,TestID,_Example,_NumE,_IO),is_valid_testname(TestID).
+
+set_current_arc_cmds:- get_now_cmd('webcmd',TaskID),is_task_id(TaskID),
+                       get_now_cmd('task',TaskID2),is_task_id(TaskID2),!,
+                       save_in_luser('task',TaskID),
+                       save_in_luser('webcmd','i'),
+                       !.
+
+set_current_arc_cmds:- get_now_cmd('webcmd',TaskID),is_task_id(TaskID),!,
+                       save_in_luser('task',TaskID),
+                       save_in_luser('webcmd','o'),
+                       !.
+
+set_current_arc_cmds:- get_now_cmd('task',TaskID),is_task_id(TaskID),!,
+                       save_in_luser('task',TaskID),
+                       save_in_luser('webcmd','i'),
+                       !.
+
 set_current_arc_cmds:- !.
 
-call_current_arc_cmds:- set_current_arc_cmds, luser_getval('webcmd',Prolog), dmsg(call_current_arc_cmds(webcmd)=Prolog), !,invoke_arc_cmd(Prolog).
+call_current_arc_cmds:- set_current_arc_cmds, luser_getval('webcmd',Prolog),
+   not_is_task_id(Prolog), dmsg(call_current_arc_cmds(webcmd)=Prolog), !,invoke_arc_cmd(Prolog).
 call_current_arc_cmds:- print_test,!. %,print_all_info_for_test,do_web_menu_key('t'),!.
 /*
 call_current_arc_cmds:-
@@ -1434,10 +1460,13 @@ call_current_arc_cmds:-
  call_current_arc_cmd(footer_cmd).
 */
 call_current_arc_cmd(Var):-
-   ignore((get_now_cmd(Var,Prolog),
+   ignore((luser_getval(Var,Prolog),
+   not_is_task_id(Prolog), 
    dmsg(call_current_arc_cmd(Var)=Prolog),invoke_arc_cmd(Prolog))).
 
 
+not_is_task_id(Prolog):- is_task_id(Prolog), dumpST,!,fail.
+not_is_task_id(_).
 
 arc_http_nav_menu:-
   with_li_pre((get_test_cmd(Prolog),
