@@ -441,12 +441,16 @@ arc_user(ID):- thread_self(ID).
 show_luser:- 
   show_all(arc_user(_ID)),
   show_all(get_current_test(_)),
-  show_all(luser_getval(_,_)).
+  show_all(luser_getval(_,_)),
+  show_all(http_session:session_data(_,_)).
 
 show_luser2:- 
   show_luser,
   solve_via_scene_change.
 
+
+luser_clear_thread:-
+ forall(nb_current(N,_),nb_delete(N)).
 
 writeq_ln(Q):- writeq(Q),nl.
 
@@ -518,11 +522,11 @@ luser_getval_1(N,V):- get_luser_default(N,V), \+ (luser_getval_3(N,VV), nop(VV\=
 %luser_getval_0(N,V):- luser_getval_3(N,V), \+ luser_getval_2(N,_), \+ luser_getval_1(N,_).
 %luser_getval_3(N,V):- is_cgi, current_predicate(get_param_req/2),get_param_req(N,M),url_decode_term(M,V).
 luser_getval_2(N,V):- atom(N), nb_current(N,ValV),arc_sensical_term(ValV,Val),Val=V.
-luser_getval_2(N,V):- \+ main_thread, atom(N), httpd_wrapper:http_current_request(Request), 
-   member(search(List),Request),member(N=VV,List),url_decode_term(VV,V),arc_sensical_term(V),!.
 
 luser_getval_3(N,V):- arc_user(ID), arc_user_prop(ID,N,V).
 luser_getval_3(_,_):- \+ is_cgi, !, fail.
+luser_getval_3(N,V):- \+ main_thread, atom(N), httpd_wrapper:http_current_request(Request), 
+   member(search(List),Request),member(N=VV,List),url_decode_term(VV,V),arc_sensical_term(V),!.
 luser_getval_3(N,V):-  \+ main_thread, atom(N), current_predicate(get_param_sess/2),get_param_sess(N,M),url_decode_term(M,V),arc_sensical_term(V).
 %luser_getval_3(N,V):- atom(N), nb_current(N,ValV),arc_sensical_term(ValV,Val),Val=V.
 
