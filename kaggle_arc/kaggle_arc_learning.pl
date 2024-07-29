@@ -2609,7 +2609,7 @@ use_test_associatable_obj(In,Sol):-
    matches_close_prop(In,giz(g(out)),OutList),
    if_t(OutList\==[],
         (member(F2,OutList), 
-         print_side_by_side((in<-out),In,F2))),
+         print_side_by_side((in-out),In,F2))),
   
    ignore(Sol=F1),
    ignore(Sol=F2))).

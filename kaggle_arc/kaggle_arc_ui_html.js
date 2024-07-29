@@ -1135,7 +1135,7 @@ function ensure_delayed_accordian(accordian_in, title) {
     if (isElement(accordian_in)) {
         return accordian_in;
     }
-    debugger;
+    //debugger;
     var accordian_id = accordian_in;
     var accordian = top.document.getElementById(accordian_id);
     if (accordian == null) {

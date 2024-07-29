@@ -1,0 +1,2 @@
+cd evaluation/
+cd ..
