@@ -666,7 +666,7 @@ write_arc_start_script(Where):- wrote_arc_start(Where),!.
 write_arc_start_script(Where):- nop(write_arc_start(Where)).
 
 
-write_arc_start(Where):- var(Where), current_output(Where), write_arc_start(Where).
+write_arc_start(Where):- var(Where), current_output(Where),!, write_arc_start(Where).
 write_arc_start(Where):- wrote_arc_start(Where),!.
 write_arc_start(Where):- asserta(wrote_arc_start(Where)),
   format(Where,'<script type="text/javascript" href="/swish/muarc/kaggle_arc_ui_html.js"></script>',[]),
@@ -1226,11 +1226,11 @@ format_s(`
  <!-- html-to-image -->
  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.9.0/html-to-image.js" crossorigin="anonymous"></script>
 
- <!-- Floating Scroll JS -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/floating-scroll/2.2.1/jquery.floatingscroll.min.js" crossorigin="anonymous"></script>
+ <!-- Floating Scroll JS 
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/floating-scroll/2.2.1/jquery.floatingscroll.min.js" crossorigin="anonymous"></script>-->
 
- <!-- Floating Scroll CSS -->
- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/floating-scroll/2.2.1/jquery.floatingscroll.css" crossorigin="anonymous"/>
+ <!-- Floating Scroll CSS
+ <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/floating-scroll/2.2.1/jquery.floatingscroll.css" crossorigin="anonymous"/> -->
 
 <script src="https://d3js.org/d3.v4.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
@@ -1239,7 +1239,7 @@ format_s(`
 <script src="/swish/muarc/kaggle_arc_ui_html.js"></script>
 <script src="/swish/muarc/kaggle_arc_ui_html_d3.js"></script>
 <script>
-$(document).ready(function(){$(".spacious-container").floatingScroll();});
+// $(document).ready(function(){$(".spacious-container").floatingScroll();});
 </script>`),
 write_arc_start(Where),
 format_s(`<body class="ignore-scroll" style="top: 0px; bottem: 0px; left: 0px; width: 100vw; height: 100vh; overflow: auto; padding: 0px;">
@@ -1305,7 +1305,7 @@ click_grid(G):- is_grid(G),print_grid(G),set_current_test(G).
 
 set_html_component(_Name,_Value):-  \+ is_cgi,!.
 set_html_component(Name,Value):-
-  nop((write_arc_start(Where),
+  ((write_arc_start(Where),
   format(Where,'<script> window.setUrlParam("~w","~w"); window.setComponent("~w","~w");</script>',[Name,Value,Name,Value]))).
 
 add_tool_tips(_Name,_Value):-  \+ is_cgi,!.
@@ -1434,11 +1434,13 @@ is_task_id(Name):- testid_name_num_io_0(Name,TestID,_Example,_NumE,_IO),is_valid
 set_current_arc_cmds0:- get_now_cmd('webcmd',TaskID),is_task_id(TaskID),
                        get_now_cmd('task',TaskID2),is_task_id(TaskID2),!,
                        save_in_luser('task',TaskID),
+                       set_html_component('task',TaskID),
                        save_in_luser('webcmd','i_solve_via_scene_change'),
                        !.
 
 set_current_arc_cmds0:- get_now_cmd('webcmd',TaskID),is_task_id(TaskID),!,
                        save_in_luser('task',TaskID),
+                       set_html_component('task',TaskID),
                        save_in_luser('webcmd','i_solve_via_scene_change'),
                        !.
 
@@ -1447,7 +1449,8 @@ set_current_arc_cmds0:- get_now_cmd('task',TaskID),is_task_id(TaskID),!,
                      save_in_luser('webcmd','i_solve_via_scene_change'),
                        !.
 
-set_current_arc_cmds0:- get_current_test(TaskID), save_in_luser('task',TaskID).
+set_current_arc_cmds0:- get_current_test(TaskID),set_html_component('task',TaskID),
+   save_in_luser('task',TaskID).
 
 
 i_solve_via_scene_change:- ndividuator, solve_via_scene_change.
