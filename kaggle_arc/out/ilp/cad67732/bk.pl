@@ -1,0 +1,72 @@
+:-use_module(library(clpfd)). 
+incr_nat30(P,Q):-Q#=P+1. 
+color_change(_,_). 
+my_geq(P,Q):-nonvar(P),nonvar(Q),!,P>=Q. 
+my_leq(P,Q):-nonvar(P),nonvar(Q),!,P=<Q. 
+my_add(P,Q,R):-nonvar(P),nonvar(Q),integer(P),integer(Q),R is P+Q. 
+my_add(P,Q,R):-nonvar(P),nonvar(R),integer(P),integer(R),Q is R-P. 
+my_add(P,Q,R):-nonvar(R),nonvar(Q),integer(Q),integer(R),P is R-Q. 
+my_mult(P,Q,R):-nonvar(P),nonvar(Q),integer(P),integer(Q),R is P*Q. 
+my_mult(P,Q,R):-nonvar(P),nonvar(R),integer(P),integer(R),\+P=0.0,\+P=0,Q is R/P. 
+my_mult(P,Q,R):-nonvar(R),nonvar(Q),integer(Q),integer(R),\+P=0.0,\+P=0,P is R/Q. 
+:-use_module(library(clpfd)). 
+size(30). 
+at_left(hv(1,_)). 
+at_top(hv(_,1)). 
+at_bottem(hv(_,P)):-size(P). 
+at_right(hv(P,_)):-size(P). 
+right(hv(P,Q),hv(R,Q)):-size(S),P#<S,R#=P+1. 
+left(hv(P,Q),hv(R,Q)):-P#>1,R#=P-1. 
+down(hv(P,Q),hv(P,R)):-size(S),Q#<S,R#=Q+1. 
+up(hv(P,Q),hv(P,R)):-Q#>1,R#=Q-1. 
+lhs(in0_green1_6_6_6_6,sameR,sid_11,center(6,6),tip_loc(6,6),no_child). 
+lhs(in0_red1_5_6_5_6,sameR,sid_11,center(5,6),tip_loc(5,6),no_child). 
+lhs(in0_red1_6_5_6_5,sameR,sid_11,center(6,5),tip_loc(6,5),no_child). 
+lhs(in0_green1_5_5_5_5,sameR,sid_11,center(5,5),tip_loc(5,5),no_child). 
+lhs(in0_blue1_4_5_4_5,sameR,sid_11,center(4,5),tip_loc(4,5),no_child). 
+lhs(in0_blue1_5_4_5_4,sameR,sid_11,center(5,4),tip_loc(5,4),no_child). 
+lhs(in0_yellow1_4_4_4_4,sameR,sid_11,center(4,4),tip_loc(4,4),no_child). 
+lhs(in0_blue1_3_4_3_4,sameR,sid_11,center(3,4),tip_loc(3,4),no_child). 
+lhs(in0_blue1_4_3_4_3,sameR,sid_11,center(4,3),tip_loc(4,3),no_child). 
+lhs(in0_green1_3_3_3_3,sameR,sid_11,center(3,3),tip_loc(3,3),no_child). 
+lhs(in0_red1_2_3_2_3,sameR,sid_11,center(2,3),tip_loc(2,3),no_child). 
+lhs(in0_red1_3_2_3_2,sameR,sid_11,center(3,2),tip_loc(3,2),no_child). 
+lhs(in0_green1_2_2_2_2,sameR,sid_11,center(2,2),tip_loc(2,2),no_child). 
+lhs(in0_blue1_1_2_1_2,sameR,sid_11,center(1,2),tip_loc(1,2),no_child). 
+lhs(in0_blue1_2_1_2_1,sameR,sid_11,center(2,1),tip_loc(2,1),no_child). 
+lhs(in0_yellow1_1_1_1_1,sameR,sid_11,center(1,1),tip_loc(1,1),no_child). 
+lhs(in1_red1_5_5_5_5,sameR,sid_11,center(5,5),tip_loc(5,5),no_child). 
+lhs(in1_red1_4_4_4_4,sameR,sid_11,center(4,4),tip_loc(4,4),no_child). 
+lhs(in1_silver1_3_4_3_4,sameR,sid_11,center(3,4),tip_loc(3,4),no_child). 
+lhs(in1_silver1_4_3_4_3,sameR,sid_11,center(4,3),tip_loc(4,3),no_child). 
+lhs(in1_red1_3_3_3_3,sameR,sid_11,center(3,3),tip_loc(3,3),no_child). 
+lhs(in1_red1_2_2_2_2,sameR,sid_11,center(2,2),tip_loc(2,2),no_child). 
+lhs(in1_silver1_1_2_1_2,sameR,sid_11,center(1,2),tip_loc(1,2),no_child). 
+lhs(in1_silver1_2_1_2_1,sameR,sid_11,center(2,1),tip_loc(2,1),no_child). 
+lhs(in1_red1_1_1_1_1,sameR,sid_11,center(1,1),tip_loc(1,1),no_child). 
+lhs(in2_purple1_1_8_1_8,sameR,sid_11,center(1,8),tip_loc(1,8),no_child). 
+lhs(in2_blue1_2_7_2_7,sameR,sid_11,center(2,7),tip_loc(2,7),no_child). 
+lhs(in2_purple1_3_6_3_6,sameR,sid_11,center(3,6),tip_loc(3,6),no_child). 
+lhs(in2_blue1_4_5_4_5,sameR,sid_11,center(4,5),tip_loc(4,5),no_child). 
+lhs(in2_purple1_5_4_5_4,sameR,sid_11,center(5,4),tip_loc(5,4),no_child). 
+lhs(in2_blue1_6_3_6_3,sameR,sid_11,center(6,3),tip_loc(6,3),no_child). 
+lhs(in2_purple1_7_2_7_2,sameR,sid_11,center(7,2),tip_loc(7,2),no_child). 
+lhs(in2_blue1_8_1_8_1,sameR,sid_11,center(8,1),tip_loc(8,1),no_child). 
+lhs(in0_cyan1_1_10_1_10,sameR,sid_11,center(1,10),tip_loc(1,10),no_child). 
+lhs(in0_yellow1_3_9_3_9,sameR,sid_11,center(3,9),tip_loc(3,9),no_child). 
+lhs(in0_cyan1_3_8_3_8,sameR,sid_11,center(3,8),tip_loc(3,8),no_child). 
+lhs(in0_yellow1_2_8_2_8,sameR,sid_11,center(2,8),tip_loc(2,8),no_child). 
+lhs(in0_yellow1_5_7_5_7,sameR,sid_11,center(5,7),tip_loc(5,7),no_child). 
+lhs(in0_cyan1_5_6_5_6,sameR,sid_11,center(5,6),tip_loc(5,6),no_child). 
+lhs(in0_yellow1_4_6_4_6,sameR,sid_11,center(4,6),tip_loc(4,6),no_child). 
+lhs(in0_yellow1_7_5_7_5,sameR,sid_11,center(7,5),tip_loc(7,5),no_child). 
+lhs(in0_cyan1_7_4_7_4,sameR,sid_11,center(7,4),tip_loc(7,4),no_child). 
+lhs(in0_yellow1_6_4_6_4,sameR,sid_11,center(6,4),tip_loc(6,4),no_child). 
+lhs(in0_yellow1_9_3_9_3,sameR,sid_11,center(9,3),tip_loc(9,3),no_child). 
+lhs(in0_cyan1_9_2_9_2,sameR,sid_11,center(9,2),tip_loc(9,2),no_child). 
+lhs(in0_yellow1_8_2_8_2,sameR,sid_11,center(8,2),tip_loc(8,2),no_child). 
+lhs(in0_purple3_1_9_2_10,rot90,s11261491,center(2,9),tip_loc(2,9),1). 
+lhs(in0_purple3_3_7_4_8,rot90,s11261491,center(4,7),tip_loc(4,7),1). 
+lhs(in0_purple3_5_5_6_6,rot90,s11261491,center(6,5),tip_loc(6,5),1). 
+lhs(in0_purple3_7_3_8_4,rot90,s11261491,center(8,3),tip_loc(8,3),1). 
+lhs(in0_purple3_9_1_10_2,rot90,s11261491,center(10,1),tip_loc(10,1),1). 

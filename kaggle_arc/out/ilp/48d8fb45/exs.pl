@@ -1,0 +1,14 @@
+pos(rhs(out0_black0_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),black)). 
+pos(rhs(out0_black0_1_3_1_3,sameR,sid_1x1,cxy(1,3),txy(1,3),black)). 
+pos(rhs(out0_black0_3_1_3_1,sameR,sid_1x1,cxy(3,1),txy(3,1),black)). 
+pos(rhs(out0_blue6_1_1_3_3,sameR,s12760807,cxy(2,2),txy(3,3),blue)). 
+pos(rhs(out1_yellow4_1_1_3_3,rot180,s14554160,cxy(2,2),txy(1,1),yellow)). 
+pos(rhs(out1_black0_1_1_3_3,sameR,s5145269,cxy(2,2),txy(2,2),black)). 
+pos(rhs(out2_black0_3_2_3_3,sameR,sid_1x2,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out2_black0_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),black)). 
+pos(rhs(out2_black0_1_3_1_3,sameR,sid_1x1,cxy(1,3),txy(1,3),black)). 
+pos(rhs(out2_red5_1_1_3_3,rot90,s11869152,cxy(2,2),txy(3,1),red)). 
+pos(rhs(out0_black0_3_1_3_2,sameR,sid_1x2,cxy(3,2),txy(3,2),black)). 
+pos(rhs(out0_black0_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),black)). 
+pos(rhs(out0_black0_1_3_1_3,sameR,sid_1x1,cxy(1,3),txy(1,3),black)). 
+pos(rhs(out0_green5_1_1_3_3,sameR,sid_tetris_T_Rotated_3x3,cxy(2,2),txy(3,3),green)). 

@@ -1,0 +1,16 @@
+pos(rhs(out0_cyan1_1_3_1_3,sameR,sid_1x1,cxy(1,3),txy(1,3),cyan)). 
+pos(rhs(out0_green9_2_1_5_5,flipDHV,s15813757,cxy(3,3),txy(3,3),pen([cc(green,2),cc(red,1),cc(yellow,2),cc(red,2),cc(yellow,1),cc(red,1)]))). 
+pos(rhs(out0_black0_1_1_5_5,sameR,s2216519,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out1_purple3_1_3_1_5,rot90,sid_2x1,cxy(1,4),txy(1,4),purple)). 
+pos(rhs(out1_silver4_3_1_4_2,sameR,sid_1x1,cxy(4,2),txy(3,1),silver)). 
+pos(rhs(out1_green3_4_4_5_5,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(5,5),txy(5,5),green)). 
+pos(rhs(out1_red1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),red)). 
+pos(rhs(out1_black0_1_1_5_5,sameR,s5414677,cxy(3,3),txy(5,1),black)). 
+pos(rhs(out2_orange2_3_4_3_5,rot90,sid_2x1,cxy(3,5),txy(3,5),orange)). 
+pos(rhs(out2_brown4_1_1_2_2,sameR,sid_1x1,cxy(2,2),txy(1,1),brown)). 
+pos(rhs(out2_yellow4_4_1_5_3,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(5,2),txy(4,1),yellow)). 
+pos(rhs(out2_black0_1_1_5_5,sameR,s12632815,cxy(3,4),txy(3,4),black)). 
+pos(rhs(out0_cyan2_1_5_2_5,sameR,sid_2x1,cxy(2,5),txy(2,5),cyan)). 
+pos(rhs(out0_blue4_1_1_2_2,sameR,sid_1x1,cxy(2,2),txy(1,1),blue)). 
+pos(rhs(out0_silver4_4_2_5_4,rot90,sid_t180_3x2,cxy(5,3),txy(5,3),silver)). 
+pos(rhs(out0_black0_1_1_5_5,sameR,s875086,cxy(3,3),txy(3,3),black)). 

@@ -1,0 +1,17 @@
+pos(rhs(out0_green4_3_4_5_6,sameR,sid_hollow_diamond_3x3,cxy(4,5),txy(4,5),green)). 
+pos(rhs(out0_orange4_11_10_13_12,sameR,sid_hollow_diamond_3x3,cxy(12,11),txy(12,11),orange)). 
+pos(rhs(out0_red1_4_5_4_5,sameR,sid_1x1,cxy(4,5),txy(4,5),red)). 
+pos(rhs(out0_blue1_12_11_12_11,sameR,sid_1x1,cxy(12,11),txy(12,11),blue)). 
+pos(rhs(out1_green2_11_11_12_12,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(12,12),txy(11,11),green)). 
+pos(rhs(out1_orange4_3_2_5_4,sameR,sid_hollow_diamond_3x3,cxy(4,3),txy(4,3),orange)). 
+pos(rhs(out1_blue1_4_3_4_3,sameR,sid_1x1,cxy(4,3),txy(4,3),blue)). 
+pos(rhs(out1_red1_12_11_12_11,sameR,sid_1x1,cxy(12,11),txy(12,11),red)). 
+pos(rhs(out2_orange2_10_7_11_8,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(11,8),txy(10,7),orange)). 
+pos(rhs(out2_green3_7_11_8_13,rot180,sid_tetris_Triple_East_and_North_2x2,cxy(7,12),txy(7,12),green)). 
+pos(rhs(out2_red1_7_12_7_12,sameR,sid_1x1,cxy(7,12),txy(7,12),red)). 
+pos(rhs(out2_blue1_11_7_11_7,sameR,sid_1x1,cxy(11,7),txy(11,7),blue)). 
+pos(rhs(out0_green3_11_3_12_5,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(12,4),txy(12,4),green)). 
+pos(rhs(out0_orange1_5_7_5_7,sameR,sid_1x1,cxy(5,7),txy(5,7),orange)). 
+pos(rhs(out0_blue1_6_7_6_7,sameR,sid_1x1,cxy(6,7),txy(6,7),blue)). 
+pos(rhs(out0_orange1_7_7_7_7,sameR,sid_1x1,cxy(7,7),txy(7,7),orange)). 
+pos(rhs(out0_red1_12_4_12_4,sameR,sid_1x1,cxy(12,4),txy(12,4),red)). 

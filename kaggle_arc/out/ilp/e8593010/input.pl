@@ -1,0 +1,252 @@
+:-style_check(- (discontiguous)). 
+:-use_module(library(aleph)). 
+:-if(current_predicate(use_rendering/1)). 
+:-use_rendering(prolog). 
+:-endif. 
+:-aleph_set(verbosity,1). 
+:-aleph_set(interactive,false). 
+:-aleph_set(i,4). 
+:-aleph_set(nodes,10000). 
+:-aleph. 
+% :- modeh(*,rhs(+state,+nat30,+nat30,+color,+nat30,+nat30,+rotation,+nat900,+shape,+list)). 
+% :- modeb(*,lhs(+state,+nat30,+nat30,#(color),+nat30,+nat30,+rotation,+nat900,+shape,+list)). 
+% :- modeb(*,my_geq(+nat30,-#(nat30))). 
+% :- modeb(*,my_leq(+nat30,-#(nat30))). 
+% :- modeb(*,my_add(+nat30,+nat30,-nat30)). 
+% :- modeb(*,my_mult(+nat30,#(nat30),-nat30)). 
+% :- lazy_evaluate(my_add/3). 
+% :- lazy_evaluate(my_geq/2). 
+% :- lazy_evaluate(my_leq/2). 
+% :- lazy_evaluate(my_mult/3). 
+% :- determination(rhs/7,lhs/7). 
+% :- determination(rhs/7,color_change/2). 
+% :- determination(rhs/7,incr_nat30/2). 
+% :- determination(rhs/7,my_geq/2). 
+% :- determination(rhs/7,my_leq/2). 
+% :- determination(rhs/7,my_add/3). 
+% :- determination(rhs/7,my_mult/3). 
+:-output(rhs_peice/2). 
+:-output(rhs_rot2D/2). 
+:-output(rhs_gis/2). 
+:-output(rhs/3). 
+:-input_cw(lhs_peice/2). 
+:-input_cw(lhs_rot2D/2). 
+:-input_cw(lhs_gis/2). 
+:-input_cw(lhs_child_c/2). 
+:-input_cw(lhs/4). 
+:-modeh(*,rhs_peice(+scope,+peice)). 
+:-modeh(*,rhs_rot2D(+peice,+rot2D)). 
+:-modeh(*,rhs_gis(+peice,+gis)). 
+:-modeh(*,rhs(+peice,+rhs,+rhs)). 
+:-modeb(*,lhs_peice(+scope,+peice)). 
+:-modeb(*,lhs_rot2D(+peice,-rot2D)). 
+:-modeb(*,lhs_gis(+peice,-gis)). 
+:-modeb(*,lhs_child_c(+peice,+nat30)). 
+:-modeb(*,lhs(+peice,-lhs,-lhs,+nat30)). 
+:-modeb(*,lhs_child_c(+peice,-c)). 
+:-modeb(*,lhs(+peice,-lhs,-lhs,-lhs)). 
+:-style_check(- (discontiguous)). 
+max_body(6). 
+max_vars(8). 
+non_magic(4). 
+% head_pred(rhs,7). 
+% body_pred(lhs,7). 
+% body_pred(child,2). 
+% body_pred(incr_nat30_by,3). 
+body_pred(incr_nat30,2). 
+body_pred(color_change,2). 
+body_pred(my_add,3). 
+body_pred(my_geq,2). 
+body_pred(my_leq,2). 
+body_pred(my_mult,3). 
+bounds(my_add,1,(0,29)). 
+bounds(my_geq,1,(1,30)). 
+bounds(my_leq,1,(1,30)). 
+bounds(my_mult,1,(1,10)). 
+% direction(color_change,(out,out)). 
+% direction(incr_nat30,(out,out)). 
+% direction(my_add,((in),(in),out)). 
+% direction(my_geq,((in),out)). 
+% direction(my_leq,((in),out)). 
+% direction(my_mult,((in),out,(in))). 
+type(my_add,(nat30,nat30,nat30)). 
+type(my_mult,(nat30,nat30,nat30)). 
+type(my_geq,(nat30,nat30)). 
+type(my_leq,(nat30,nat30)). 
+type(incr_nat30,(nat30,nat30)). 
+type(color_change,(color,color)). 
+% direction(rhs,((in),(in),(in),(in),(in),(in),(in),(in),(in),(in))). 
+type(rhs,(state,center2D,rot2D,color,vis2D,rotSize2D,nat900,shape)). 
+% direction(lhs,(out,out,out,out,out,out,out,out,out,out)). 
+type(lhs,(state,center2D,rot2D,color,vis2D,rotSize2D,nat900,shape)). 
+magic_type(color). 
+magic_type(nat30). 
+magic_value_type(color). 
+magic_value_type(nat30). 
+numerical_pred(my_add,3). 
+numerical_pred(my_geq,2). 
+numerical_pred(my_leq,2). 
+numerical_pred(my_mult,3). 
+:-begin_bg. 
+:-use_module(library(clpfd)). 
+incr_nat30(P,Q):-Q#=P+1. 
+color_change(_,_). 
+my_geq(P,Q):-nonvar(P),nonvar(Q),!,P>=Q. 
+my_leq(P,Q):-nonvar(P),nonvar(Q),!,P=<Q. 
+my_add(P,Q,R):-nonvar(P),nonvar(Q),integer(P),integer(Q),R is P+Q. 
+my_add(P,Q,R):-nonvar(P),nonvar(R),integer(P),integer(R),Q is R-P. 
+my_add(P,Q,R):-nonvar(R),nonvar(Q),integer(Q),integer(R),P is R-Q. 
+my_mult(P,Q,R):-nonvar(P),nonvar(Q),integer(P),integer(Q),R is P*Q. 
+my_mult(P,Q,R):-nonvar(P),nonvar(R),integer(P),integer(R),\+P=0.0,\+P=0,Q is R/P. 
+my_mult(P,Q,R):-nonvar(R),nonvar(Q),integer(Q),integer(R),\+P=0.0,\+P=0,P is R/Q. 
+:-use_module(library(clpfd)). 
+size(30). 
+at_left(hv(1,_)). 
+at_top(hv(_,1)). 
+at_bottem(hv(_,P)):-size(P). 
+at_right(hv(P,_)):-size(P). 
+right(hv(P,Q),hv(R,Q)):-size(S),P#<S,R#=P+1. 
+left(hv(P,Q),hv(R,Q)):-P#>1,R#=P-1. 
+down(hv(P,Q),hv(P,R)):-size(S),Q#<S,R#=Q+1. 
+up(hv(P,Q),hv(P,R)):-Q#>1,R#=Q-1. 
+lhs(in0_silver75_5_6,rot90,s3923317,15). 
+lhs(in0_black0_8_10,sameR,sid_11,no_child). 
+lhs(in0_black0_1_10,sameR,sid_11,no_child). 
+lhs(in0_black0_8_6,sameR,sid_11,no_child). 
+lhs(in0_black0_3_6,sameR,sid_11,no_child). 
+lhs(in0_black0_3_4,sameR,sid_11,no_child). 
+lhs(in0_black0_9_1,sameR,sid_11,no_child). 
+lhs(in0_black0_5_1,sameR,sid_11,no_child). 
+lhs(in0_black0_10_10,sameR,sid_21,no_child). 
+lhs(in0_black0_6_7,rot90,sid_21,no_child). 
+lhs(in0_black0_10_7,sameR,sid_21,no_child). 
+lhs(in0_black0_1_7,sameR,sid_21,no_child). 
+lhs(in0_black0_6_5,rot90,sid_21,no_child). 
+lhs(in0_black0_10_4,sameR,sid_21,no_child). 
+lhs(in0_black0_8_3,sameR,s11261491,no_child). 
+lhs(in0_black0_1_2,sameR,s11261491,no_child). 
+lhs(in1_silver1_10_10,sameR,sid_11,no_child). 
+lhs(in1_silver73_5_5,rot90,s8209143,17). 
+lhs(in1_black0_9_10,sameR,sid_11,no_child). 
+lhs(in1_black0_10_9,sameR,sid_11,no_child). 
+lhs(in1_black0_7_9,sameR,sid_11,no_child). 
+lhs(in1_black0_10_7,sameR,sid_11,no_child). 
+lhs(in1_black0_9_5,sameR,sid_11,no_child). 
+lhs(in1_black0_2_4,sameR,sid_11,no_child). 
+lhs(in1_black0_10_2,sameR,sid_11,no_child). 
+lhs(in1_black0_4_2,sameR,sid_11,no_child). 
+lhs(in1_black0_1_10,sameR,s11261491,no_child). 
+lhs(in1_black0_8_7,sameR,s11261491,no_child). 
+lhs(in1_black0_2_7,rot90,sid_21,no_child). 
+lhs(in1_black0_5_7,sameR,sid_21,no_child). 
+lhs(in1_black0_9_3,rot90,sid_21,no_child). 
+lhs(in1_black0_6_4,sameR,sid_21,no_child). 
+lhs(in1_black0_2_2,rot90,sid_21,no_child). 
+lhs(in1_black0_7_1,rot90,sid_21,no_child). 
+lhs(in2_silver71_6_6,sameR,s15609147,17). 
+lhs(in2_silver2_4_1,sameR,sid_12,no_child). 
+lhs(in2_black0_3_10,sameR,sid_11,no_child). 
+lhs(in2_black0_8_9,sameR,sid_11,no_child). 
+lhs(in2_black0_6_9,sameR,sid_11,no_child). 
+lhs(in2_black0_2_9,sameR,sid_11,no_child). 
+lhs(in2_black0_4_8,sameR,sid_11,no_child). 
+lhs(in2_black0_6_7,sameR,sid_11,no_child). 
+lhs(in2_black0_6_3,sameR,sid_11,no_child). 
+lhs(in2_black0_5_1,sameR,sid_11,no_child). 
+lhs(in2_black0_3_7,sameR,sid_21,no_child). 
+lhs(in2_black0_10_6,sameR,sid_21,no_child). 
+lhs(in2_black0_8_6,sameR,sid_21,no_child). 
+lhs(in2_black0_5_5,sameR,s11261491,no_child). 
+lhs(in2_black0_2_4,sameR,sid_21,no_child). 
+lhs(in2_black0_4_2,sameR,s11261491,no_child). 
+lhs(in2_black0_9_2,sameR,sid_21,no_child). 
+lhs(in2_black0_2_1,rot90,sid_21,no_child). 
+lhs(in0_silver1_10_7,sameR,sid_11,no_child). 
+lhs(in0_silver71_5_5,rot90,s14415209,16). 
+lhs(in0_black0_10_10,sameR,sid_11,no_child). 
+lhs(in0_black0_5_10,sameR,sid_11,no_child). 
+lhs(in0_black0_10_8,sameR,sid_11,no_child). 
+lhs(in0_black0_4_6,sameR,sid_11,no_child). 
+lhs(in0_black0_4_2,sameR,sid_11,no_child). 
+lhs(in0_black0_1_1,sameR,sid_11,no_child). 
+lhs(in0_black0_7_10,sameR,s11261491,no_child). 
+lhs(in0_black0_2_9,rot90,sid_21,no_child). 
+lhs(in0_black0_3_8,sameR,sid_21,no_child). 
+lhs(in0_black0_9_6,sameR,s11261491,no_child). 
+lhs(in0_black0_7_6,sameR,sid_21,no_child). 
+lhs(in0_black0_1_6,sameR,sid_21,no_child). 
+lhs(in0_black0_3_4,sameR,s11261491,no_child). 
+lhs(in0_black0_9_3,sameR,sid_21,no_child). 
+lhs(in0_black0_7_1,sameR,s11261491,no_child). 
+:-end_bg. 
+:-begin_in_pos. 
+pos(rhs(out0_green1_8_10,sameR,sid_11)). 
+pos(rhs(out0_green1_1_10,sameR,sid_11)). 
+pos(rhs(out0_green1_8_6,sameR,sid_11)). 
+pos(rhs(out0_green1_3_6,sameR,sid_11)). 
+pos(rhs(out0_green1_3_4,sameR,sid_11)). 
+pos(rhs(out0_green1_9_1,sameR,sid_11)). 
+pos(rhs(out0_green1_5_1,sameR,sid_11)). 
+pos(rhs(out0_red2_10_10,rot90,sid_12)). 
+pos(rhs(out0_red2_6_7,sameR,sid_12)). 
+pos(rhs(out0_red2_10_7,rot90,sid_12)). 
+pos(rhs(out0_red2_1_7,rot90,sid_12)). 
+pos(rhs(out0_red2_6_5,sameR,sid_12)). 
+pos(rhs(out0_red2_10_4,rot90,sid_12)). 
+pos(rhs(out0_blue3_8_3,rot90,s11261491)). 
+pos(rhs(out0_blue3_1_2,rot180,s11261491)). 
+pos(rhs(out0_silver75_5_6,rot90,s3923317)). 
+pos(rhs(out1_silver1_10_10,sameR,sid_11)). 
+pos(rhs(out1_green1_9_10,sameR,sid_11)). 
+pos(rhs(out1_green1_10_9,sameR,sid_11)). 
+pos(rhs(out1_green1_7_9,sameR,sid_11)). 
+pos(rhs(out1_green1_10_7,sameR,sid_11)). 
+pos(rhs(out1_green1_9_5,sameR,sid_11)). 
+pos(rhs(out1_green1_2_4,sameR,sid_11)). 
+pos(rhs(out1_green1_10_2,sameR,sid_11)). 
+pos(rhs(out1_green1_4_2,sameR,sid_11)). 
+pos(rhs(out1_blue3_1_10,rot270,s11261491)). 
+pos(rhs(out1_blue3_8_7,rot90,s11261491)). 
+pos(rhs(out1_red2_2_7,sameR,sid_12)). 
+pos(rhs(out1_red2_5_7,rot90,sid_12)). 
+pos(rhs(out1_red2_9_3,sameR,sid_12)). 
+pos(rhs(out1_red2_6_4,rot90,sid_12)). 
+pos(rhs(out1_red2_2_2,sameR,sid_12)). 
+pos(rhs(out1_red2_7_1,sameR,sid_12)). 
+pos(rhs(out1_silver73_5_5,rot90,s8209143)). 
+pos(rhs(out2_green1_3_10,sameR,sid_11)). 
+pos(rhs(out2_green1_8_9,sameR,sid_11)). 
+pos(rhs(out2_green1_6_9,sameR,sid_11)). 
+pos(rhs(out2_green1_2_9,sameR,sid_11)). 
+pos(rhs(out2_green1_4_8,sameR,sid_11)). 
+pos(rhs(out2_green1_6_7,sameR,sid_11)). 
+pos(rhs(out2_green1_6_3,sameR,sid_11)). 
+pos(rhs(out2_green1_5_1,sameR,sid_11)). 
+pos(rhs(out2_red2_3_7,rot90,sid_12)). 
+pos(rhs(out2_red2_10_6,rot90,sid_12)). 
+pos(rhs(out2_red2_8_6,rot90,sid_12)). 
+pos(rhs(out2_blue3_5_5,sameR,s11261491)). 
+pos(rhs(out2_red2_2_4,rot90,sid_12)). 
+pos(rhs(out2_blue3_4_2,rot90,s11261491)). 
+pos(rhs(out2_blue3_9_2,rot90,sid_12)). 
+pos(rhs(out2_silver71_6_6,sameR,s15609147)). 
+pos(rhs(out2_silver2_4_1,sameR,sid_12)). 
+pos(rhs(out2_red2_2_1,sameR,sid_12)). 
+pos(rhs(out0_green1_10_10,sameR,sid_11)). 
+pos(rhs(out0_green1_5_10,sameR,sid_11)). 
+pos(rhs(out0_green1_10_8,sameR,sid_11)). 
+pos(rhs(out0_silver1_10_7,sameR,sid_11)). 
+pos(rhs(out0_green1_4_6,sameR,sid_11)). 
+pos(rhs(out0_green1_4_2,sameR,sid_11)). 
+pos(rhs(out0_green1_1_1,sameR,sid_11)). 
+pos(rhs(out0_blue3_7_10,rot270,s11261491)). 
+pos(rhs(out0_red2_2_9,sameR,sid_12)). 
+pos(rhs(out0_red2_3_8,rot90,sid_12)). 
+pos(rhs(out0_blue3_9_6,rot180,s11261491)). 
+pos(rhs(out0_red2_7_6,rot90,sid_12)). 
+pos(rhs(out0_red2_1_6,rot90,sid_12)). 
+pos(rhs(out0_blue3_3_4,sameR,s11261491)). 
+pos(rhs(out0_red2_9_3,rot90,sid_12)). 
+pos(rhs(out0_blue3_7_1,rot180,s11261491)). 
+pos(rhs(out0_silver71_5_5,rot90,s14415209)). 
+:-end_in_pos. 

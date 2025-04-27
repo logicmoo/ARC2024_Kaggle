@@ -1,0 +1,9 @@
+pos(rhs(out0_yellow4_2_4_4_5,sameR,sid_t180_3x2,cxy(3,5),txy(3,5),yellow)). 
+pos(rhs(out0_black0_1_1_5_5,sameR,s15609749,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out1_yellow9_1_3_5_5,sameR,sid_RtTriagle_north_5x3,cxy(3,4),txy(3,4),yellow)). 
+pos(rhs(out1_black0_1_1_5_4,rot90,s15609749,cxy(3,2),txy(3,2),black)). 
+pos(rhs(out2_yellow25_1_1_5_5,sameR,sid_1x1,cxy(3,3),txy(3,3),yellow)). 
+pos(rhs(out0_black0_1_1_2_2,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(1,1),txy(1,1),black)). 
+pos(rhs(out0_black0_4_1_5_2,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(5,1),txy(5,1),black)). 
+pos(rhs(out0_yellow4_1_1_5_2,rot270,s6467734,cxy(3,2),txy(3,2),yellow)). 
+pos(rhs(out0_yellow15_1_3_5_5,sameR,sid_2x1,cxy(3,4),txy(3,4),yellow)). 

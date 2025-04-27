@@ -1,0 +1,75 @@
+:-use_module(library(clpfd)). 
+incr_nat30(P,Q):-Q#=P+1. 
+color_change(_,_). 
+my_geq(P,Q):-nonvar(P),nonvar(Q),!,P>=Q. 
+my_leq(P,Q):-nonvar(P),nonvar(Q),!,P=<Q. 
+my_add(P,Q,R):-nonvar(P),nonvar(Q),integer(P),integer(Q),R is P+Q. 
+my_add(P,Q,R):-nonvar(P),nonvar(R),integer(P),integer(R),Q is R-P. 
+my_add(P,Q,R):-nonvar(R),nonvar(Q),integer(Q),integer(R),P is R-Q. 
+my_mult(P,Q,R):-nonvar(P),nonvar(Q),integer(P),integer(Q),R is P*Q. 
+my_mult(P,Q,R):-nonvar(P),nonvar(R),integer(P),integer(R),\+P=0.0,\+P=0,Q is R/P. 
+my_mult(P,Q,R):-nonvar(R),nonvar(Q),integer(Q),integer(R),\+P=0.0,\+P=0,P is R/Q. 
+:-use_module(library(clpfd)). 
+size(30). 
+at_left(hv(1,_)). 
+at_top(hv(_,1)). 
+at_bottem(hv(_,P)):-size(P). 
+at_right(hv(P,_)):-size(P). 
+right(hv(P,Q),hv(R,Q)):-size(S),P#<S,R#=P+1. 
+left(hv(P,Q),hv(R,Q)):-P#>1,R#=P-1. 
+down(hv(P,Q),hv(P,R)):-size(S),Q#<S,R#=Q+1. 
+up(hv(P,Q),hv(P,R)):-Q#>1,R#=Q-1. 
+lhs(trn_0,c(2,2),rot270,red,vis2D(3,3),7,s1201147,[copy_row_ntimes(1,2)],missing). 
+lhs(trn_0,c(3,7),sameR,blue,vis2D(3,3),7,s1201147,[copy_row_ntimes(1,2)],missing). 
+lhs(trn_0,c(4,14),sameR,blue,vis2D(4,3),10,s14011369,[],1). 
+lhs(trn_0,c(7,9),rot270,blue,vis2D(3,4),9,s5187905,[c_r(copy_row_ntimes(1,2))],missing). 
+lhs(trn_0,c(14,3),rot90,blue,vis2D(3,4),9,s5187905,[c_r(copy_row_ntimes(1,2))],missing). 
+lhs(trn_0,c(10,3),rot90,blue,vis2D(3,4),9,s1201147,[c_r(copy_row_ntimes(1,3)),rot90],missing). 
+lhs(trn_0,c(13,11),sameR,blue,vis2D(4,4),10,s1201147,[rot90,c_r(copy_row_ntimes(1,3)),copy_row_ntimes(2,2)],missing). 
+lhs(trn_0,c(4,14),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(trn_1,c(17,16),rot90,black,vis2D(3,1),3,sid_21,[make_solid_object(rect,1,3)],missing). 
+lhs(trn_1,c(17,18),rot90,black,vis2D(3,1),3,sid_21,[make_solid_object(rect,1,3)],missing). 
+lhs(trn_1,c(2,11),rot90,black,vis2D(3,2),6,sid_21,[make_solid_object(rect,2,3)],missing). 
+lhs(trn_1,c(4,16),rot90,blue,vis2D(3,3),7,s1201147,[c_r(copy_row_ntimes(1,2)),rot90],missing). 
+lhs(trn_1,c(2,2),sameR,red,vis2D(3,3),7,s16715379,[],1). 
+lhs(trn_1,c(15,2),sameR,blue,vis2D(3,3),7,s16715379,[],1). 
+lhs(trn_1,c(12,14),sameR,blue,vis2D(4,3),8,s16715379,[c_r(copy_row_ntimes(2,2))],missing). 
+lhs(trn_1,c(14,8),sameR,blue,vis2D(4,3),8,s12561063,[flipV,as_rot(rollD,rollDR,copy_row_ntimes(2,2)),c_r(copy_row_ntimes(3,2))],missing). 
+lhs(trn_1,c(8,5),sameR,blue,vis2D(5,3),11,s5187905,[c_r(and(copy_row_ntimes(3,2),copy_row_ntimes(1,2)))],missing). 
+lhs(trn_1,c(16,16),rot270,blue,vis2D(4,5),11,s7732729,[copy_row_ntimes(1,3)],2). 
+lhs(trn_1,c(4,11),sameR,blue,vis2D(7,4),16,s5187905,[c_r(and(copy_row_ntimes(3,3),copy_row_ntimes(1,3))),copy_row_ntimes(2,2)],1). 
+lhs(trn_1,c(2,1),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(trn_1,c(15,1),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(trn_2,c(4,10),rot90,black,vis2D(2,1),2,sid_21,[],missing). 
+lhs(trn_2,c(10,6),sameR,black,vis2D(1,2),2,sid_21,[],missing). 
+lhs(trn_2,c(7,16),sameR,black,vis2D(2,2),4,sid_11,[make_solid_object(square,2,2)],missing). 
+lhs(trn_2,c(13,18),sameR,black,vis2D(2,2),4,sid_11,[make_solid_object(square,2,2)],missing). 
+lhs(trn_2,c(10,10),rot180,blue,vis2D(3,2),5,s1201147,[],missing). 
+lhs(trn_2,c(2,2),sameR,red,vis2D(3,3),8,sid_323,[],1). 
+lhs(trn_2,c(16,11),sameR,blue,vis2D(3,3),8,sid_323,[],1). 
+lhs(trn_2,c(4,6),sameR,blue,vis2D(3,3),7,s1201147,[rot90,c_r(copy_row_ntimes(1,2))],missing). 
+lhs(trn_2,c(15,2),sameR,blue,vis2D(3,3),7,s16715379,[],1). 
+lhs(trn_2,c(10,6),rot90,blue,vis2D(3,4),10,sid_323,[c_r(copy_row_ntimes(2,2))],1). 
+lhs(trn_2,c(4,10),sameR,blue,vis2D(4,3),10,sid_323,[c_r(copy_row_ntimes(2,2))],1). 
+lhs(trn_2,c(7,16),sameR,blue,vis2D(4,4),12,sid_323,[c_r(copy_row_ntimes(2,2)),copy_row_ntimes(2,2)],1). 
+lhs(trn_2,c(13,16),rot90,blue,vis2D(4,4),10,s5187905,[c_r(copy_row_ntimes(1,2)),copy_row_ntimes(2,2)],1). 
+lhs(trn_2,c(2,2),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(trn_2,c(15,1),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(trn_2,c(16,11),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(tst_0,c(5,17),sameR,black,vis2D(1,2),2,sid_21,[],missing). 
+lhs(tst_0,c(10,16),sameR,black,vis2D(1,2),2,sid_21,[],missing). 
+lhs(tst_0,c(15,15),rot90,black,vis2D(3,1),3,sid_21,[make_solid_object(rect,1,3)],missing). 
+lhs(tst_0,c(15,17),rot90,black,vis2D(3,1),3,sid_21,[make_solid_object(rect,1,3)],missing). 
+lhs(tst_0,c(10,3),sameR,blue,vis2D(3,3),8,sid_323,[],1). 
+lhs(tst_0,c(10,16),rot90,blue,vis2D(3,4),10,sid_323,[c_r(copy_row_ntimes(2,2))],1). 
+lhs(tst_0,c(17,4),rot270,blue,vis2D(3,4),9,s5187905,[c_r(copy_row_ntimes(1,2))],missing). 
+lhs(tst_0,c(15,9),sameR,blue,vis2D(4,3),9,s1201147,[rot90,c_r(copy_row_ntimes(1,3))],missing). 
+lhs(tst_0,c(3,2),sameR,red,vis2D(5,3),13,s16201681,[],2). 
+lhs(tst_0,c(4,8),sameR,blue,vis2D(4,4),10,s1201147,[rot90,c_r(copy_row_ntimes(1,3)),copy_row_ntimes(2,2)],missing). 
+lhs(tst_0,c(4,17),sameR,blue,vis2D(5,4),16,s16201681,[copy_row_ntimes(2,2)],2). 
+lhs(tst_0,c(15,16),sameR,blue,vis2D(5,5),19,s16201681,[rot90,c_r(copy_row_ntimes(2,3))],2). 
+lhs(tst_0,c(2,2),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(tst_0,c(4,2),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(tst_0,c(9,9),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(tst_0,c(9,11),sameR,black,vis2D(1,1),1,sid_11,[],missing). 
+lhs(tst_0,c(10,3),sameR,black,vis2D(1,1),1,sid_11,[],missing). 

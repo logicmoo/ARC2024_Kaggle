@@ -1,0 +1,14 @@
+pos(rhs(trn_0,nw_loc(8,7),se_loc(8,9),rot90,yellow,3,sid_12,[make_solid_object(rect,3,1)])). 
+pos(rhs(trn_0,nw_loc(4,4),se_loc(4,9),rot90,green,6,sid_12,[make_solid_object(rect,6,1)])). 
+pos(rhs(trn_0,nw_loc(2,2),se_loc(2,9),rot90,red,8,sid_12,[make_solid_object(rect,8,1)])). 
+pos(rhs(trn_0,nw_loc(6,1),se_loc(6,9),rot90,blue,9,sid_12,[make_solid_object(rect,9,1)])). 
+pos(rhs(trn_0,nw_loc(7,1),se_loc(9,9),sameR,black,14,s12482970,[rot180,and(copy_row_ntimes(3,5),copy_row_ntimes(1,3)),flipV])). 
+pos(rhs(trn_0,nw_loc(1,1),se_loc(5,9),sameR,black,29,s13674977,[rot90,copy_row_ntimes(4,6),flipH])). 
+pos(rhs(trn_1,nw_loc(2,8),se_loc(2,9),rot90,yellow,2,sid_12,[])). 
+pos(rhs(trn_1,nw_loc(6,6),se_loc(6,9),rot90,green,4,sid_12,[make_solid_object(rect,4,1)])). 
+pos(rhs(trn_1,nw_loc(4,5),se_loc(4,9),rot90,red,5,sid_12,[make_solid_object(rect,5,1)])). 
+pos(rhs(trn_1,nw_loc(8,2),se_loc(8,9),rot90,blue,8,sid_12,[make_solid_object(rect,8,1)])). 
+pos(rhs(tst_0,nw_loc(4,7),se_loc(4,9),rot90,yellow,3,sid_12,[make_solid_object(rect,3,1)])). 
+pos(rhs(tst_0,nw_loc(8,5),se_loc(8,9),rot90,green,5,sid_12,[make_solid_object(rect,5,1)])). 
+pos(rhs(tst_0,nw_loc(6,3),se_loc(6,9),rot90,red,7,sid_12,[make_solid_object(rect,7,1)])). 
+pos(rhs(tst_0,nw_loc(2,2),se_loc(2,9),rot90,blue,8,sid_12,[make_solid_object(rect,8,1)])). 
