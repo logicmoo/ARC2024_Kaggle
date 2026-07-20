@@ -11,3 +11,5 @@ git add . -a
 git add . -A
 git status .
 git push
+git commit -am "updated"
+git push

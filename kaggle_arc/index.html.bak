@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logicmoo ARC TopFrame</title>
+    <!--base href="https://logicmoo.org:11766/swish/muarc/kaggle_arc_ui_html.html"-->
+    <link rel="shortcut icon" href="/static/images/favicon.png?v=ab6cc8e66e2c76decf54d9c3fa2b90345ce2df6bfcd7b546450cf2ddcc5a6311d4a76feaff55c28512c1688bc017478e24a7af1c0949c1da366417b44d6cbcf3" crossorigin="anonymous">
+    <script src="https://releases.jquery.com/git/jquery-3.x-git.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js" integrity="sha256-6XMVI0zB8cRzfZjqKcD01PBsAy3FlDASrlC8SxCpInY=" crossorigin="anonymous"></script>
+    <!--script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" crossorigin="anonymous"></-script-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+        < /script-->
+        <!--script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js" crossorigin="anonymous"></!--script -->
+        <!-- DataTables CSS -->
+        <
+        link rel = "stylesheet"
+        type = "text/css"
+        href = "https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
+        crossorigin = "anonymous" >
+
+            <!-- DataTables JS -->
+            <
+            script type = "text/javascript"
+        charset = "utf8"
+        src = "https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"
+        crossorigin = "anonymous" >
+    </script>
+
+    <!-- dom-to-image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" crossorigin="anonymous"></script>
+
+    <!-- html-to-image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.9.0/html-to-image.js" crossorigin="anonymous"></script>
+
+    <!-- Floating Scroll JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/floating-scroll/2.2.1/jquery.floatingscroll.min.js" crossorigin="anonymous"></script>
+
+    <!-- Floating Scroll CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/floating-scroll/2.2.1/jquery.floatingscroll.css" crossorigin="anonymous" />
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!--scriptsrc="https://www.w3schools.com/lib/w3.js"crossorigin="anonymous"></script>
+	<linkhref="https://www.w3schools.com/w3css/4/w3.css"rel="stylesheet"crossorigin="anonymous"-->
+
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="/swish/muarc/kaggle_arc_ui_html.js"></script>
+    <script src="/swish/muarc/kaggle_arc_ui_html_d3.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/testing_interface.css"
+	<link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet" />-->
+    <!--<script type="text/javascript" src="https://bam.nr-data.net/1/b19c58809e?a=7212547&amp;v=1223.PROD&amp;to=YV1SNkUDWEQDBRdQDFgXcQFDC1lZTRYCXgY%3D&amp;rst=3081&amp;ck=0&amp;s=0fb3489c54b9f73e&amp;ref=https://www.bu.edu/tech/services/cccs/websites/www/wordpress/how-to/sortable-searchable-tables/&amp;ap=319&amp;be=534&amp;fe=2400&amp;dc=1331&amp;perf=%7B%22timing%22:%7B%22of%22:1675537765379,%22n%22:0,%22u%22:526,%22ue%22:526,%22f%22:1,%22dn%22:1,%22dne%22:1,%22c%22:1,%22ce%22:1,%22rq%22:3,%22rp%22:518,%22rpe%22:521,%22dl%22:527,%22di%22:1865,%22ds%22:1865,%22de%22:1875,%22dc%22:2932,%22l%22:2933,%22le%22:2938%7D,%22navigation%22:%7B%22ty%22:2%7D%7D&amp;fp=1138&amp;fcp=1138&amp;at=TRpFQA0ZSxtAB0EDGEtF&amp;jsonp=NREUM.setToken"></script>
+    <script src="https://www.bu.edu/tech/wp-content/plugins/bu-front-end-library/js/vendor/tablesorter/jquery.tablesorter.min.js?ver=5.4.2"></script>
+    <script src="https://www.bu.edu/tech/wp-content/plugins/bu-front-end-library/js/sortable.js?ver=5.4.2"></script>
+    <link rel="stylesheet" id="bu-jquery-tablesorter-css" href="https://www.bu.edu/tech/wp-content/plugins/bu-front-end-library/css/tablesorter/bu-tablesorter.css?ver=5.4.2" media="all">-->
+
+    <script>
+        function toggleNavL(navId) {
+            var nav = document.getElementById(navId);
+            var mainContent = document.querySelector('.main-content');
+            if (nav.classList.contains('hidden')) {
+                nav.classList.remove('hidden');
+                mainContent.style.marginLeft = '250px';
+            } else {
+                nav.classList.add('hidden');
+                mainContent.style.marginLeft = '0';
+            }
+            adjustMainContent();
+        }
+
+        function toggleNavR(navId) {
+            var nav = document.getElementById(navId);
+            var mainContent = document.querySelector('.main-content');
+            if (nav.classList.contains('hidden')) {
+                nav.classList.remove('hidden');
+                mainContent.style.marginRight = '250px';
+            } else {
+                nav.classList.add('hidden');
+                mainContent.style.marginRight = '0';
+            }
+            adjustMainContent();
+        }
+
+        function adjustMainContent() {
+            var mainContent = document.querySelector('.main-content');
+            if (document.getElementById('mySideNavL').classList.contains('hidden') &&
+                document.getElementById('mySideNavR').classList.contains('hidden')) {
+                mainContent.classList.add('full');
+            } else {
+                mainContent.classList.remove('full');
+            }
+        }
+
+        function ensureTopUsesIFrameParams() {
+            var iframe = document.getElementById("lm_xref");
+            var iframeSrch = iframe.contentWindow.location.search;
+            var topwSrch = window.location.search;
+            if (iframeSrch != topwSrch) {
+                srch = iframeSrch
+                var topw = window.parent
+                var oldUrl = topw.location.href;
+                let url = new URL(oldUrl);
+                url.search = srch;
+                topw.history.pushState({}, null, url.href);
+            }
+        }
+
+        function ensureIFrameUseTopParams() {
+            var iframe = document.getElementById("lm_xref");
+            var iframeSrch = iframe.contentWindow.location.search;
+            var topwSrch = window.location.search;
+            if (iframeSrch != topwSrch || iframe.contentWindow.location.href == "about:blank") {
+                navToParams(topwSrch);
+            }
+        }
+
+        window.onload = (event) => {
+            console.log("page is fully loaded");
+
+            var iframe = document.getElementById('lm_xref');
+            iframe.contentWindow.addEventListener("beforeunload", (e) => {
+                // ensureTopUsesIFrameParams();
+            });
+            iframe.contentWindow.addEventListener("readystatechange", (e) => {
+                ensureTopUsesIFrameParams();
+            });
+            ensureIFrameUseTopParams();
+        };
+    </script>
+    <link rel="stylesheet" type="text/css" href="kaggle_arc_ui_html.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidenav {
+            width: 250px;
+            height: 100%;
+            color: #fff;
+            background-color: #111;
+            overflow-y: auto;
+            padding-top: 10px;
+            position: fixed;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidenavL {
+            left: 0;
+            transform: translateX(0);
+        }
+        
+        .sidenavL.hidden {
+            transform: translateX(-100%);
+        }
+        
+        .sidenavR {
+            right: 0;
+            transform: translateX(0);
+        }
+        
+        .sidenavR {
+            height: 100%;
+            z-index: 1;
+            color: #eeeeee;
+            background-color: #111;
+            overflow: scroll;
+            transition: 0.5s;
+            padding-top: 10px;
+            margin-right: 12px;
+            right: 0px;
+            top: 0px;
+            display: inline;
+            position: fixed;
+            width: 250px;
+            background-blend-mode: none;
+            mix-blend-mode: none;
+        }
+        
+        .sidenavR a {
+            /* padding: 8px 8px 8px 8px; */
+            text-decoration: none;
+            /* font-size: 12px; */
+            white-space: nowrap;
+            /* color: #f1f1f1; */
+            /* display: inline; */
+            /* overflow: auto; */
+            transition: 0.3s;
+        }
+        
+        .sidenavR.hidden {
+            transform: translateX(100%);
+        }
+        
+        .sidenav a {
+            font-size: 12px;
+            transition: 0.3s;
+            color: cyan;
+            text-decoration: none;
+        }
+        
+        .sidenav a:hover {
+            color: #ffffff;
+        }
+        
+        .closebtn {
+            position: absolute;
+            top: 0px;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+        
+        .sidenavR {
+            padding-top: 15px;
+        }
+        
+        .sidenavR a {
+            font-size: 18px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            margin-left: 250px;
+            margin-right: 250px;
+            transition: margin-left 0.3s ease, margin-right 0.3s ease;
+            height: 100vh;
+        }
+        
+        .main-content.full {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        iframe {
+            flex: 1;
+            border: none;
+            height: 100vh;
+        }
+        
+        .floating-button {
+            position: fixed;
+            top: 10px;
+            padding: 10px;
+            background-color: #111;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        .floating-button.left {
+            left: 10px;
+        }
+        
+        .floating-button.right {
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mySideNavL" class="sidenav sidenavL">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleNavL('mySideNavL');">&#10005;</a>
+        <table id="tableMySideNavL" class="searchable sortable sorttable" style="color: white; text-align: left;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Suite Name</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <script>
+            var suite_menu = {
+                "ARC-Others-dbigham-MyTrainingData": "21",
+                "ARC-Others-MINI-ARC-MiniARC": "149",
+                "dbigham_eval_pass": "64",
+                "dbigham_fail": "943",
+                "dbigham_personal": "14",
+                "dbigham_train_core": "92",
+                "dbigham_train_pass": "88",
+                "dmiles": "16",
+                "dmiles_all": "41",
+                "dmiles_cc_1": "8",
+                "dmiles_fast": "16",
+                "dmiles_h": "13",
+                "dmiles_lr": "41",
+                "dmiles_nsn": "8",
+                "easy_solve_suite": "7",
+                "eval400": "400",
+                "human_t": "12",
+                "is_symgrid": "36",
+                "michod_solved_ordered": "729",
+                "MiniARC": "149",
+                "shared-1D_testset": "12",
+                "shared-ConceptARC-AboveBelow": "11",
+                "shared-ConceptARC-Center": "11",
+                "shared-ConceptARC-CleanUp-OriginalARCEvalSet": "1",
+                "shared-ConceptARC-CleanUp": "12",
+                "shared-ConceptARC-CompleteShape-OriginalARCEvalSet": " ?",
+                "shared-ConceptARC-CompleteShape": "11",
+                "shared-ConceptARC-Copy-OriginalARCEvalSet": "2",
+                "shared-ConceptARC-Copy": "13",
+                "shared-ConceptARC-Count-OriginalARCEvalSet": "6",
+                "shared-ConceptARC-Count": "17",
+                "shared-ConceptARC-ExtendToBoundary-OriginalARCEvalSet": "2",
+                "shared-ConceptARC-ExtendToBoundary": "13",
+                "shared-ConceptARC-ExtractObjects-OriginalARCEvalSet": "2",
+                "shared-ConceptARC-ExtractObjects": "13",
+                "shared-ConceptARC-FilledNotFilled-OriginalARCEvalSet": "1",
+                "shared-ConceptARC-FilledNotFilled": "12",
+                "shared-ConceptARC-HorizontalVertical-OriginalARCEvalSet": "1",
+                "shared-ConceptARC-HorizontalVertical": "12",
+                "shared-ConceptARC-InsideOutside": "11",
+                "shared-ConceptARC-MoveToBoundary-OriginalARCEvalSet": "4",
+                "shared-ConceptARC-MoveToBoundary": "15",
+                "shared-ConceptARC-Order-OriginalARCEvalSet": "2",
+                "shared-ConceptARC-Order": "13",
+                "shared-ConceptARC-ProblemsWithErrors-__MACOSX-Fixed": " ?",
+                "shared-ConceptARC-ProblemsWithErrors-__MACOSX": " ?",
+                "shared-ConceptARC-ProblemsWithErrors-Fixed": "4",
+                "shared-ConceptARC-ProblemsWithErrors-Original": "4",
+                "shared-ConceptARC-ProblemsWithErrors": "4",
+                "shared-ConceptARC-SameDifferent-OriginalARCEvalSet": "5",
+                "shared-ConceptARC-SameDifferent": "16",
+                "shared-ConceptARC-TopBottom2D": "11",
+                "shared-ConceptARC-TopBottom3D-OriginalARCEvalSet": "1",
+                "shared-ConceptARC-TopBottom3D": "12",
+                "shared-ConceptARC": "203",
+                "shared-devaluation": "400",
+                "shared-training": "402",
+                "test_names_by_fav": "99",
+                "test_names_by_hard": "1189",
+                "train400": "402",
+                "x_marks_the_spot": "9",
+                "was__lmDSL": "1",
+                "training": "400",
+                "train400": "400",
+                "todo_sol": "1",
+                "test_names_by_hard": "834",
+                "test_names_by_fav": "97",
+                "take_negative": "5",
+                "take_minimum": "5",
+                "take_maximum": "15",
+                "take_intersection": "2",
+                "take_half": "1",
+                "take_complement": "7",
+                "summarize": "17",
+                "spacing": "1",
+                "skip_human": "1",
+                "size_guessing": "5",
+                "shape_guessing": "3",
+                "separate_shapes": "10",
+                "separate_images": "41",
+                "separate_image": "1",
+                "second_most_used_color": "1",
+                "replace_pattern": "8",
+                "remove_noise": "11",
+                "remove_intruders": "7",
+                "rectangle_guessing": "32",
+                "recoloring": "58",
+                "proximity_guessing": "1",
+                "projection_unto_rectangle": "4",
+                "portals": "1",
+                "pattern_rotation": "13",
+                "pattern_resizing": "8",
+                "pattern_repetition": "36",
+                "pattern_reflection": "18",
+                "pattern_moving": "29",
+                "pattern_modification": "11",
+                "pattern_juxtaposition": "23",
+                "pattern_intersection": "10",
+                "pattern_expansion": "68",
+                "pattern_differences": "1",
+                "pattern_deconstruction": "3",
+                "pattern_completion": "13",
+                "pattern_coloring": "1",
+                "pattern_alignment": "1",
+                "pairwise_analogy": "15",
+                "out_of_boundary": "6",
+                "order_numbers": "5",
+                "only_one": "1",
+                "one_yes_one_no": "1",
+                "ohuman": "48",
+                "obstacles": "2",
+                "nthDSL": "1",
+                "no_sol": "1",
+                "no_output_grid(is_size_lte_3x3)": "699",
+                "no_output_grid(is_size_gte_20x20)": "733",
+                "no_output_grid(is_size_3x3)": "731",
+                "no_output_grid(is_size_1x1)": "822",
+                "no_output_grid(is_mass_lte_25)": "322",
+                "no_input_grid(is_size_lte_3x3)": "736",
+                "no_input_grid(is_size_gte_20x20)": "675",
+                "no_input_grid(is_size_3x3)": "740",
+                "no_input_grid(is_size_1x1)": "?",
+                "no_input_grid(is_mass_lte_25)": "305",
+                "no_grid(is_size_lte_3x3)": "648",
+                "no_grid(is_size_gte_20x20)": "673",
+                "no_grid(is_size_3x3)": "678",
+                "no_grid(is_size_1x1)": "822",
+                "no_grid(is_mass_lte_25)": "214",
+                "MyTrainingData": "21",
+                "mimic_pattern": "2",
+                "measure_length": "5",
+                "measure_distance_from_side": "1",
+                "measure_area": "9",
+                "maze": "2",
+                "loop_filling": "17",
+                "learn": "5",
+                "jigsaw": "5",
+                "is_symgrid": "36",
+                "inside_out": "1",
+                "indivs": "1",
+                "indiv_option": "1",
+                "indiv": "33",
+                "image_within_image": "2",
+                "image_rotation": "9",
+                "image_resizing": "11",
+                "image_repetition": "23",
+                "image_reflection": "19",
+                "image_juxtaposition": "3",
+                "image_filling": "10",
+                "image_expansion": "12",
+                "icecuber_pass": "233",
+                "icecuber_fail": "167",
+                "human_t": "6",
+                "human_skip": "3",
+                "human": "6",
+                "homeomorphism": "1",
+                "holes": "5",
+                "hint": "1",
+                "hedra": "1",
+                "grid_size_same": "524",
+                "grid_coloring": "5",
+                "gravity": "12",
+                "giz": "1",
+                "fractal_repetition": "3",
+                "find_the_intruder": "26",
+                "find_symmetry": "1",
+                "failed_predict_grid_size": "14",
+                "extrapolate_image_from_grid": "1",
+                "ex_nihilo": "4",
+                "every_output_grid(is_size_lte_3x3)": "75",
+                "every_output_grid(is_size_gte_20x20)": "59",
+                "every_output_grid(is_size_3x3)": "51",
+                "every_output_grid(is_size_1x1)": "8",
+                "every_output_grid(is_mass_lte_25)": "334",
+                "every_input_grid(is_size_lte_3x3)": "52",
+                "every_input_grid(is_size_gte_20x20)": "80",
+                "every_input_grid(is_size_3x3)": "47",
+                "every_input_grid(is_size_1x1)": "?",
+                "every_input_grid(is_mass_lte_25)": "370",
+                "every_grid(is_size_lte_3x3)": "16",
+                "every_grid(is_size_gte_20x20)": "58",
+                "every_grid(is_size_3x3)": "14",
+                "every_grid(is_size_1x1)": "?",
+                "every_grid(is_mass_lte_25)": "213",
+                "even_or_odd": "1",
+                "evaluation": "100",
+                "eval400": "400",
+                "enlarge_image": "1",
+                "easy_solve_suite": "7",
+                "e": "1",
+                "draw_rectangle": "1",
+                "draw_pattern_from_point": "3",
+                "draw_parallel_line": "1",
+                "draw_line_from_point": "48",
+                "draw_line_from_border": "4",
+                "dominant_color": "4",
+                "divide_by_n": "1",
+                "direction_guessing": "38",
+                "diagonals": "16",
+                "diagonal_symmetry": "3",
+                "devaluation": "400",
+                "detect_wall": "16",
+                "detect_symmetry": "3",
+                "detect_repetition": "2",
+                "detect_hor_lines": "1",
+                "detect_grid": "29",
+                "detect_enclosure": "2",
+                "detect_connectedness": "1",
+                "detect_closed_curves": "3",
+                "detect_background_color": "3",
+                "print_info": "2",
+                "dbigham_train_pass": "88",
+                "dbigham_train_core": "92",
+                "dbigham_personal": "14",
+                "dbigham_fail": "589",
+                "dbigham_eval_pass": "64",
+                "cylindrical": "1",
+                "crop": "62",
+                "create_image_from_info": "1",
+                "create_grid": "1",
+                "count_ver_lines": "1",
+                "count_tiles": "33",
+                "count_shapes": "2",
+                "count_patterns": "2",
+                "count_hor_lines": "1",
+                "count_different_colors": "4",
+                "contouring": "11",
+                "connect_the_dots": "14",
+                "concentric": "1",
+                "compare_image": "1",
+                "combine_are_cells": "1",
+                "color_permutation": "2",
+                "color_palette": "7",
+                "color_matching": "2",
+                "color_guessing": "20",
+                "clue": "3",
+                "bring_patterns_close": "9",
+                "bridges": "2",
+                "bouncing": "2",
+                "background_filling": "5",
+                "associate_patterns_to_patterns": "1",
+                "associate_patterns_to_colors": "1",
+                "associate_images_to_patterns": "1",
+                "associate_images_to_numbers": "6",
+                "associate_images_to_images": "1",
+                "associate_images_to_colors": "1",
+                "associate_images_to_bools": "2",
+                "associate_colors_to_shapes": "1",
+                "associate_colors_to_ranks": "6",
+                "associate_colors_to_patterns": "3",
+                "associate_colors_to_numbers": "5",
+                "associate_colors_to_images": "2",
+                "associate_colors_to_colors": "7",
+                "associate_colors_to_bools": "7",
+                "associate_color_to_bools": "1",
+                "algebra": "2",
+                "adapt_image_to_grid": "1",
+                "1D_testset": "12",
+                "-shape_match": "265",
+                "-rotation_match": "790",
+                "-mask_match": "680",
+                "-color_match": "463",
+                "+shape_match": "528",
+                "+mask_match": "113",
+                "+Errors": "26",
+                "+color_match": "330",
+                "(8: 3)": "1",
+                "(8: 1)": "1",
+                "(7: 3)": "1",
+                "(7: 2)": "2",
+                "(7: 2)": "3",
+                "(7: 1)": "1",
+                "(6: 2)": "2",
+                "(6: 2)": "2",
+                "(6: 1)": "3",
+                "(6: 1)": "12",
+                "(5: 2)": "1",
+                "(5: 2)": "7",
+                "(5: 1)": "17",
+                "(5: 1)": "23",
+                "(4: 2)": "2",
+                "(4: 2)": "4",
+                "(4: 1)": "83",
+                "(4: 1)": "79",
+                "(3: 2)": "3",
+                "(3: 1)": "232",
+                "(3: 1)": "209",
+                "(2: 2)": "1",
+                "(2: 1)": "57",
+                "(2: 1)": "44",
+                "(10: 2)": "1"
+            };
+
+            var tableMySideNavL = document.getElementById("tableMySideNavL");
+
+            for (var key in suite_menu) {
+                var row = tableMySideNavL.insertRow(-1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell2.innerHTML = `<a target='lm_xref' href="?webcmd=preview_suite('${key}')">${key}</a>`;
+                cell1.innerHTML = `${suite_menu[key]}`;
+            }
+        </script>
+    </div>
+    <div class="main-content">
+        <iframe name="lm_xref" id="lm_xref"></iframe>
+    </div>
+    <div id="mySideNavR" class="sidenav sidenavR">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleNavR('mySideNavR')" style="font-size:14px;">&#10005;</a>
+        <style>
+            .nav-link {
+                display: inline;
+            }
+        </style>
+        <nav id="navbar-example" class="navbar navbar-dark bg-dark" style="white-space: normal; white-space: nowrap; font-size: 20px;">
+            <ul id="navbar_items" class="nav nav-pills" style="font-size: 14px; white-space: normal; color: white"></ul>
+            <ul id="test_commands_menu" class="nav nav-pills" style="font-size: 12px; white-space: normal; color: white">
+                <ul id="test_command_items" class="nav nav-pills" style="font-size: 10px; white-space: nowrap"></ul>
+                With selected test: ....
+                <li class="nav-item"><a class="nav-link" href="?webcmd=t">You may fully (t)rain from examples</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=i">See the (i)ndividuation correspondences in the input/outputs</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="?webcmd=I">FULL (I)ndividuation</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=o">&nbsp;(o)bjects found in the input/outputs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=u">&nbsp;(u)niqueness between objects in the input/outputs</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="?webcmd=y">Wh(y) between objects in the input/outputs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=a">&nbsp;(a)ll between objects</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=j">&nbsp;(j)unctions between objects</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=k">&nbsp;(k)ill/clear all test data.</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=B">&nbsp;(B)oxes test.</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=R">&nbsp;(R)epairs test.</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=g">&nbsp;(g)ridcells between objects in the input/outputs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=p">&nbsp;(p)rint the test (textured grid)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=w">&nbsp;(w)rite the test info</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=X">E(X)amine the program leared by training</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=L">&nbsp;(L)earned program</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=e">&nbsp;(e)xecute .................. '<font color="cyan" style="color: cyan">306</font>'</a></li>
+                <li class="nav-item"><a class="nav-link" href="?webcmd=x">e(x)ecute .................. '<font color="blue" style="color: blue">print_all_info_for_test</font>'</a></li>
+                <p>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=clear_training%2cclear_test">&nbsp;(C)lear cached test info,</a></li> &nbsp;
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=s">Try to (s)olve based on training</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=S">&nbsp;(S)olve confirming it works on training pairs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=h">&nbsp;(h)uman proposed solution</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=r">Maybe (r)un some of the above: (p)rint, (t)rain, (e)xamine and (s)olve !</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=A">&nbsp;(A)dvance to the next test and (r)un it</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=n">&nbsp;(n)ext test (skipping this one)</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=b">&nbsp;(b)ack to previous test</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=f">&nbsp;(f)orce a favorite test.</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=~">&nbsp;(PageUp) to begining of suite</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=N">&nbsp;(N)ext suite</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=R">Menu to (R)un all tests noninteractively</a></li>
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=l">&nbsp;(l)ist special tests to run,</a></li> &nbsp;
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=clear_tee%2cupdate_changes">recomple this progra(m),</a></li> &nbsp;
+                    <!--li class="nav-item"><a class="nav-link" href="?webcmd=force_full_tee%2creally_cls">&nbsp;(c)lear the scrollback buffer,</a></li-->
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=call_dsl">&nbsp;(r)un DSL code,</a></li> &nbsp;
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=true">&nbsp;(Q)uit Menu,</a></li> &nbsp;
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=halt%284%29">&nbsp;(^q)uit to shell,</a></li> &nbsp;
+                    <li class="nav-item"><a class="nav-link" href="?webcmd=break">or (D)ebug/break to interpreter.</a></li>
+            </ul>
+            <ul id="global_command_menu" class="nav nav-pills" style="font-size: 12px; white-space: pre-line;">
+                <ul id="global_command_items" class="nav nav-pills" style="font-size: 8px; white-space: nowrap"></ul>
+                <li class="nav-item"><a class="nav-link" href="?icmd=pbox">100:pbox</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_pbox">101:test_pbox</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=back_test">102:back_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=bestfit_test">103:bestfit_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_test">104:clear_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=enter_test">105:enter_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=force_clear_test">106:force_clear_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=forward_test">107:forward_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=fully_test">108:fully_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=human_test">109:human_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=js_test">110:js_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=learned_test">111:learned_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=local_sanity_test">112:local_sanity_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=maybe_ogs_test">113:maybe_ogs_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=mregression_test">114:mregression_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=next_random_test">115:next_random_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=next_test">116:next_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=prev_test">117:prev_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_all_info_for_test">118:print_all_info_for_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_test">119:print_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_whole_test">120:print_whole_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=read_dsl_test">121:read_dsl_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=read_michod_test">122:read_michod_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=report_test">123:report_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=run_next_test">124:run_next_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_colorfull_idioms">125:show_colorfull_idioms</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_make_symmetrical">126:show_make_symmetrical</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_neighbor_map">127:show_neighbor_map</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_patterns">128:show_patterns</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_reps">129:show_reps</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=solve_test">130:solve_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_abstracted_recall">131:test_abstracted_recall</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_arcui">132:test_arcui</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_blur_least">133:test_blur_least</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_classes">134:test_classes</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_compile_arcathon">135:test_compile_arcathon</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_easy">136:test_easy</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_encoder_for_simple_output">137:test_encoder_for_simple_output</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_encoders">138:test_encoders</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_encoders_mining">139:test_encoders_mining</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_example_grid">140:test_example_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_find_outline">141:test_find_outline</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_grav_rot">142:test_grav_rot</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_grid_size_prediction">143:test_grid_size_prediction</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_http_off">144:test_http_off</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_http_on">145:test_http_on</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_is_single_char_ifiable">146:test_is_single_char_ifiable</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_learn_decls">147:test_learn_decls</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_load_task_states">148:test_load_task_states</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_make_predicate">149:test_make_predicate</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_make_symmetrical">150:test_make_symmetrical</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_make_symmetrical_sanity_tests">151:test_make_symmetrical_sanity_tests</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_most_d_colors">152:test_most_d_colors</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_neighbor_map">153:test_neighbor_map</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs">154:test_ogs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_a">155:test_ogs_a</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_b">156:test_ogs_b</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_c">157:test_ogs_c</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_d">158:test_ogs_d</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_e">159:test_ogs_e</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_f">160:test_ogs_f</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_l">161:test_ogs_l</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_m">162:test_ogs_m</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_ogs_s">163:test_ogs_s</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_pp">164:test_pp</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_predict_grid_size">165:test_predict_grid_size</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_print_tree">166:test_print_tree</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_reduce_grid">167:test_reduce_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_reduce_grid_mo">168:test_reduce_grid_mo</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_regressions">169:test_regressions</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_repair_symmetry">170:test_repair_symmetry</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_repair_symmetry_ALL">171:test_repair_symmetry_ALL</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_reps">172:test_reps</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_rok">173:test_rok</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_rot">174:test_rot</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_run_arcathon">175:test_run_arcathon</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_secret_data">176:test_secret_data</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_show_color_on_reload">177:test_show_color_on_reload</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_show_colors">178:test_show_colors</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_show_grid_objs">179:test_show_grid_objs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_show_patterns">180:test_show_patterns</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_supergrid">181:test_supergrid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_tag">182:test_tag</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_tmw">183:test_tmw</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_try_something">184:test_try_something</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_url_encode">185:test_url_encode</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_w_section">186:test_w_section</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_webui_menu">187:test_webui_menu</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=train_test">188:train_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=uast_test">189:uast_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=with_current_test">190:with_current_test</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=cache_devel(_56384)">191:cache_devel(_56384)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=cache_grid_objs(_56174)">192:cache_grid_objs(_56174)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=calc_all_individuals(_56184)">193:calc_all_individuals(_56184)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_object_dependancy(_56214)">194:clear_object_dependancy(_56214)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_saveable_test_info(_56064)">195:clear_saveable_test_info(_56064)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_saveable_test_info_now(_55908)">196:clear_saveable_test_info_now(_55908)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_test(_56194)">197:clear_test(_56194)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_test_now(_56444)">198:clear_test_now(_56444)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_training(_56094)">199:clear_training(_56094)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=clear_training_now(_56304)">200:clear_training_now(_56304)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=compile_and_save_hints_now(_56364)">201:compile_and_save_hints_now(_56364)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=compute_and_show_test_hints(_56104)">202:compute_and_show_test_hints(_56104)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=compute_and_show_test_hints_fresh(_55968)">203:compute_and_show_test_hints_fresh(_55968)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=compute_scene_change(_55818)">204:compute_scene_change(_55818)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=deduce_shapes(_56394)">205:deduce_shapes(_56394)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=detect_all_training_hints(_55828)">206:detect_all_training_hints(_55828)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=detect_pair_hints(_55878)">207:detect_pair_hints(_55878)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=each_ndividuator(_56054)">208:each_ndividuator(_56054)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=ensure_individuals1(_55918)">209:ensure_individuals1(_55918)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=ensure_propcounts(_56144)">210:ensure_propcounts(_56144)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=ensure_scene_change_rules(_56084)">211:ensure_scene_change_rules(_56084)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=force_clear_test(_56404)">212:force_clear_test(_56404)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=gen_gids(_55858)">213:gen_gids(_55858)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=invoke_arc_cmd(_55868)">214:invoke_arc_cmd(_55868)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=invoke_n_v(_56234)">215:invoke_n_v(_56234)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=is_encode_tst(_55888)">216:is_encode_tst(_55888)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=learn_grid_size(_56074)">217:learn_grid_size(_56074)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=learn_ilp(_56344)">218:learn_ilp(_56344)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=learned_test(_56024)">219:learned_test(_56024)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=ndividuator(_55898)">220:ndividuator(_55898)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=ndividuator_logicmoo(_56264)">221:ndividuator_logicmoo(_56264)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=parcCmt(_55988)">222:parcCmt(_55988)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_best_individuals(_56164)">223:print_best_individuals(_56164)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_hybrid_set(_56424)">224:print_hybrid_set(_56424)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_individuals(_56374)">225:print_individuals(_56374)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_info(_55978)">226:print_info(_55978)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_qtest(_55958)">227:print_qtest(_55958)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_test(_56414)">228:print_test(_56414)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_test_file_hints(_56434)">229:print_test_file_hints(_56434)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_test_hints(_55838)">230:print_test_hints(_55838)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_testinfo(_56224)">231:print_testinfo(_56224)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=print_whole_test(_56274)">232:print_whole_test(_56274)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=save_test_hints(_55948)">233:save_test_hints(_55948)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_all_test_reductions(_56464)">234:show_all_test_reductions(_56464)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_assumed_mapped(_56114)">235:show_assumed_mapped(_56114)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_filtered_groups(_56014)">236:show_filtered_groups(_56014)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_groups(_56284)">237:show_groups(_56284)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_object_dependancy(_56204)">238:show_object_dependancy(_56204)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_pair_groups(_56254)">239:show_pair_groups(_56254)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_reduced_inputs(_56154)">240:show_reduced_inputs(_56154)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_reduced_io(_56124)">241:show_reduced_io(_56124)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_reduced_io_fav(_56324)">242:show_reduced_io_fav(_56324)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_reduced_outputs(_55938)">243:show_reduced_outputs(_55938)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_reduced_pairs(_56454)">244:show_reduced_pairs(_56454)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=show_task_pairs(_56034)">245:show_task_pairs(_56034)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=solve_easy(_56044)">246:solve_easy(_56044)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_abstracted_recall(_56354)">247:test_abstracted_recall(_56354)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_encoder_for_simple_output(_56134)">248:test_encoder_for_simple_output(_56134)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_encoders(_56314)">249:test_encoders(_56314)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_encoders_mining(_55928)">250:test_encoders_mining(_55928)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_example_grid(_56244)">251:test_example_grid(_56244)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_predict_grid_size(_55848)">252:test_predict_grid_size(_55848)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=test_show_grid_objs(_56334)">253:test_show_grid_objs(_56334)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=whole_ndividuator(_56294)">254:whole_ndividuator(_56294)</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=detect_pair_hints(_55998,_56000,_56002,_56004)">255:detect_pair_hints(_55998,_56000,_56002,_56004)</a></li>
+            </ul>
+            <ul class="nav">
+                <li class="nav-item"><a class="nav-link" href="?icmd=800">800:in</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=801">801:in_in</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=802">802:in_out</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=803">803:out</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=804">804:out_in</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=805">805:out_out</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=806">806:train_mono_in_in</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=807">807:train_mono_in_out</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=808">808:train_mono_out_out</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=809">809:bigger_grid_contains_other</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=810">810:black_to_zero</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=811">811:colormass_3</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=812">812:colormass_subshapes</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=813">813:combine_duplicates</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=814">814:combine_objects</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=815">815:combine_same_globalpoints</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=816">816:complete_broken_lines</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=817">817:complete_occluded</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=818">818:consider_other_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=819">819:current_as_one</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=820">820:decolorize</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=821">821:do_im_complete</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=822">822:ensure_objects</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=823">823:extend_obj_proplists</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=824">824:find_colorfull_idioms</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=825">825:find_contained_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=826">826:find_hybrid_shapes</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=827">827:find_relations</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=828">828:fourway</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=829">829:gather_cached</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=830">830:gather_texture</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=831">831:glean_grid_patterns</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=832">832:grid_to_obj_other</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=833">833:group_vm_priors</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=834">834:i_intersect</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=835">835:i_ogs_subobj</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=836">836:i_subtract_objs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=837">837:i_to_o_is_none_some_some</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=838">838:identify_subgrids</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=839">839:indiv_grid_pings</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=840">840:indv_omem_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=841">841:interlink_overlapping_black_lines</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=842">842:into_monochrome</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=843">843:keypads</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=844">844:last_indiv</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=845">845:leftover_as_one</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=846">846:lo_dots</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=847">847:maybe_1_3rd_mass</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=848">848:maybe_glyphic</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=849">849:maybe_lo_dots</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=850">850:maybe_pbox_vm</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=851">851:mono_i_to_o_is_none_some_none</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=852">852:must_indv_omem_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=853">853:nop</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=854">854:nsew_2</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=855">855:obj_into_cells</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=856">856:objects_as_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=857">857:objects_into_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=858">858:only_proportional_mass</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=859">859:overlay_original</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=860">860:pbox_vm</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=861">861:pbox_vm_special_sizes</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=862">862:pixelate_swatches</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=863">863:point_corners</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=864">864:print_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=865">865:print_info</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=866">866:really_group_vm_priors</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=867">867:recompute_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=868">868:rectangles</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=869">869:release_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=870">870:remember_repaired</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=871">871:remove_background_only_object</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=872">872:remove_dead_links</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=873">873:remove_illegals</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=874">874:remove_omem_trumped_by_boxes</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=875">875:remove_used_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=876">876:reset_grid</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=877">877:reset_objs</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=878">878:reset_points</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=879">879:set_indv_flags</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=880">880:show_colorfull_idioms</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=881">881:skip_some</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=882">882:uncolorize</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=883">883:whole</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=884">884:zero_to_black</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=885">@([S_1,do_ending],[S_1=completely_do(S_1)])</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=886">@([S_1,alone_dots(lte(5)),hv_line(h),dg_line(d),dg_line(u),hv_line(v),diamonds,nsew,colormass,connects(dg_line(_139288),dg_line(_139292)),connects(hv_line(_139308),dg_line(_139312)),connects(hv_line(_139328),hv_line(_139332)),jumps,merge_shapes(hv_line(_139354),hv_line(_139358)),merge_shapes(dg_line(_139374),dg_line(_139378)),end_of_macro],[S_1=subshape_both(h,S_1)])</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=887">@([S_1,alone_dots(lte(5)),hv_line(v),dg_line(u),dg_line(d),hv_line(h),diamonds,nsew,colormass,connects(dg_line(_139904),dg_line(_139908)),connects(hv_line(_139924),dg_line(_139928)),connects(hv_line(_139944),hv_line(_139948)),jumps,merge_shapes(hv_line(_139970),hv_line(_139974)),merge_shapes(dg_line(_139990),dg_line(_139994)),end_of_macro],[S_1=subshape_both(v,S_1)])</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=888">[_56748,alone_dots(lte(5)),hv_line(v),dg_line(u),dg_line(d),hv_line(h),diamonds,nsew,colormass,connects(dg_line(_140520),dg_line(_140524)),connects(hv_line(_140540),dg_line(_140544)),connects(hv_line(_140560),hv_line(_140564)),jumps,merge_shapes(hv_line(_140586),hv_line(_140590)),merge_shapes(dg_line(_140606),dg_line(_140610)),end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=889">[_56950,alone_dots(lte(5)),hv_line(h),dg_line(d),dg_line(u),hv_line(v),diamonds,nsew,colormass,connects(dg_line(_141126),dg_line(_141130)),connects(hv_line(_141146),dg_line(_141150)),connects(hv_line(_141166),hv_line(_141170)),jumps,merge_shapes(hv_line(_141192),hv_line(_141196)),merge_shapes(dg_line(_141212),dg_line(_141216)),end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=890">[_58474,do_ending]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=891">[colormass]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=892">[complete]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=893">[consider_other_grid,reset_points,indv_omem_points,reset_points,i_mono_colormass,reset_points,reset_objs,pbox_vm_special_sizes,[i_mono_colormass],reset_points,[i_mono_nsew],reset_points,gather_cached,reset_points,alone_dots(lte(5)),print_vm_info(pre_boxes),pbox_vm_special_sizes,print_vm_info(post_boxes),keep_if_prop(or(iz(type()),iz(type(sa_dots)))),remove_used_points,pbox_vm_special_sizes,remove_used_points,fg_subtractions(nsew),nsew,fg_subtractions(colormass),colormass,fg_intersections(nsew),nsew,fg_intersections(colormass),colormass,interlink_overlapping_black_lines,reset_points,remove_used_points,whole]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=894">[diamonds]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=895">[do_im_complete,do_ending]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=896">[gather_cached,pbox_vm_special_sizes]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=897">[generic_nsew_colormass]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=898">[i_complete]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=899">[i_complete_generic1a,do_ending]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=900">[indv_omem_points]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=901">[keypads,bigger_grid_contains_other,maybe_glyphic,save_as_hybrid_shapes([indv_omem_points]),find_hybrid_shapes]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=902">[keypads,bigger_grid_contains_other,fg_intersections([generic_nsew_colormass]),fg_subtractions([i_subtract_objs]),i_subtract_objs]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=903">[keypads,nsew,black_to_zero,nsew,nsew_2,colormass_3,zero_to_black,colormass,black_to_zero,alone_dots(lte(25)),zero_to_black,print_vm_info(post_generic_nsew_colormass),maybe_lo_dots,print_vm_info(post_lo_dots)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=904">[maybe_glyphic]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=905">[maybe_glyphic,subshape_both(v,nsew),by_color,end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=906">[maybe_glyphic,subshape_both(v,nsew),by_color,end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=907">[maybe_lo_dots,remove_illegals,remove_used_points,named_grid_props(post_indiv),end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=908">[pbox_vm,generic_nsew_colormass,do_ending]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=909">[recompute_points,diamonds,colormass,by_color(1),by_color(0)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=910">[reduce_population,remove_used_points,when(len(points)=<90,alone_dots(lte(5))),when(len(points)>90,by_color)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=911">[standard,complete]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=912">[std_shape_lib,+max_learn_objects(colormass,90),+max_learn_objects(nsew,90),+max_learn_objects(hv_line(_150224),90),+max_learn_objects(dg_line(_150244),90),subshape_main,connects(jumps(_150266),jumps(_150266)),end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=913">[call(retractall(special_sizes(_150640,_150642))),[fg_subtractions(colormass),fg_intersections(colormass),colormass],save_as_obj_group([fg_subtractions(nsew),fg_intersections(nsew),nsew]),save_as_obj_group([consider_other_grid]),save_as_obj_group([i_mono_colormass]),save_as_obj_group([by_color]),find_hybrid_shapes,pbox_vm_special_sizes([special_sizes_v_h_sorted_l_s]),reset_points,pbox_vm_special_sizes([special_sizes_v_h_sorted_s_l]),remove_used_points,interlink_overlapping_black_lines]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=914">[detect(_151234),detect(_151244),done,ls,progress,shape_lib(cheat),shape_lib(in),use_reserved,-progress,+progress,stype(solid(nsew)),all]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=915">[fg_intersections([i_intersect]),gather_cached,remove_used_points,fg_subtractions(i_subtract_objs),print_vm_info(post_i_complete_generic)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=916">[fg_shapes(colormass),generic_nsew_colormass,do_ending]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=917">[fg_shapes(nsew)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=918">[hv_line(h),dg_line(d),dg_line(u),hv_line(v),end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=919">[jumps(hv_line(h)),jumps(hv_line(v)),jumps(dg_line(d)),jumps(dg_line(u)),jumps(jumps(hv_line(v))),jumps(jumps(hv_line(h)))]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=920">[maybe_repair_in_vm(find_symmetry_code)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=921">[fg_intersections([i_intersect]),gather_cached,remove_used_points,fg_subtractions(i_subtract_objs),print_vm_info(post_i_complete_generic)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=922">[repair_in_vm(find_symmetry_code)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=923">[save_as_obj_group([i_mono_colormass])]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=924">[save_as_obj_group([indv_omem_points]),save_as_obj_group([consider_other_grid]),save_as_obj_group([colormass]),save_as_obj_group([i_mono_colormass]),save_as_obj_group([mono_shapes(nsew)]),save_as_obj_group([by_color]),fg_intersections([i_intersect]),fg_subtractions([i_subtract_objs]),each_ogs_object([i_ogs_subobj]),i_subtract_objs,gather_cached,print_vm_info(post_i_complete_generic)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=925">[set_indv_flags(_58356),which_tf(mono,fg_shapes([which_tf(shape,do_im_complete,nop),which_tf(diags,colormass,nsew),call(print(_58356)),which_tf(boxes,pbox_vm_special_sizes,nop),which_tf(bground,remove_if_prop(cc(fg,0)),nop)]),[which_tf(shape,do_im_complete,nop),which_tf(diags,colormass,nsew),call(print(_58356)),which_tf(boxes,pbox_vm_special_sizes,nop),which_tf(bground,remove_if_prop(cc(fg,0)),nop)])]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=926">[shape_lib(as_is),fourway,find_colorfull_idioms,maybe_glyphic,if_done,complete_broken_lines,complete_occluded,maybe_1_3rd_mass,standard,point_corners,reduce_population,colormass_subshapes,colormass_merger(2),when(len(points)=<90,alone_dots(lte(5))),alone_dots(lte(5)),done]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=927">[shape_lib(as_is),shape_lib(hammer),shape_lib(removed),shape_lib(in),shape_lib(out),shape_lib(pair)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=928">[shape_lib(out),shape_lib(as_is),shape_lib(noise),shape_lib(intruder),shape_lib(in),shape_lib(out),shape_lib(pair),shape_lib(hammer),shape_lib(l_shape),shape_lib(human)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=929">[by_color(1,blue),by_color(1,red),by_color(1,green),by_color(1,yellow),by_color(1,silver),by_color(1,purple),by_color(1,orange),by_color(1,cyan),by_color(1,brown),by_color(1,zero),by_color(1,wfg),by_color(1,#b399d4)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=930">[by_color(10,blue),by_color(10,red),by_color(10,green),by_color(10,yellow),by_color(10,silver),by_color(10,purple),by_color(10,orange),by_color(10,cyan),by_color(10,brown),by_color(10,zero),by_color(10,wfg),by_color(10,#b399d4)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=931">[shape_lib(strict,rect_squares),shape_lib(regular,rect_squares)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=932">[subshape_both(h,colormass),nsew,by_color,end_of_macro]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=933">[when(get(h)=<5,all_columns),when(get(h)>5,some_columns)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=934">[when(get(h)=<5,all_rows),when(get(v)>5,some_rows)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=935">[when(len(objs)>40,colormass_merger(3)),when(len(objs)>40,colormass_merger(4)),when(len(objs)>40,colormass_merger(5)),when(len(objs)>40,release_objs_lighter(3)),when(len(objs)>40,release_objs_lighter(4)),when(len(objs)>40,release_objs_lighter(5)),when(len(objs)>40,colormass_merger(6)),when(len(objs)>40,release_objs_lighter(6)),when(len(objs)>20,colormass_merger(7)),when(len(objs)>20,colormass_merger(10)),when(len(objs)>20,colormass_merger(15)),call(true)]</a></li>
+                <li class="nav-item"><a class="nav-link" href="?icmd=936">[with_mapgrid([fgc_as_color(plain_var),bgc_as_color(zero),plain_var_as(black)],_nsew_bg,[nsew,alone_dots,maybe_lo_dots])]</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <button class="floating-button left" onclick="toggleNavL('mySideNavL')">&#9776; Task Suites</button>
+    <button class="floating-button right" onclick="toggleNavR('mySideNavR')">&#9776; Task Operations</button>
+</body>
+
+</html>
