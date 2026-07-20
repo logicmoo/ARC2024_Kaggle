@@ -1,0 +1,12 @@
+pos(rhs(out0_green1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),green)). 
+pos(rhs(out0_purple1_1_3_1_3,sameR,sid_1x1,cxy(1,3),txy(1,3),purple)). 
+pos(rhs(out0_orange1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),orange)). 
+pos(rhs(out0_cyan1_3_1_3_1,sameR,sid_1x1,cxy(3,1),txy(3,1),cyan)). 
+pos(rhs(out0_brown1_3_3_3_3,sameR,sid_1x1,cxy(3,3),txy(3,3),brown)). 
+pos(rhs(out0_black0_1_1_3_3,sameR,sid_hollow_diamond_3x3,cxy(2,2),txy(2,2),black)). 
+pos(rhs(out1_red1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),red)). 
+pos(rhs(out1_orange1_2_3_2_3,sameR,sid_1x1,cxy(2,3),txy(2,3),orange)). 
+pos(rhs(out0_yellow1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),yellow)). 
+pos(rhs(out0_green1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),green)). 
+pos(rhs(out0_brown1_2_3_2_3,sameR,sid_1x1,cxy(2,3),txy(2,3),brown)). 
+pos(rhs(out0_black0_1_1_3_3,sameR,s807685,cxy(2,2),txy(2,2),black)). 

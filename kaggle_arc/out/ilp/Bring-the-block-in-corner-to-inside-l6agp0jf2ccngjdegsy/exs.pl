@@ -1,0 +1,15 @@
+pos(rhs(out0_yellow7_2_2_4_4,sameR,s9613470,cxy(3,3),txy(3,3),yellow)). 
+pos(rhs(out0_red1_2_4_2_4,sameR,sid_1x1,cxy(2,4),txy(2,4),red)). 
+pos(rhs(out0_purple1_4_2_4_2,sameR,sid_1x1,cxy(4,2),txy(4,2),purple)). 
+pos(rhs(out0_black0_1_1_5_5,sameR,sid_hollow_3x3,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out1_orange4_3_2_4_3,rot270,sid_2x1,cxy(4,3),txy(3,2),pen([cc(orange,2),cc(cyan,2)]))). 
+pos(rhs(out1_cyan4_2_2_3_3,sameR,sid_1x1,cxy(3,3),txy(2,2),cyan)). 
+pos(rhs(out1_cyan6_2_2_4_3,sameR,sid_2x1,cxy(3,3),txy(3,3),pen([cc(cyan,2),cc(orange,1)]))). 
+pos(rhs(out2_silver7_2_2_4_4,rot90,sid_t180_3x2,cxy(3,3),txy(3,3),silver)). 
+pos(rhs(out2_yellow1_2_4_2_4,sameR,sid_1x1,cxy(2,4),txy(2,4),yellow)). 
+pos(rhs(out2_red1_4_4_4_4,sameR,sid_1x1,cxy(4,4),txy(4,4),red)). 
+pos(rhs(out2_black0_1_1_5_5,sameR,sid_hollow_3x3,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out0_blue4_2_3_3_4,sameR,sid_1x1,cxy(3,4),txy(2,3),blue)). 
+pos(rhs(out0_green1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),green)). 
+pos(rhs(out0_yellow1_3_2_3_2,sameR,sid_1x1,cxy(3,2),txy(3,2),yellow)). 
+pos(rhs(out0_black0_1_1_5_5,sameR,sid_hollow_3x3,cxy(3,3),txy(3,3),black)). 

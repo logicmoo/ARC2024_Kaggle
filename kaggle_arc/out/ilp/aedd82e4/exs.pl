@@ -1,0 +1,11 @@
+pos(rhs(trn_0,c(1,3),sameR,blue,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(trn_1,c(2,4),sameR,blue,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(trn_1,c(4,3),sameR,blue,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(trn_2,c(4,3),sameR,blue,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(trn_3,c(3,3),rot90,blue,vis2D(2,2),2,s1961242,[rot180,as_rot(rollD,rollDR,copy_row_ntimes(1,2))])). 
+pos(rhs(trn_3,c(3,3),sameR,black,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(tst_0,c(4,5),sameR,red,vis2D(2,1),2,sid_12,[])). 
+pos(rhs(tst_0,c(2,1),rot90,red,vis2D(2,2),3,s11261491,[])). 
+pos(rhs(tst_0,c(1,4),sameR,blue,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(tst_0,c(3,3),sameR,blue,vis2D(1,1),1,sid_11,[])). 
+pos(rhs(tst_0,c(4,1),sameR,blue,vis2D(1,1),1,sid_11,[])). 

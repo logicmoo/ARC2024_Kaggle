@@ -1,0 +1,9 @@
+pos(rhs(out0_green2_1_1_2_1,sameR,sid_2x1,cxy(2,1),txy(2,1),green)). 
+pos(rhs(out0_green1_3_3_3_3,sameR,sid_1x1,cxy(3,3),txy(3,3),green)). 
+pos(rhs(out0_black0_1_1_5_5,sameR,s663654,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out1_green4_1_1_2_3,rot270,sid_t180_3x2,cxy(1,2),txy(1,2),green)). 
+pos(rhs(out1_black0_1_1_5_5,sameR,s7660163,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out2_green3_1_1_3_2,flipD,sid_tetris_Triple_East_and_North_2x2,cxy(2,2),txy(1,1),green)). 
+pos(rhs(out2_black0_1_1_5_5,sameR,s11778174,cxy(3,3),txy(3,3),black)). 
+pos(rhs(out0_green4_1_1_2_3,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(2,2),txy(1,1),green)). 
+pos(rhs(out0_black0_1_1_5_5,sameR,s11470631,cxy(3,3),txy(3,3),black)). 

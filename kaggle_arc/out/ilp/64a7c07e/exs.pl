@@ -1,0 +1,9 @@
+pos(rhs(out0_cyan8_5_2_7_4,sameR,sid_hollow_3x3,cxy(6,3),txy(6,3))). 
+pos(rhs(out0_cyan1_3_7_3_7,sameR,sid_1x1,cxy(3,7),txy(3,7))). 
+pos(rhs(out0_black0_6_3_6_3,sameR,sid_1x1,cxy(6,3),txy(6,3))). 
+pos(rhs(out1_cyan4_3_2_4_3,sameR,sid_1x1,cxy(4,3),txy(3,2))). 
+pos(rhs(out2_cyan4_7_9_8_10,sameR,sid_1x1,cxy(8,10),txy(7,9))). 
+pos(rhs(out2_cyan12_6_2_9_5,sameR,sid_u_3x2,cxy(8,4),txy(6,2))). 
+pos(rhs(out0_black0_9_4_9_5,sameR,sid_1x2,cxy(9,5),txy(9,5))). 
+pos(rhs(out0_cyan3_7_9_8_10,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(8,10),txy(8,10))). 
+pos(rhs(out0_cyan13_7_2_11_6,rot90,s10632248,cxy(9,4),txy(9,4))). 
