@@ -120,51 +120,62 @@ def infer_direction(action: Any) -> str | None:
     return matches[0] if len(matches) == 1 else None
 
 
-def build_keymap(runner: Arc3Runner) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    """
-    Assign semantic keys first, then numbered/letter fallbacks.
 
-    Directional actions get arrow keys only when their names clearly indicate
-    direction. Every remaining legal action gets a unique fallback key.
-    """
+def build_keymap(runner: Arc3Runner) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Build standardized ARC controls plus safe fallbacks."""
     mapping: dict[str, Any] = {}
     rows: list[dict[str, Any]] = []
-    assigned_actions: set[int] = set()
+    assigned_ids: set[int] = set()
 
-    # First pass: semantic arrow-key mappings.
+    standard = {
+        "ACTION1": ("UP", "1", "↑ / 1"),
+        "ACTION2": ("DOWN", "2", "↓ / 2"),
+        "ACTION3": ("LEFT", "3", "← / 3"),
+        "ACTION4": ("RIGHT", "4", "→ / 4"),
+        "ACTION5": (" ", "5", "Space / 5"),
+        "ACTION6": ("6", None, "6"),
+        "ACTION7": ("\x1a", "7", "Ctrl-Z / 7"),
+    }
+
     for action in runner.action_space:
+        name = action_name(action).upper()
+        if name not in standard:
+            continue
+        primary, alias, display = standard[name]
+        mapping[primary] = action
+        if alias is not None:
+            mapping[alias] = action
+        assigned_ids.add(id(action))
+        rows.append({"key": display, "action": action, "semantic": True})
+
+    for action in runner.action_space:
+        if id(action) in assigned_ids:
+            continue
         direction = infer_direction(action)
         if direction and direction not in mapping:
             mapping[direction] = action
-            assigned_actions.add(id(action))
+            assigned_ids.add(id(action))
             rows.append({
-                "key": {
-                    "UP": "↑",
-                    "DOWN": "↓",
-                    "LEFT": "←",
-                    "RIGHT": "→",
-                }[direction],
+                "key": {"UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→"}[direction],
                 "action": action,
                 "semantic": True,
             })
 
-    # Second pass: safe fallback keys for all unmapped legal actions.
-    fallback_iter = iter(FALLBACK_ACTION_KEYS)
+    reserved = {"r", "R", "h", "s", "a", "?", "q", " ", "1", "2", "3", "4", "5", "6", "7"}
+    fallback_keys = (
+        key for key in FALLBACK_ACTION_KEYS
+        if key not in reserved and key not in mapping
+    )
 
     for action in runner.action_space:
-        if id(action) in assigned_actions:
+        if id(action) in assigned_ids:
             continue
-
-        key = next(fallback_iter, None)
+        key = next(fallback_keys, None)
         if key is None:
-            raise RuntimeError("Too many legal actions for the available fallback keys.")
-
+            raise RuntimeError("Too many legal actions for available fallback keys.")
         mapping[key] = action
-        rows.append({
-            "key": key,
-            "action": action,
-            "semantic": False,
-        })
+        assigned_ids.add(id(action))
+        rows.append({"key": key, "action": action, "semantic": False})
 
     return mapping, rows
 
@@ -202,8 +213,13 @@ def print_controls(
         suffix = " (asks for x,y)" if is_complex_action(action) else ""
         print(f"  {row['key']:<2} {action_name(action)}{suffix}")
 
+    print("\nStandard aliases:")
+    print("  ↑/1 ACTION1   ↓/2 ACTION2")
+    print("  ←/3 ACTION3   →/4 ACTION4")
+    print("  Space/5 ACTION5   6 ACTION6   Ctrl-Z/7 ACTION7")
     print("\nDebugger keys:")
-    print("  r  reset")
+    print("  r  reset current level")
+    print("  R  restart from level 1")
     print("  h  show history")
     print("  s  show scorecard")
     print("  a  show legal actions")
@@ -256,10 +272,14 @@ def main() -> None:
         )
 
         key = read_key()
-        lookup_key = key if key in {"UP", "DOWN", "LEFT", "RIGHT"} else key.lower()
+        lookup_key = key if key in {"UP", "DOWN", "LEFT", "RIGHT", "\x1a", " "} else key.lower()
 
         if key in {"UP", "DOWN", "LEFT", "RIGHT"}:
             print({"UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→"}[key])
+        elif key == " ":
+            print("Space")
+        elif key == "\x1a":
+            print("Ctrl-Z")
         elif key.isprintable():
             print(key)
         else:
@@ -274,10 +294,16 @@ def main() -> None:
                 print_controls(runner, action_mapping, action_rows)
                 continue
 
+            if key == "R":
+                runner.restart_game()
+                action_mapping, action_rows = build_keymap(runner)
+                print("Game restarted from level 1.")
+                continue
+
             if lookup_key == "r":
                 runner.reset()
                 action_mapping, action_rows = build_keymap(runner)
-                print("Environment reset.")
+                print("Current level reset.")
                 continue
 
             if lookup_key == "h":

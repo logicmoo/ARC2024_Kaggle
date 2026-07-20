@@ -217,11 +217,21 @@ class Arc3Runner:
         return observation
 
     def reset(self, *, clear_history: bool = True) -> Any:
+        """Reset the current level."""
         result = self.env.reset()
         self.current_observation = result
         if clear_history:
             self.records.clear()
         return result
+
+    def restart_game(self) -> Any:
+        """Recreate the environment and return to level 1."""
+        self.env = self.arc.make(self.game_id, render_mode=self.render_mode)
+        if self.env is None:
+            raise RuntimeError(f"Failed to restart ARC3 game: {self.game_id}")
+        self.current_observation = None
+        self.records.clear()
+        return self.env
 
     def state_name(self) -> str | None:
         state = getattr(self.current_observation, "state", None)

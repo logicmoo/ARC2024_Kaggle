@@ -48,6 +48,17 @@ python examples/interactive_runner.py ls20
 
 The debugger uses single keypresses without requiring Enter.
 
+```text
+↑ or 1       ACTION1
+↓ or 2       ACTION2
+← or 3       ACTION3
+→ or 4       ACTION4
+Space or 5   ACTION5
+6            ACTION6, then x/y
+Ctrl-Z or 7  ACTION7
+```
+
+
 Action keys are assigned dynamically from the environment's legal action list.
 Actions whose names clearly identify `up`, `down`, `left`, or `right` are mapped
 to the arrow keys. Opaque or game-specific actions receive numbered/letter keys:
@@ -63,7 +74,8 @@ have fixed directional meanings.
 Debugger controls:
 
 ```text
-r  reset
+r  reset current level
+R  restart from level 1
 h  history
 s  scorecard
 a  list actions
