@@ -1,75 +1,100 @@
-# ARC3 Turtle Debugger
+# ARC3 Debugger
 
-Minimal end-to-end skeleton:
-
-**Jupyter notebook → Python subprocess bridge → SWI-Prolog → ANSI debugger output**
-
-## Structure
+A small debugger/runner for ARC-AGI-3:
 
 ```text
-arc3_debugger/
-├── notebooks/
-│   └── arc3_debugger.ipynb
-├── python/
-│   ├── __init__.py
-│   ├── ansi_console.py
-│   └── swipl_bridge.py
-├── prolog/
-│   ├── arc3_debugger.pl
-│   ├── demo_task.pl
-│   ├── turtle_dsl.pl
-│   └── world_state.pl
-├── requirements.txt
-└── README.md
+Jupyter or CLI
+    -> Arc3Runner
+    -> arc_agi.Arcade environment
+    -> observation/history snapshot
+    -> optional SWI-Prolog controller
 ```
 
-## Requirements
+## What works
 
-- Python 3.10+
-- SWI-Prolog available as `swipl`
-- JupyterLab
+- Opens an ARC3 game by ID.
+- Uses `env.action_space` as the legal-action source.
+- Resolves actions by index, enum, or name.
+- Supports simple and coordinate actions.
+- Tracks compact step history.
+- Resets and replays actions.
+- Saves history as JSON.
+- Exposes a stable snapshot for SWI-Prolog.
+- Includes a minimal Prolog controller skeleton.
+- Includes notebook and CLI runners.
 
-## Setup
+## Existing environment
+
+From the directory containing this project:
 
 ```bash
-cd arc3_debugger
-
-python3 -m venv .venv
 source .venv/bin/activate
-
+cd arc3_debugger
 pip install -r requirements.txt
-jupyter lab
 ```
 
-Open:
+Your existing ARC toolkit installation must already provide:
 
-```text
-notebooks/arc3_debugger.ipynb
+```python
+import arc_agi
+from arcengine import GameAction, GameState
 ```
 
-## Test SWI-Prolog directly
+## CLI runner
 
 ```bash
-swipl -q \
-  -s prolog/arc3_debugger.pl \
-  -g arc3_debugger:demo \
-  -t halt
+python examples/interactive_runner.py ls20
 ```
 
-## Current DSL instructions
+Example commands:
+
+```text
+ACTION1
+ACTION6 20 30
+reset
+history
+score
+quit
+```
+
+## Notebook
+
+```bash
+jupyter lab notebooks/arc3_runner.ipynb
+```
+
+## SWI-Prolog controller demo
+
+```bash
+python examples/prolog_controlled_runner.py
+```
+
+The supplied Prolog policy deliberately selects the first legal action. Replace:
 
 ```prolog
-penup
-pendown
-set_cell
-fwd(N)
-rot(Degrees)
+choose_action/2
 ```
 
-Rotations are relative and currently normalized to 90-degree steps.
+in `prolog/arc3_agent.pl` with the Turtle DSL and world-model policy.
 
-## First milestone
+## Python usage
 
-A notebook cell calls SWI-Prolog, executes a Turtle DSL program, and displays the colored ANSI execution trace.
+```python
+runner = Arc3Runner("ls20", render_mode="terminal")
 
-The Python layer is intentionally thin. Turtle execution, world-state handling, and debugging remain in Prolog so another UI can later reuse the same API.
+runner.action_table()
+runner.step("ACTION1")
+runner.step("ACTION6", x=20, y=30)
+
+runner.history()
+runner.save_history("run.json")
+runner.reset()
+runner.replay()
+runner.scorecard()
+```
+
+## Design rule
+
+The toolkit environment remains the real world. Prolog receives a simplified
+snapshot and returns an action decision. The notebook and CLI are front ends,
+not alternate game implementations.

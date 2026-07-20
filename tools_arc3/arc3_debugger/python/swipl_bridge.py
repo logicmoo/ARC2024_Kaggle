@@ -1,65 +1,60 @@
 from __future__ import annotations
 
-import os
+import json
 import subprocess
+import tempfile
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Mapping
 
 
 class SWIPrologBridge:
+    """Invoke a Prolog controller using a JSON snapshot from Arc3Runner."""
+
     def __init__(
         self,
-        debugger_file: str | Path,
+        agent_file: str | Path,
         swipl_executable: str = "swipl",
     ) -> None:
-        self.debugger_file = Path(debugger_file).resolve()
+        self.agent_file = Path(agent_file).resolve()
         self.swipl_executable = swipl_executable
+        if not self.agent_file.exists():
+            raise FileNotFoundError(self.agent_file)
 
-        if not self.debugger_file.exists():
-            raise FileNotFoundError(
-                f"Prolog debugger file not found: {self.debugger_file}"
+    def choose_action(self, snapshot: Mapping[str, Any]) -> dict[str, Any]:
+        with tempfile.TemporaryDirectory(prefix="arc3_debugger_") as tmp:
+            tmp_path = Path(tmp)
+            input_path = tmp_path / "state.json"
+            output_path = tmp_path / "action.json"
+            input_path.write_text(json.dumps(snapshot), encoding="utf-8")
+
+            goal = (
+                "arc3_agent:choose_action_file("
+                + repr(str(input_path))
+                + ","
+                + repr(str(output_path))
+                + ")"
             )
 
-    def run_goal(self, goal: str) -> str:
-        command = [
-            self.swipl_executable,
-            "-q",
-            "-s",
-            str(self.debugger_file),
-            "-g",
-            goal,
-            "-t",
-            "halt",
-        ]
-
-        environment = os.environ.copy()
-        environment.setdefault("TERM", "xterm-256color")
-
-        result = subprocess.run(
-            command,
-            cwd=self.debugger_file.parent,
-            env=environment,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-
-        if result.returncode != 0:
-            raise RuntimeError(
-                "SWI-Prolog execution failed.\n"
-                f"Command: {' '.join(command)}\n"
-                f"stderr:\n{result.stderr}"
+            result = subprocess.run(
+                [
+                    self.swipl_executable,
+                    "-q",
+                    "-s",
+                    str(self.agent_file),
+                    "-g",
+                    goal,
+                    "-t",
+                    "halt",
+                ],
+                cwd=self.agent_file.parent,
+                capture_output=True,
+                text=True,
+                check=False,
             )
 
-        return result.stdout
+            if result.returncode != 0:
+                raise RuntimeError(
+                    "SWI-Prolog controller failed:\n" + result.stderr
+                )
 
-    def run_demo(self) -> str:
-        return self.run_goal("arc3_debugger:demo")
-
-    def debug_program(self, instructions: Sequence[str]) -> str:
-        if not instructions:
-            raise ValueError("The instruction sequence cannot be empty.")
-
-        prolog_list = "[" + ",".join(instructions) + "]"
-        goal = f"arc3_debugger:debug_program({prolog_list})"
-        return self.run_goal(goal)
+            return json.loads(output_path.read_text(encoding="utf-8"))

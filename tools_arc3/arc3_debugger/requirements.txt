@@ -1,3 +1,5 @@
 ansi2html
 ipython
+ipywidgets
 jupyterlab
+# Install arc_agi / arcengine from the ARC-AGI toolkit checkout used by your project.
