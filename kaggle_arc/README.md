@@ -47,6 +47,8 @@ Create an AI capable of solving reasoning tasks it has never seen before…
 (H)MUARC Source code is organized into:
 
 
+ version 9.3.10-55-g49389f9d9
+
 
 * [Kaggle_arc.pl](https://github.com/logicmoo/logicmoo_workspace/blob/master/packs_sys/logicmoo_agi/prolog/kaggle_arc/kaggle_arc.pl) - toplevel routines for invoking testing
 * [Kaggle_arc_test_iface.pl](https://github.com/logicmoo/logicmoo_workspace/blob/master/packs_sys/logicmoo_agi/prolog/kaggle_arc/kaggle_arc_test_iface.pl) - Interface for loading training and testing the results
