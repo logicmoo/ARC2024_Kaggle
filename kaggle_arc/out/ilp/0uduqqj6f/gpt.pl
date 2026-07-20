@@ -1,6 +1,6 @@
 % =======================================
 
-Riddle t(ea32f347)
+Riddle t(0uduqqj6f)
 
 Always: 
 
@@ -64,7 +64,7 @@ In the left-hand-side (lhs) facts can be longer and mean:
 
 
 
-Title: t(ea32f347)
+Title: t(0uduqqj6f)
 
 The provided facts represent transformations from an initial state (lhs) to a final state (rhs).
 These transformations might involve changes in color, rotation, and size of objects.
@@ -85,59 +85,53 @@ In the left-hand-side (lhs) facts can be longer and specialize the normalized sh
 
 
 %  Objects of Example 1 for input grid (1,1)-(10,10)
-lhs(in0_silver3_8_5_8_7,rot90,sid_2x1,cxy(8,6),txy(8,6),silver,no_child). 
-lhs(in0_silver5_5_3_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),silver,no_child). 
-lhs(in0_silver6_2_2_2_7,rot90,sid_2x1,cxy(2,5),txy(2,5),silver,no_child). 
-lhs(in0_black0_1_1_10_10,sameR,s1540869,cxy(6,6),txy(1,1),black,no_child). 
+lhs(in0_silver4_5_7_7_8,flipH,sid_tetris_Z_270_Rotated_2x3,cxy(6,8),txy(5,7),silver,no_child). 
+lhs(in0_silver4_2_2_3_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(2,3),txy(3,4),silver,no_child). 
+lhs(in0_silver8_6_2_8_4,sameR,sid_hollow_3x3,cxy(7,3),txy(7,3),silver,no_child). 
+lhs(in0_black0_7_3_7_3,sameR,sid_1x1,cxy(7,3),txy(7,3),black,no_child). 
+lhs(in0_black0_1_1_10_10,sameR,s1054068,cxy(5,6),txy(10,1),black,no_child). 
 
 
 %  Objects of Example 1 for output grid (1,1)-(10,10)
-rhs(out0_red3_8_5_8_7,rot90,sid_2x1,cxy(8,6),txy(8,6),red). 
-rhs(out0_yellow5_5_3_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),yellow). 
-rhs(out0_blue6_2_2_2_7,rot90,sid_2x1,cxy(2,5),txy(2,5),blue). 
-rhs(out0_black0_1_1_10_10,sameR,s1540869,cxy(6,6),txy(1,1),black). 
+rhs(out0_red4_5_7_7_8,flipH,sid_tetris_Z_270_Rotated_2x3,cxy(6,8),txy(5,7),red). 
+rhs(out0_red4_2_2_3_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(2,3),txy(3,4),red). 
+rhs(out0_blue8_6_2_8_4,sameR,sid_hollow_3x3,cxy(7,3),txy(7,3),blue). 
+rhs(out0_black0_7_3_7_3,sameR,sid_1x1,cxy(7,3),txy(7,3),black). 
+rhs(out0_black0_1_1_10_10,sameR,s1054068,cxy(5,6),txy(10,1),black). 
 
 
 %  Objects of Example 2 for input grid (1,1)-(10,10)
-lhs(in1_silver2_8_6_8_7,rot90,sid_2x1,cxy(8,7),txy(8,7),silver,no_child). 
-lhs(in1_silver4_2_4_2_7,rot90,sid_2x1,cxy(2,6),txy(2,6),silver,no_child). 
-lhs(in1_silver6_5_2_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),silver,no_child). 
-lhs(in1_black0_1_1_10_10,sameR,s16560111,cxy(6,6),txy(1,1),black,no_child). 
+lhs(in1_black0_7_3_8_4,sameR,sid_1x1,cxy(8,4),txy(7,3),black,no_child). 
+lhs(in1_silver12_6_2_9_5,sameR,sid_hollow_3x3,cxy(8,4),txy(6,2),silver,no_child). 
+lhs(in1_silver15_2_2_9_9,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(4,7),txy(4,7),silver,no_child). 
+lhs(in1_black0_1_1_10_10,sameR,s11340380,cxy(5,6),txy(10,1),black,no_child). 
 
 
 %  Objects of Example 2 for output grid (1,1)-(10,10)
-rhs(out1_red2_8_6_8_7,rot90,sid_2x1,cxy(8,7),txy(8,7),red). 
-rhs(out1_yellow4_2_4_2_7,rot90,sid_2x1,cxy(2,6),txy(2,6),yellow). 
-rhs(out1_blue6_5_2_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),blue). 
-rhs(out1_black0_1_1_10_10,sameR,s16560111,cxy(6,6),txy(1,1),black). 
+rhs(out1_black0_7_3_8_4,sameR,sid_1x1,cxy(8,4),txy(7,3),black). 
+rhs(out1_blue12_6_2_9_5,sameR,sid_hollow_3x3,cxy(8,4),txy(6,2),blue). 
+rhs(out1_red15_2_2_9_9,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(4,7),txy(4,7),red). 
+rhs(out1_black0_1_1_10_10,sameR,s11340380,cxy(5,6),txy(10,1),black). 
 
 
 %  Objects of Example 3 for input grid (1,1)-(10,10)
-lhs(in2_silver3_3_8_5_8,sameR,sid_2x1,cxy(4,8),txy(4,8),silver,no_child). 
-lhs(in2_silver5_8_4_8_8,rot90,sid_2x1,cxy(8,6),txy(8,6),silver,no_child). 
-lhs(in2_silver6_1_3_6_3,sameR,sid_2x1,cxy(4,3),txy(4,3),silver,no_child). 
-lhs(in2_black0_1_1_10_10,sameR,s8171524,cxy(6,6),txy(1,1),black,no_child). 
+lhs(in2_silver3_6_3_7_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(6,4),txy(6,4),silver,no_child). 
+lhs(in2_silver3_3_6_4_7,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(4,6),txy(4,6),silver,no_child). 
+lhs(in2_silver8_2_2_4_4,sameR,sid_hollow_3x3,cxy(3,3),txy(3,3),silver,no_child). 
+lhs(in2_silver8_6_6_8_8,sameR,sid_hollow_3x3,cxy(7,7),txy(7,7),silver,no_child). 
+lhs(in2_black0_3_3_3_3,sameR,sid_1x1,cxy(3,3),txy(3,3),black,no_child). 
+lhs(in2_black0_7_7_7_7,sameR,sid_1x1,cxy(7,7),txy(7,7),black,no_child). 
+lhs(in2_black0_1_1_10_10,sameR,s9772013,cxy(6,6),txy(1,1),black,no_child). 
 
 
 %  Objects of Example 3 for output grid (1,1)-(10,10)
-rhs(out2_red3_3_8_5_8,sameR,sid_2x1,cxy(4,8),txy(4,8),red). 
-rhs(out2_yellow5_8_4_8_8,rot90,sid_2x1,cxy(8,6),txy(8,6),yellow). 
-rhs(out2_blue6_1_3_6_3,sameR,sid_2x1,cxy(4,3),txy(4,3),blue). 
-rhs(out2_black0_1_1_10_10,sameR,s8171524,cxy(6,6),txy(1,1),black). 
-
-
-%  Objects of Example 4 for input grid (1,1)-(10,10)
-lhs(in3_silver4_2_3_5_3,sameR,sid_2x1,cxy(4,3),txy(4,3),silver,no_child). 
-lhs(in3_silver5_2_6_6_6,sameR,sid_2x1,cxy(4,6),txy(4,6),silver,no_child). 
-lhs(in3_silver7_8_2_8_8,rot90,sid_2x1,cxy(8,5),txy(8,5),silver,no_child). 
-lhs(in3_black0_1_1_10_10,sameR,s9018019,cxy(5,6),txy(10,1),black,no_child). 
-
-
-%  Objects of Example 4 for output grid (1,1)-(10,10)
-rhs(out3_red4_2_3_5_3,sameR,sid_2x1,cxy(4,3),txy(4,3),red). 
-rhs(out3_yellow5_2_6_6_6,sameR,sid_2x1,cxy(4,6),txy(4,6),yellow). 
-rhs(out3_blue7_8_2_8_8,rot90,sid_2x1,cxy(8,5),txy(8,5),blue). 
-rhs(out3_black0_1_1_10_10,sameR,s9018019,cxy(5,6),txy(10,1),black). 
+rhs(out2_red3_6_3_7_4,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(6,4),txy(6,4),red). 
+rhs(out2_red3_3_6_4_7,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(4,6),txy(4,6),red). 
+rhs(out2_blue8_2_2_4_4,sameR,sid_hollow_3x3,cxy(3,3),txy(3,3),blue). 
+rhs(out2_blue8_6_6_8_8,sameR,sid_hollow_3x3,cxy(7,7),txy(7,7),blue). 
+rhs(out2_black0_3_3_3_3,sameR,sid_1x1,cxy(3,3),txy(3,3),black). 
+rhs(out2_black0_7_7_7_7,sameR,sid_1x1,cxy(7,7),txy(7,7),black). 
+rhs(out2_black0_1_1_10_10,sameR,s9772013,cxy(6,6),txy(1,1),black). 
 
 ```
 
@@ -163,10 +157,10 @@ Dont respond in natural langauge, instead, create prolog syntax that would denot
 
 
 %  Objects of Exam 1 for input grid (1,1)-(10,10)
-lhs(in0_silver3_4_2_4_4,rot90,sid_2x1,cxy(4,3),txy(4,3),silver,no_child). 
-lhs(in0_silver5_1_9_5_9,sameR,sid_2x1,cxy(3,9),txy(3,9),silver,no_child). 
-lhs(in0_silver6_5_6_10_6,sameR,sid_2x1,cxy(8,6),txy(8,6),silver,no_child). 
-lhs(in0_black0_1_1_10_10,sameR,s9951808,cxy(6,5),txy(1,10),black,no_child). 
+lhs(in0_silver3_2_2_3_3,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(2,2),txy(2,2),silver,no_child). 
+lhs(in0_silver3_3_4_4_5,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(4,5),txy(4,5),silver,no_child). 
+lhs(in0_silver24_6_2_9_7,rot90,sid_3x3,cxy(8,5),txy(6,2),pen([cc(silver,7),cc(green,4),cc(silver,2),cc(green,4),cc(silver,7)]),no_child). 
+lhs(in0_black0_1_1_10_10,sameR,s4656530,cxy(5,6),txy(10,1),black,no_child). 
 
 
 Explain the transformation rules and then show the resulting object/8 of Exam 1 in a codeblock
@@ -177,9 +171,9 @@ Explain the transformation rules and then show the resulting object/8 of Exam 1 
 
 Grade your response from:
 ```prolog
-rhs(out0_red3_4_2_4_4,rot90,sid_2x1,cxy(4,3),txy(4,3),red). 
-rhs(out0_yellow5_1_9_5_9,sameR,sid_2x1,cxy(3,9),txy(3,9),yellow). 
-rhs(out0_blue6_5_6_10_6,sameR,sid_2x1,cxy(8,6),txy(8,6),blue). 
-rhs(out0_black0_1_1_10_10,sameR,s9951808,cxy(6,5),txy(1,10),black). 
+rhs(out0_red3_2_2_3_3,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(2,2),txy(2,2),red). 
+rhs(out0_red3_3_4_4_5,sameR,sid_tetris_Z_270_Rotated_2x3,cxy(4,5),txy(4,5),red). 
+rhs(out0_blue24_6_2_9_7,rot90,sid_2x1,cxy(8,5),txy(6,2),blue). 
+rhs(out0_black0_1_1_10_10,sameR,s4656530,cxy(5,6),txy(10,1),black). 
 ```
 if wrong, what rules did you miss?

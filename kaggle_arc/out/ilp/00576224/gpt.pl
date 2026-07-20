@@ -87,7 +87,7 @@ In the left-hand-side (lhs) facts can be longer and specialize the normalized sh
 %  Objects of Example 1 for input grid (1,1)-(2,2)
 lhs(in0_cyan1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),cyan,no_child). 
 lhs(in0_yellow1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),yellow,no_child). 
-lhs(in0_purple2_1_1_2_2,rot90,sid_tetris_Triple_East_and_North_2x2,cxy(2,2),txy(2,2),purple,2). 
+lhs(in0_purple2_1_1_2_2,rot90,sid_tetris_Triple_East_and_North_2x2,cxy(2,2),txy(2,2),purple,no_child). 
 
 
 %  Objects of Example 1 for output grid (1,1)-(6,6)

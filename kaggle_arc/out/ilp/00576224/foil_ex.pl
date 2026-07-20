@@ -32,21 +32,6 @@
 :-output(rhs_t2d/2). 
 :-output(rhs_pen_color/2). 
 :-output(rhs/6). 
-:-output(rhs_peice/2). 
-:-output(rhs_rot2D/2). 
-:-output(rhs_gis/2). 
-:-output(rhs_c2d/2). 
-:-output(rhs_t2d/2). 
-:-output(rhs_pen_color/2). 
-:-output(rhs/6). 
-:-input_cw(lhs_peice/2). 
-:-input_cw(lhs_rot2D/2). 
-:-input_cw(lhs_gis/2). 
-:-input_cw(lhs_c2d/2). 
-:-input_cw(lhs_t2d/2). 
-:-input_cw(lhs_pen_color/2). 
-:-input_cw(lhs_child_c/2). 
-:-input_cw(lhs/7). 
 :-input_cw(lhs_peice/2). 
 :-input_cw(lhs_rot2D/2). 
 :-input_cw(lhs_gis/2). 
@@ -62,13 +47,6 @@
 :-modeh(*,rhs_t2d(+peice,+t2d)). 
 :-modeh(*,rhs_pen_color(+peice,+ #(color))). 
 :-modeh(*,rhs(+peice,+rhs,+rhs,+rhs,+rhs,+ #(color))). 
-:-modeh(*,rhs_peice(+scope,+peice)). 
-:-modeh(*,rhs_rot2D(+peice,+rot2D)). 
-:-modeh(*,rhs_gis(+peice,+gis)). 
-:-modeh(*,rhs_c2d(+peice,+c2d)). 
-:-modeh(*,rhs_t2d(+peice,+t2d)). 
-:-modeh(*,rhs_pen_color(+peice,+ #(color))). 
-:-modeh(*,rhs(+peice,+rhs,+rhs,+rhs,+rhs,+ #(color))). 
 :-modeb(*,lhs_peice(+scope,+peice)). 
 :-modeb(*,lhs_rot2D(+peice,-rot2D)). 
 :-modeb(*,lhs_gis(+peice,-gis)). 
@@ -77,18 +55,6 @@
 :-modeb(*,lhs_pen_color(+peice,+ #(color))). 
 :-modeb(*,lhs_child_c(+peice,-c)). 
 :-modeb(*,lhs(+peice,-lhs,-lhs,-lhs,-lhs,+ #(color),-lhs)). 
-:-modeb(*,lhs_child_c(+peice,+nat30)). 
-:-modeb(*,lhs(+peice,-lhs,-lhs,-lhs,-lhs,+ #(color),+nat30)). 
-:-modeb(*,lhs_peice(+scope,+peice)). 
-:-modeb(*,lhs_rot2D(+peice,-rot2D)). 
-:-modeb(*,lhs_gis(+peice,-gis)). 
-:-modeb(*,lhs_c2d(+peice,-c2d)). 
-:-modeb(*,lhs_t2d(+peice,-t2d)). 
-:-modeb(*,lhs_pen_color(+peice,+ #(color))). 
-:-modeb(*,lhs_child_c(+peice,-c)). 
-:-modeb(*,lhs(+peice,-lhs,-lhs,-lhs,-lhs,+ #(color),-lhs)). 
-:-modeb(*,lhs_child_c(+peice,+nat30)). 
-:-modeb(*,lhs(+peice,-lhs,-lhs,-lhs,-lhs,+ #(color),+nat30)). 
 :-style_check(- (discontiguous)). 
 max_body(6). 
 max_vars(8). 
@@ -155,7 +121,7 @@ down(hv(P,Q),hv(P,R)):-size(S),Q#<S,R#=Q+1.
 up(hv(P,Q),hv(P,R)):-Q#>1,R#=Q-1. 
 lhs(in0_cyan1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),cyan,no_child). 
 lhs(in0_yellow1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),yellow,no_child). 
-lhs(in0_purple2_1_1_2_2,rot90,sid_tetris_Triple_East_and_North_2x2,cxy(2,2),txy(2,2),purple,2). 
+lhs(in0_purple2_1_1_2_2,rot90,sid_tetris_Triple_East_and_North_2x2,cxy(2,2),txy(2,2),purple,no_child). 
 lhs(in1_orange1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),orange,no_child). 
 lhs(in1_yellow1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),yellow,no_child). 
 lhs(in1_brown1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),brown,no_child). 

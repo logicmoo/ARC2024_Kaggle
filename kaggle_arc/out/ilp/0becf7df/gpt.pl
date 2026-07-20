@@ -1,6 +1,6 @@
 % =======================================
 
-Riddle t(ea32f347)
+Riddle v(0becf7df)
 
 Always: 
 
@@ -64,7 +64,7 @@ In the left-hand-side (lhs) facts can be longer and mean:
 
 
 
-Title: t(ea32f347)
+Title: v(0becf7df)
 
 The provided facts represent transformations from an initial state (lhs) to a final state (rhs).
 These transformations might involve changes in color, rotation, and size of objects.
@@ -85,59 +85,79 @@ In the left-hand-side (lhs) facts can be longer and specialize the normalized sh
 
 
 %  Objects of Example 1 for input grid (1,1)-(10,10)
-lhs(in0_silver3_8_5_8_7,rot90,sid_2x1,cxy(8,6),txy(8,6),silver,no_child). 
-lhs(in0_silver5_5_3_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),silver,no_child). 
-lhs(in0_silver6_2_2_2_7,rot90,sid_2x1,cxy(2,5),txy(2,5),silver,no_child). 
-lhs(in0_black0_1_1_10_10,sameR,s1540869,cxy(6,6),txy(1,1),black,no_child). 
+lhs(in0_yellow5_7_2_8_5,flipDHV,sid_tetris_Triple_East_and_North_2x2,cxy(8,3),txy(7,2),yellow,no_child). 
+lhs(in0_orange6_4_5_5_8,rot270,sid_u_3x2,cxy(4,7),txy(5,5),orange,no_child). 
+lhs(in0_green5_5_3_6_6,flipD,sid_tetris_Z_270_Rotated_2x3,cxy(6,5),txy(5,6),green,no_child). 
+lhs(in0_red5_7_4_8_7,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(7,6),txy(8,7),red,no_child). 
+lhs(in0_yellow1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),yellow,no_child). 
+lhs(in0_green1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),green,no_child). 
+lhs(in0_red1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),red,no_child). 
+lhs(in0_orange1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),orange,no_child). 
+lhs(in0_black0_1_1_10_10,sameR,s15084955,cxy(6,6),txy(5,7),black,no_child). 
 
 
 %  Objects of Example 1 for output grid (1,1)-(10,10)
-rhs(out0_red3_8_5_8_7,rot90,sid_2x1,cxy(8,6),txy(8,6),red). 
-rhs(out0_yellow5_5_3_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),yellow). 
-rhs(out0_blue6_2_2_2_7,rot90,sid_2x1,cxy(2,5),txy(2,5),blue). 
-rhs(out0_black0_1_1_10_10,sameR,s1540869,cxy(6,6),txy(1,1),black). 
+rhs(out0_red5_7_2_8_5,flipDHV,sid_tetris_Triple_East_and_North_2x2,cxy(8,3),txy(7,2),red). 
+rhs(out0_green6_4_5_5_8,rot270,sid_u_3x2,cxy(4,7),txy(5,5),green). 
+rhs(out0_orange5_5_3_6_6,flipD,sid_tetris_Z_270_Rotated_2x3,cxy(6,5),txy(5,6),orange). 
+rhs(out0_yellow5_7_4_8_7,rot270,sid_tetris_Z_270_Rotated_2x3,cxy(7,6),txy(8,7),yellow). 
+rhs(out0_yellow1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),yellow). 
+rhs(out0_green1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),green). 
+rhs(out0_red1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),red). 
+rhs(out0_orange1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),orange). 
+rhs(out0_black0_1_1_10_10,sameR,s15084955,cxy(6,6),txy(5,7),black). 
 
 
 %  Objects of Example 2 for input grid (1,1)-(10,10)
-lhs(in1_silver2_8_6_8_7,rot90,sid_2x1,cxy(8,7),txy(8,7),silver,no_child). 
-lhs(in1_silver4_2_4_2_7,rot90,sid_2x1,cxy(2,6),txy(2,6),silver,no_child). 
-lhs(in1_silver6_5_2_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),silver,no_child). 
-lhs(in1_black0_1_1_10_10,sameR,s16560111,cxy(6,6),txy(1,1),black,no_child). 
+lhs(in1_red4_5_6_5_9,rot90,sid_2x1,cxy(5,8),txy(5,8),red,no_child). 
+lhs(in1_cyan5_7_5_8_7,flipD,sid_tetris_Z_270_Rotated_2x3,cxy(8,6),txy(7,7),cyan,no_child). 
+lhs(in1_green6_3_5_6_6,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(4,5),txy(3,6),green,no_child). 
+lhs(in1_blue8_5_2_7_5,rot90,sid_t180_3x2,cxy(6,4),txy(7,2),blue,no_child). 
+lhs(in1_blue1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),blue,no_child). 
+lhs(in1_red1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),red,no_child). 
+lhs(in1_green1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),green,no_child). 
+lhs(in1_cyan1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),cyan,no_child). 
+lhs(in1_black0_1_1_10_10,sameR,s1874425,cxy(6,6),txy(6,6),black,no_child). 
 
 
 %  Objects of Example 2 for output grid (1,1)-(10,10)
-rhs(out1_red2_8_6_8_7,rot90,sid_2x1,cxy(8,7),txy(8,7),red). 
-rhs(out1_yellow4_2_4_2_7,rot90,sid_2x1,cxy(2,6),txy(2,6),yellow). 
-rhs(out1_blue6_5_2_5_7,rot90,sid_2x1,cxy(5,5),txy(5,5),blue). 
-rhs(out1_black0_1_1_10_10,sameR,s16560111,cxy(6,6),txy(1,1),black). 
+rhs(out1_cyan4_5_6_5_9,rot90,sid_2x1,cxy(5,8),txy(5,8),cyan). 
+rhs(out1_red5_7_5_8_7,flipD,sid_tetris_Z_270_Rotated_2x3,cxy(8,6),txy(7,7),red). 
+rhs(out1_blue6_3_5_6_6,rot180,sid_tetris_Z_270_Rotated_2x3,cxy(4,5),txy(3,6),blue). 
+rhs(out1_green8_5_2_7_5,rot90,sid_t180_3x2,cxy(6,4),txy(7,2),green). 
+rhs(out1_blue1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),blue). 
+rhs(out1_red1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),red). 
+rhs(out1_green1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),green). 
+rhs(out1_cyan1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),cyan). 
+rhs(out1_black0_1_1_10_10,sameR,s1874425,cxy(6,6),txy(6,6),black). 
 
 
 %  Objects of Example 3 for input grid (1,1)-(10,10)
-lhs(in2_silver3_3_8_5_8,sameR,sid_2x1,cxy(4,8),txy(4,8),silver,no_child). 
-lhs(in2_silver5_8_4_8_8,rot90,sid_2x1,cxy(8,6),txy(8,6),silver,no_child). 
-lhs(in2_silver6_1_3_6_3,sameR,sid_2x1,cxy(4,3),txy(4,3),silver,no_child). 
-lhs(in2_black0_1_1_10_10,sameR,s8171524,cxy(6,6),txy(1,1),black,no_child). 
+lhs(in2_yellow2_6_4_6_5,rot90,sid_2x1,cxy(6,5),txy(6,5),yellow,no_child). 
+lhs(in2_orange2_5_5_6_6,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(6,6),txy(5,5),orange,no_child). 
+lhs(in2_brown3_6_2_7_3,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(7,2),txy(7,2),brown,no_child). 
+lhs(in2_purple4_4_6_6_7,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(5,7),txy(4,6),purple,no_child). 
+lhs(in2_brown1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),brown,no_child). 
+lhs(in2_orange1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),orange,no_child). 
+lhs(in2_yellow1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),yellow,no_child). 
+lhs(in2_purple1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),purple,no_child). 
+lhs(in2_orange1_4_7_4_7,sameR,sid_1x1,cxy(4,7),txy(4,7),orange,no_child). 
+lhs(in2_orange1_6_3_6_3,sameR,sid_1x1,cxy(6,3),txy(6,3),orange,no_child). 
+lhs(in2_black0_1_1_10_10,sameR,s2354895,cxy(6,6),txy(6,6),black,no_child). 
 
 
 %  Objects of Example 3 for output grid (1,1)-(10,10)
-rhs(out2_red3_3_8_5_8,sameR,sid_2x1,cxy(4,8),txy(4,8),red). 
-rhs(out2_yellow5_8_4_8_8,rot90,sid_2x1,cxy(8,6),txy(8,6),yellow). 
-rhs(out2_blue6_1_3_6_3,sameR,sid_2x1,cxy(4,3),txy(4,3),blue). 
-rhs(out2_black0_1_1_10_10,sameR,s8171524,cxy(6,6),txy(1,1),black). 
-
-
-%  Objects of Example 4 for input grid (1,1)-(10,10)
-lhs(in3_silver4_2_3_5_3,sameR,sid_2x1,cxy(4,3),txy(4,3),silver,no_child). 
-lhs(in3_silver5_2_6_6_6,sameR,sid_2x1,cxy(4,6),txy(4,6),silver,no_child). 
-lhs(in3_silver7_8_2_8_8,rot90,sid_2x1,cxy(8,5),txy(8,5),silver,no_child). 
-lhs(in3_black0_1_1_10_10,sameR,s9018019,cxy(5,6),txy(10,1),black,no_child). 
-
-
-%  Objects of Example 4 for output grid (1,1)-(10,10)
-rhs(out3_red4_2_3_5_3,sameR,sid_2x1,cxy(4,3),txy(4,3),red). 
-rhs(out3_yellow5_2_6_6_6,sameR,sid_2x1,cxy(4,6),txy(4,6),yellow). 
-rhs(out3_blue7_8_2_8_8,rot90,sid_2x1,cxy(8,5),txy(8,5),blue). 
-rhs(out3_black0_1_1_10_10,sameR,s9018019,cxy(5,6),txy(10,1),black). 
+rhs(out2_brown2_6_4_6_5,rot90,sid_2x1,cxy(6,5),txy(6,5),brown). 
+rhs(out2_purple2_5_5_6_6,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(6,6),txy(5,5),purple). 
+rhs(out2_yellow3_6_2_7_3,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(7,2),txy(7,2),yellow). 
+rhs(out2_orange4_4_6_6_7,sameR,sid_tetris_Triple_East_and_North_2x2,cxy(5,7),txy(4,6),orange). 
+rhs(out2_brown1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),brown). 
+rhs(out2_orange1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),orange). 
+rhs(out2_yellow1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),yellow). 
+rhs(out2_purple1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),purple). 
+rhs(out2_purple1_4_7_4_7,sameR,sid_1x1,cxy(4,7),txy(4,7),purple). 
+rhs(out2_purple1_6_3_6_3,sameR,sid_1x1,cxy(6,3),txy(6,3),purple). 
+rhs(out2_black0_1_1_10_10,sameR,s2354895,cxy(6,6),txy(6,6),black). 
 
 ```
 
@@ -163,10 +183,16 @@ Dont respond in natural langauge, instead, create prolog syntax that would denot
 
 
 %  Objects of Exam 1 for input grid (1,1)-(10,10)
-lhs(in0_silver3_4_2_4_4,rot90,sid_2x1,cxy(4,3),txy(4,3),silver,no_child). 
-lhs(in0_silver5_1_9_5_9,sameR,sid_2x1,cxy(3,9),txy(3,9),silver,no_child). 
-lhs(in0_silver6_5_6_10_6,sameR,sid_2x1,cxy(8,6),txy(8,6),silver,no_child). 
-lhs(in0_black0_1_1_10_10,sameR,s9951808,cxy(6,5),txy(1,10),black,no_child). 
+lhs(in0_cyan5_4_3_6_4,flipV,sid_tetris_Z_270_Rotated_2x3,cxy(5,3),txy(6,4),cyan,no_child). 
+lhs(in0_brown4_6_2_7_4,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(7,3),txy(6,2),brown,no_child). 
+lhs(in0_yellow7_5_5_6_9,flipD,s6607543,cxy(6,7),txy(5,5),yellow,no_child). 
+lhs(in0_red6_4_4_6_7,rot270,sid_t180_3x2,cxy(5,6),txy(4,4),red,no_child). 
+lhs(in0_cyan1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),cyan,no_child). 
+lhs(in0_red1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),red,no_child). 
+lhs(in0_brown1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),brown,no_child). 
+lhs(in0_yellow1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),yellow,no_child). 
+lhs(in0_brown1_4_8_4_8,sameR,sid_1x1,cxy(4,8),txy(4,8),brown,no_child). 
+lhs(in0_black0_1_1_10_10,sameR,s11567348,cxy(6,6),txy(6,6),black,no_child). 
 
 
 Explain the transformation rules and then show the resulting object/8 of Exam 1 in a codeblock
@@ -177,9 +203,15 @@ Explain the transformation rules and then show the resulting object/8 of Exam 1 
 
 Grade your response from:
 ```prolog
-rhs(out0_red3_4_2_4_4,rot90,sid_2x1,cxy(4,3),txy(4,3),red). 
-rhs(out0_yellow5_1_9_5_9,sameR,sid_2x1,cxy(3,9),txy(3,9),yellow). 
-rhs(out0_blue6_5_6_10_6,sameR,sid_2x1,cxy(8,6),txy(8,6),blue). 
-rhs(out0_black0_1_1_10_10,sameR,s9951808,cxy(6,5),txy(1,10),black). 
+rhs(out0_brown5_4_3_6_4,flipV,sid_tetris_Z_270_Rotated_2x3,cxy(5,3),txy(6,4),brown). 
+rhs(out0_cyan4_6_2_7_4,rot90,sid_tetris_Z_270_Rotated_2x3,cxy(7,3),txy(6,2),cyan). 
+rhs(out0_red7_5_5_6_9,flipD,s6607543,cxy(6,7),txy(5,5),red). 
+rhs(out0_yellow6_4_4_6_7,rot270,sid_t180_3x2,cxy(5,6),txy(4,4),yellow). 
+rhs(out0_cyan1_1_1_1_1,sameR,sid_1x1,cxy(1,1),txy(1,1),cyan). 
+rhs(out0_red1_1_2_1_2,sameR,sid_1x1,cxy(1,2),txy(1,2),red). 
+rhs(out0_brown1_2_1_2_1,sameR,sid_1x1,cxy(2,1),txy(2,1),brown). 
+rhs(out0_yellow1_2_2_2_2,sameR,sid_1x1,cxy(2,2),txy(2,2),yellow). 
+rhs(out0_cyan1_4_8_4_8,sameR,sid_1x1,cxy(4,8),txy(4,8),cyan). 
+rhs(out0_black0_1_1_10_10,sameR,s11567348,cxy(6,6),txy(6,6),black). 
 ```
 if wrong, what rules did you miss?

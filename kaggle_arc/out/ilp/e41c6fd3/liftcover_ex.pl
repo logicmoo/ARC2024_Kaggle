@@ -61,8 +61,6 @@ modeb(*,lhs_t2d(+peice,-t2d)).
 modeb(*,lhs_pen_color(+peice,+ #(color))). 
 modeb(*,lhs_child_c(+peice,-c)). 
 modeb(*,lhs(+peice,-lhs,-lhs,-lhs,-lhs,+ #(color),-lhs)). 
-modeb(*,lhs_child_c(+peice,+nat30)). 
-modeb(*,lhs(+peice,-lhs,-lhs,-lhs,-lhs,+ #(color),+nat30)). 
 :-use_module(library(clpfd)). 
 incr_nat30(P,Q):-Q#=P+1. 
 color_change(_,_). 
@@ -87,24 +85,24 @@ up(hv(P,Q),hv(P,R)):-Q#>1,R#=Q-1.
 lhs(in0_red16_4_4_7_8,rot270,s12561063,cxy(6,6),txy(4,8),red,no_child). 
 lhs(in0_cyan16_11_2_14_6,rot270,s12561063,cxy(13,4),txy(11,6),cyan,no_child). 
 lhs(in0_yellow16_17_8_20_12,rot270,s12561063,cxy(19,10),txy(17,12),yellow,no_child). 
-lhs(in0_black0_1_1_23_13,rot90,s8678073,cxy(12,7),txy(12,7),black,no_child). 
+lhs(in0_black0_1_1_23_13,rot90,s13295452,cxy(12,7),txy(12,7),black,no_child). 
 lhs(in1_black0_15_14_16_14,rot90,sid_1x2,cxy(16,14),txy(16,14),black,no_child). 
 lhs(in1_cyan16_5_7_10_10,sameR,s5507379,cxy(8,9),txy(8,9),cyan,no_child). 
-lhs(in1_purple16_13_11_18_14,sameR,s5507379,cxy(16,13),txy(16,13),purple,1). 
+lhs(in1_purple16_13_11_18_14,sameR,s5507379,cxy(16,13),txy(16,13),purple,no_child). 
 lhs(in1_blue16_19_3_24_6,sameR,s5507379,cxy(22,5),txy(22,5),blue,no_child). 
 lhs(in1_green16_25_9_30_12,sameR,s5507379,cxy(28,11),txy(28,11),green,no_child). 
-lhs(in1_black0_1_1_30_14,rot90,s8843638,cxy(15,7),txy(30,14),black,no_child). 
+lhs(in1_black0_1_1_30_14,rot90,s5138054,cxy(15,7),txy(30,14),black,no_child). 
 lhs(in2_blue12_3_6_6_9,sameR,s14594424,cxy(5,8),txy(5,8),blue,no_child). 
 lhs(in2_yellow12_8_9_11_12,sameR,s14594424,cxy(10,11),txy(10,11),yellow,no_child). 
 lhs(in2_cyan12_14_3_17_6,sameR,s14594424,cxy(16,5),txy(16,5),cyan,no_child). 
 lhs(in2_red12_18_8_21_11,sameR,s14594424,cxy(20,10),txy(20,10),red,no_child). 
 lhs(in2_green12_25_4_28_7,sameR,s14594424,cxy(27,6),txy(27,6),green,no_child). 
-lhs(in2_black0_1_1_30_16,rot90,s6130932,cxy(16,9),txy(1,1),black,no_child). 
+lhs(in2_black0_1_1_30_16,rot90,s14552680,cxy(16,9),txy(1,1),black,no_child). 
 lhs(in0_green15_3_10_7_14,rot90,s1496004,cxy(5,12),txy(5,12),green,no_child). 
 lhs(in0_blue15_10_13_14_17,rot90,s1496004,cxy(12,15),txy(12,15),blue,no_child). 
 lhs(in0_yellow15_15_3_19_7,rot90,s1496004,cxy(17,5),txy(17,5),yellow,no_child). 
 lhs(in0_cyan15_22_8_26_12,rot90,s1496004,cxy(24,10),txy(24,10),cyan,no_child). 
-lhs(in0_black0_1_1_30_17,rot90,s8682924,cxy(16,9),txy(16,9),black,no_child). 
+lhs(in0_black0_1_1_30_17,rot90,s10576348,cxy(16,9),txy(16,9),black,no_child). 
 begin(model(trn_0)). 
 lhs_peice(trn_0,obj_0_744_in). 
 lhs_rot2D(obj_0_744_in,rot270). 
@@ -129,7 +127,7 @@ lhs_pen_color(obj_0_396_in,yellow).
 lhs_child_c(obj_0_396_in,no_child). 
 lhs_peice(trn_0,obj_0_143_in). 
 lhs_rot2D(obj_0_143_in,rot90). 
-lhs_gis(obj_0_143_in,s8678073). 
+lhs_gis(obj_0_143_in,s13295452). 
 lhs_c2d(obj_0_143_in,cxy(12,7)). 
 lhs_t2d(obj_0_143_in,txy(12,7)). 
 lhs_pen_color(obj_0_143_in,black). 
@@ -154,7 +152,7 @@ rhs_t2d(obj_0_91_out,txy(17,6)).
 rhs_pen_color(obj_0_91_out,yellow). 
 rhs_peice(trn_0,obj_0_143_out). 
 rhs_rot2D(obj_0_143_out,rot90). 
-rhs_gis(obj_0_143_out,s9741348). 
+rhs_gis(obj_0_143_out,s9642428). 
 rhs_c2d(obj_0_143_out,cxy(12,8)). 
 rhs_t2d(obj_0_143_out,txy(12,8)). 
 rhs_pen_color(obj_0_143_out,black). 
@@ -180,7 +178,7 @@ lhs_gis(obj_1_777_in,s5507379).
 lhs_c2d(obj_1_777_in,cxy(16,13)). 
 lhs_t2d(obj_1_777_in,txy(16,13)). 
 lhs_pen_color(obj_1_777_in,purple). 
-lhs_child_c(obj_1_777_in,1). 
+lhs_child_c(obj_1_777_in,no_child). 
 lhs_peice(trn_1,obj_1_327_in). 
 lhs_rot2D(obj_1_327_in,sameR). 
 lhs_gis(obj_1_327_in,s5507379). 
@@ -197,7 +195,7 @@ lhs_pen_color(obj_1_660_in,green).
 lhs_child_c(obj_1_660_in,no_child). 
 lhs_peice(trn_1,obj_1_691_in). 
 lhs_rot2D(obj_1_691_in,rot90). 
-lhs_gis(obj_1_691_in,s8843638). 
+lhs_gis(obj_1_691_in,s5138054). 
 lhs_c2d(obj_1_691_in,cxy(15,7)). 
 lhs_t2d(obj_1_691_in,txy(30,14)). 
 lhs_pen_color(obj_1_691_in,black). 
@@ -228,7 +226,7 @@ rhs_t2d(obj_1_627_out,txy(28,9)).
 rhs_pen_color(obj_1_627_out,green). 
 rhs_peice(trn_1,obj_1_691_out). 
 rhs_rot2D(obj_1_691_out,rot90). 
-rhs_gis(obj_1_691_out,s4383387). 
+rhs_gis(obj_1_691_out,s186023). 
 rhs_c2d(obj_1_691_out,cxy(15,7)). 
 rhs_t2d(obj_1_691_out,txy(30,14)). 
 rhs_pen_color(obj_1_691_out,black). 
@@ -271,7 +269,7 @@ lhs_pen_color(obj_2_273_in,green).
 lhs_child_c(obj_2_273_in,no_child). 
 lhs_peice(trn_2,obj_2_483_in). 
 lhs_rot2D(obj_2_483_in,rot90). 
-lhs_gis(obj_2_483_in,s6130932). 
+lhs_gis(obj_2_483_in,s14552680). 
 lhs_c2d(obj_2_483_in,cxy(16,9)). 
 lhs_t2d(obj_2_483_in,txy(1,1)). 
 lhs_pen_color(obj_2_483_in,black). 
@@ -314,7 +312,7 @@ rhs_t2d(obj_2_566_out,txy(27,5)).
 rhs_pen_color(obj_2_566_out,green). 
 rhs_peice(trn_2,obj_2_483_out). 
 rhs_rot2D(obj_2_483_out,rot90). 
-rhs_gis(obj_2_483_out,s13796390). 
+rhs_gis(obj_2_483_out,s3735665). 
 rhs_c2d(obj_2_483_out,cxy(16,9)). 
 rhs_t2d(obj_2_483_out,txy(1,1)). 
 rhs_pen_color(obj_2_483_out,black). 
@@ -350,14 +348,14 @@ lhs_pen_color(obj_0_13_in,cyan).
 lhs_child_c(obj_0_13_in,no_child). 
 lhs_peice(tst_0,obj_0_695_in). 
 lhs_rot2D(obj_0_695_in,rot90). 
-lhs_gis(obj_0_695_in,s8682924). 
+lhs_gis(obj_0_695_in,s10576348). 
 lhs_c2d(obj_0_695_in,cxy(16,9)). 
 lhs_t2d(obj_0_695_in,txy(16,9)). 
 lhs_pen_color(obj_0_695_in,black). 
 lhs_child_c(obj_0_695_in,no_child). 
 rhs_peice(tst_0,obj_0_32_out). 
 rhs_rot2D(obj_0_32_out,rot90). 
-rhs_gis(obj_0_32_out,s5766781). 
+rhs_gis(obj_0_32_out,s4868024). 
 rhs_c2d(obj_0_32_out,cxy(15,9)). 
 rhs_t2d(obj_0_32_out,txy(14,10)). 
 rhs_pen_color(obj_0_32_out,black). 
@@ -387,7 +385,7 @@ rhs_t2d(obj_0_13_out,txy(24,10)).
 rhs_pen_color(obj_0_13_out,cyan). 
 rhs_peice(tst_0,obj_0_695_out). 
 rhs_rot2D(obj_0_695_out,rot90). 
-rhs_gis(obj_0_695_out,s4831827). 
+rhs_gis(obj_0_695_out,s12520586). 
 rhs_c2d(obj_0_695_out,cxy(16,9)). 
 rhs_t2d(obj_0_695_out,txy(16,9)). 
 rhs_pen_color(obj_0_695_out,black). 
