@@ -46,16 +46,32 @@ from arcengine import GameAction, GameState
 python examples/interactive_runner.py ls20
 ```
 
-Example commands:
+The debugger uses single keypresses without requiring Enter.
+
+Action keys are assigned dynamically from the environment's legal action list.
+Actions whose names clearly identify `up`, `down`, `left`, or `right` are mapped
+to the arrow keys. Opaque or game-specific actions receive numbered/letter keys:
 
 ```text
-ACTION1
-ACTION6 20 30
-reset
-history
-score
-quit
+↑ ↓ ← →       explicit directional actions
+1 2 3 ...     remaining legal actions
 ```
+
+The debugger does not assume that `ACTION1`, `ACTION2`, and similar opaque names
+have fixed directional meanings.
+
+Debugger controls:
+
+```text
+r  reset
+h  history
+s  scorecard
+a  list actions
+?  controls
+q  quit
+```
+
+Complex actions prompt for `x` and `y` coordinates after the action key is pressed.
 
 ## Notebook
 

@@ -15,3 +15,16 @@ git add .
 git add . -A
 git add . -m
 git status .
+git commit -am notebooks/arc3_runner.ipynb
+git push
+python examples/prolog_controlled_runner.py
+pip install arc-agi
+pip install arc_agi
+deactivate 
+. ../examples/.venv/bin/activate
+pip install arc_agi
+python examples/prolog_controlled_runner.py
+pip install  typing_extensions
+ 
+python examples/prolog_controlled_runner.py
+pip install arc_agi
