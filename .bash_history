@@ -142,3 +142,10 @@ git status .
 git add .
 git rm --cached shared/data/ConceptARC/editor
 git status .
+git commit -am "all mising files"
+git status .
+git push
+git push -f
+git push
+git status .
+git status shared/data/ConceptARC/editor
