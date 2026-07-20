@@ -163,3 +163,21 @@ ls
 git add ILP
 git add ILP -fr
 git add ILP -f
+git commit -am "ILP symlink"
+git push
+ls saves
+ls
+ls ..
+mkdir tools_arc3
+cat examples/.gitignore 
+cd ..
+git add tools_arc3/examples/
+git add tools_arc3/examples/
+cd /opt/arcprize
+git status
+git submodule status
+ls -la tools_arc3/example
+rm -rf tools_arc3/examples/.git
+git rm --cached shared/data/ConceptARC/editor 2>/dev/null || true
+git rm --cached tools_arc3/examples 2>/dev/null || true
+git add tools_arc3/examples/
