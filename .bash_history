@@ -181,3 +181,10 @@ rm -rf tools_arc3/examples/.git
 git rm --cached shared/data/ConceptARC/editor 2>/dev/null || true
 git rm --cached tools_arc3/examples 2>/dev/null || true
 git add tools_arc3/examples/
+git commit -am tools_arc3/examples
+git push
+git commit -m "Add ARC3 tools and convert nested repositories to regular directories"
+df  shared/data/ConceptARC/editor/
+du  shared/data/ConceptARC/editor/
+ls -l
+ls -l tools_arc3/
