@@ -149,3 +149,17 @@ git push -f
 git push
 git status .
 git status shared/data/ConceptARC/editor
+git commit -am "all mising files"
+git push
+git status 
+df .git -h
+du .git -h
+find .gitignroe
+find . .gitignore
+find . -name .gitignore
+vi ./shared/data/.gitignore
+vi ./logicmoo_llm_arc/.gitignore
+ls
+git add ILP
+git add ILP -fr
+git add ILP -f
