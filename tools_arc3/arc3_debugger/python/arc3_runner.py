@@ -460,6 +460,7 @@ class Arc3Runner:
             f"objects.pl: {result['objects_path']} "
             f"({'GPT' if result['objects_called'] else 'cached'})"
         )
+        print(f"object_registry.pl: {result['registry_path']}")
         if result["differences_path"] is not None:
             print(
                 f"differences.pl: {result['differences_path']} "

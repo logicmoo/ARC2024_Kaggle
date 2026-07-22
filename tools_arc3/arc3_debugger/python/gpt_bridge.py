@@ -5,7 +5,6 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -19,11 +18,28 @@ def _data_url(path: Path) -> str:
 
 def _strip_fences(text: str) -> str:
     value = text.strip()
-    match = re.fullmatch(r"```(?:prolog|pl)?\s*(.*?)\s*```", value, re.DOTALL | re.IGNORECASE)
+    match = re.fullmatch(
+        r"```(?:prolog|pl)?\s*(.*?)\s*```",
+        value,
+        re.DOTALL | re.IGNORECASE,
+    )
     return match.group(1).strip() + "\n" if match else value + "\n"
 
 
+def _read_if_present(path: Path) -> str:
+    if path.exists() and path.stat().st_size:
+        return path.read_text(encoding="utf-8")
+    return ""
+
+
 class GptArcAnalyzer:
+    """GPT-backed ARC analysis with persistent friendly object identities.
+
+    The level's ``object_registry.pl`` is the canonical identity memory. The
+    first analyzed frame chooses friendly names. Every later request receives
+    that registry and the parent state's objects, and must reuse those names.
+    """
+
     def __init__(
         self,
         prompts_path: str | Path,
@@ -66,8 +82,11 @@ class GptArcAnalyzer:
         *,
         supplemental_text: str = "",
     ) -> str:
+        full_prompt = prompt
+        if supplemental_text:
+            full_prompt += "\n\nPERSISTENT SYMBOLIC CONTEXT:\n" + supplemental_text
         content: list[dict[str, Any]] = [
-            {"type": "input_text", "text": prompt + ("\n\n" + supplemental_text if supplemental_text else "")}
+            {"type": "input_text", "text": full_prompt}
         ]
         for label, image_path in images:
             content.append({"type": "input_text", "text": label})
@@ -87,6 +106,59 @@ class GptArcAnalyzer:
             raise RuntimeError("OpenAI response contained no output_text")
         return _strip_fences(output_text)
 
+    def _identity_context(
+        self,
+        store: ActionTreeStore,
+        node: StateNode,
+        *,
+        include_current: bool = False,
+        include_differences: bool = False,
+    ) -> str:
+        metadata = store.metadata(node)
+        parent = store.parent_node(node)
+        sections: list[str] = [
+            "IDENTITY RULES:\n"
+            "- Friendly Prolog atoms are canonical object IDs for this entire level.\n"
+            "- Reuse an existing friendly ID whenever it denotes the same object.\n"
+            "- Never replace a friendly ID with obj_1, object_2, or another opaque ID.\n"
+            "- Never recycle an old ID for a different object.\n"
+            "- Create a new friendly ID only for a truly new object.\n"
+            "- Prefer semantic snake_case names such as blue_player, red_goal, "
+            "left_wall, yellow_key, moving_platform, or blue_square_2.\n"
+            "- Every visible object must have exactly one object_identity/3 fact."
+        ]
+
+        registry = store.registry_text()
+        sections.append(
+            "LEVEL object_registry.pl (canonical names from the beginning of the level):\n"
+            + (registry if registry else "% Empty: this is the first identity assignment.\n")
+        )
+
+        if parent is not None:
+            parent_objects = _read_if_present(parent.objects_path)
+            sections.append(
+                "PARENT objects.pl (reuse these names for surviving objects):\n"
+                + (parent_objects or "% Parent objects have not been analyzed yet.\n")
+            )
+
+        sections.append(
+            "INCOMING ACTION:\n"
+            f"action({metadata.get('incoming_action') or 'initial'}, "
+            f"{json.dumps(metadata.get('action_data') or {}, ensure_ascii=False)})."
+        )
+
+        if include_current:
+            current_objects = _read_if_present(node.objects_path)
+            if current_objects:
+                sections.append("CURRENT objects.pl:\n" + current_objects)
+
+        if include_differences:
+            differences = _read_if_present(node.differences_path)
+            if differences:
+                sections.append("CURRENT differences.pl:\n" + differences)
+
+        return "\n\n".join(sections)
+
     def ensure_objects(
         self,
         store: ActionTreeStore,
@@ -96,13 +168,24 @@ class GptArcAnalyzer:
     ) -> tuple[Path, bool]:
         output = node.objects_path
         if output.exists() and output.stat().st_size and not force:
+            store.update_registry_from_objects(node)
             return output, False
+
+        parent = store.parent_node(node)
+        if parent is not None:
+            self.ensure_objects(store, parent, force=False)
+
         text = self._respond(
             self.prompts()["objects"],
             [("Current ARC3 state:", node.image_path)],
+            supplemental_text=self._identity_context(store, node),
         )
+        store.validate_friendly_objects(text, node)
         output.write_text(text, encoding="utf-8")
+        store.update_registry_from_objects(node)
         store.refresh_readme(node)
+        if parent is not None:
+            store.refresh_readme(parent)
         return output, True
 
     def ensure_differences(
@@ -121,21 +204,19 @@ class GptArcAnalyzer:
         if output.exists() and output.stat().st_size and not force:
             return output, False
 
-        parent_objects, _ = self.ensure_objects(store, parent, force=False)
-        current_objects, _ = self.ensure_objects(store, node, force=False)
-        supplemental = (
-            "PREVIOUS objects.pl:\n"
-            + parent_objects.read_text(encoding="utf-8")
-            + "\nCURRENT objects.pl:\n"
-            + current_objects.read_text(encoding="utf-8")
-        )
+        self.ensure_objects(store, parent, force=False)
+        self.ensure_objects(store, node, force=False)
         text = self._respond(
             self.prompts()["differences"],
             [
                 ("Previous ARC3 state:", parent.image_path),
                 ("Current ARC3 state:", node.image_path),
             ],
-            supplemental_text=supplemental,
+            supplemental_text=self._identity_context(
+                store,
+                node,
+                include_current=True,
+            ),
         )
         output.write_text(text, encoding="utf-8")
         store.refresh_readme(node)
@@ -161,6 +242,7 @@ class GptArcAnalyzer:
             "objects_called": objects_called,
             "differences_path": differences_path,
             "differences_called": differences_called,
+            "registry_path": store.object_registry_path,
         }
 
     def generate_single_artifact(
@@ -175,9 +257,16 @@ class GptArcAnalyzer:
         output = node.path / filename
         if output.exists() and output.stat().st_size and not force:
             return output, False
+        self.ensure_objects(store, node, force=False)
         text = self._respond(
             self.prompts()[prompt_name],
             [("Current ARC3 state:", node.image_path)],
+            supplemental_text=self._identity_context(
+                store,
+                node,
+                include_current=True,
+                include_differences=True,
+            ),
         )
         output.write_text(text, encoding="utf-8")
         store.refresh_readme(node)
@@ -198,12 +287,21 @@ class GptArcAnalyzer:
         output = node.path / filename
         if output.exists() and output.stat().st_size and not force:
             return output, False
+        self.ensure_objects(store, parent, force=False)
+        self.ensure_objects(store, node, force=False)
+        self.ensure_differences(store, node, force=False)
         text = self._respond(
             self.prompts()[prompt_name],
             [
                 ("Previous ARC3 state:", parent.image_path),
                 ("Current ARC3 state:", node.image_path),
             ],
+            supplemental_text=self._identity_context(
+                store,
+                node,
+                include_current=True,
+                include_differences=True,
+            ),
         )
         output.write_text(text, encoding="utf-8")
         store.refresh_readme(node)

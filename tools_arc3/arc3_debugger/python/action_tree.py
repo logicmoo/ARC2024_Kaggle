@@ -102,6 +102,16 @@ class ActionTreeStore:
         )
         self.level_root.mkdir(parents=True, exist_ok=True)
 
+    @property
+    def object_registry_path(self) -> Path:
+        return self.level_root / "object_registry.pl"
+
+    def registry_text(self) -> str:
+        path = self.object_registry_path
+        if path.exists() and path.stat().st_size:
+            return path.read_text(encoding="utf-8")
+        return ""
+
     @staticmethod
     def image_hash(png_bytes: bytes) -> str:
         return hashlib.sha256(png_bytes).hexdigest()[:16]
@@ -264,38 +274,117 @@ class ActionTreeStore:
             return self.image_hash(image_path.read_bytes())
         return "unknown"
 
+    FRIENDLY_ID_RE = re.compile(
+        r"^\s*object_identity\(\s*([a-z][a-zA-Z0-9_]*)\s*,.*\)\.\s*$"
+    )
+    OPAQUE_ID_RE = re.compile(r"^(?:obj(?:ect)?|item|thing|shape)_?\d+$", re.IGNORECASE)
+
+    def identity_facts(self, source: str) -> dict[str, str]:
+        """Extract one required object_identity/3 fact per friendly object."""
+        facts: dict[str, str] = {}
+        for line in source.splitlines():
+            match = self.FRIENDLY_ID_RE.match(line)
+            if match:
+                facts[match.group(1)] = line.strip()
+        return facts
+
+    def validate_friendly_objects(self, source: str, node: StateNode) -> None:
+        facts = self.identity_facts(source)
+        if not facts:
+            raise RuntimeError(
+                "GPT objects output has no object_identity/3 facts. Friendly canonical "
+                "IDs are required before objects.pl can be cached."
+            )
+        opaque = sorted(name for name in facts if self.OPAQUE_ID_RE.match(name))
+        if opaque:
+            raise RuntimeError(
+                "GPT returned opaque object IDs instead of friendly names: "
+                + ", ".join(opaque)
+            )
+
+        # Existing names may be absent from a frame. The friendly atom itself is
+        # canonical; descriptive type/label wording may become more precise later.
+        # The registry therefore preserves the first declaration for each name.
+
+    def registry_identities(self) -> dict[str, str]:
+        return self.identity_facts(self.registry_text())
+
+    def update_registry_from_objects(self, node: StateNode) -> Path:
+        if not node.objects_path.exists() or not node.objects_path.stat().st_size:
+            return self.object_registry_path
+        source = node.objects_path.read_text(encoding="utf-8")
+        self.validate_friendly_objects(source, node)
+        registry = self.registry_identities()
+        for name, fact in self.identity_facts(source).items():
+            registry.setdefault(name, fact)
+        lines = [
+            "% Canonical friendly object identities for this entire ARC3 level.",
+            "% Names are created once and reused from the beginning to the end.",
+            "",
+        ]
+        lines.extend(registry[name] for name in sorted(registry))
+        self.object_registry_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        self.refresh_readme(node)
+        return self.object_registry_path
+
     def refresh_readme(self, node: StateNode) -> Path:
         metadata = self.metadata(node)
         parent = self.parent_node(node)
         action_path = metadata.get("action_path") or []
         title = "Initial state" if not action_path else " / ".join(action_path)
+        children = self.child_nodes(node)
 
+        # Navigation belongs at the top so a GitHub-rendered README can be used
+        # directly as the action-tree browser.
         lines: list[str] = [
             f"# `{self.game_dir_name}` level `{self.level}` — {title}",
             "",
-            f"- **Full game ID:** `{self.game_id}`",
-            f"- **State:** `{metadata.get('state', '?')}`",
-            f"- **Image hash:** `{node.image_hash}`",
-            f"- **Incoming action:** `{metadata.get('incoming_action') or 'initial'}`",
+            "## Navigation",
+            "",
         ]
+
+        nav_links: list[str] = []
+        if node.path != self.level_root:
+            nav_links.append(
+                f"[Level start]({_rel_link(node.path, self.level_root / 'README.md')})"
+            )
+        if parent is not None:
+            nav_links.append(
+                f"[Parent]({_rel_link(node.path, parent.readme_path)})"
+            )
+        if nav_links:
+            lines.append(" · ".join(nav_links))
+        else:
+            lines.append("**Level start**")
+
+        lines.extend(["", "### Actions", ""])
+        if not children:
+            lines.append("*No child actions recorded yet.*")
+        else:
+            lines.append(
+                " · ".join(
+                    f"[`{action_dir}`]({_rel_link(node.path, child.readme_path)})"
+                    for action_dir, child in children
+                )
+            )
+
+        lines.extend(
+            [
+                "",
+                "---",
+                "",
+                f"- **Full game ID:** `{self.game_id}`",
+                f"- **State:** `{metadata.get('state', '?')}`",
+                f"- **Image hash:** `{node.image_hash}`",
+                f"- **Incoming action:** `{metadata.get('incoming_action') or 'initial'}`",
+            ]
+        )
 
         action_data = metadata.get("action_data") or {}
         if action_data:
             lines.append(
                 f"- **Action data:** `{json.dumps(action_data, ensure_ascii=False)}`"
             )
-
-        lines.extend(["", "## Navigation", ""])
-        if node.path != self.level_root:
-            lines.append(
-                f"- [Level start]({_rel_link(node.path, self.level_root / 'README.md')})"
-            )
-        if parent is not None:
-            lines.append(
-                f"- [Parent state]({_rel_link(node.path, parent.readme_path)})"
-            )
-        if node.path == self.level_root:
-            lines.append("- This is the level start.")
 
         lines.extend(
             [
@@ -307,10 +396,14 @@ class ActionTreeStore:
                 "## Files",
                 "",
                 "- [state.json](state.json)",
+                f"- [object_registry.pl]({_rel_link(node.path, self.object_registry_path)})",
             ]
         )
 
-        prolog_files = sorted(node.path.glob("*.pl"))
+        prolog_files = sorted(
+            path for path in node.path.glob("*.pl")
+            if path.resolve() != self.object_registry_path.resolve()
+        )
         if prolog_files:
             for pl_file in prolog_files:
                 lines.append(f"- [{pl_file.name}]({pl_file.name})")
@@ -329,16 +422,6 @@ class ActionTreeStore:
                         file_path.read_text(encoding="utf-8").rstrip(),
                         "```",
                     ]
-                )
-
-        children = self.child_nodes(node)
-        lines.extend(["", "## Actions", ""])
-        if not children:
-            lines.append("*No child actions recorded yet.*")
-        else:
-            for action_dir, child in children:
-                lines.append(
-                    f"- [`{action_dir}`]({_rel_link(node.path, child.readme_path)})"
                 )
 
         node.readme_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

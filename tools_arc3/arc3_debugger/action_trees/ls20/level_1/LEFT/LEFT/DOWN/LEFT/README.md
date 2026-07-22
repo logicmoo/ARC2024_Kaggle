@@ -19,6 +19,7 @@
 - [state.json](state.json)
 - [differences.pl](differences.pl)
 - [objects.pl](objects.pl)
+- [redraw.pl](redraw.pl)
 
 ## `objects.pl`
 
