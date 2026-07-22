@@ -188,3 +188,12 @@ df  shared/data/ConceptARC/editor/
 du  shared/data/ConceptARC/editor/
 ls -l
 ls -l tools_arc3/
+ls /opt/ -l
+cd /opt/arcprize/
+ls
+git status .
+ls /opt/ -l
+cd /opt/arcprize/
+vi .gitattributes
+git add .gitattributes 
+git config --global core.fileMode false

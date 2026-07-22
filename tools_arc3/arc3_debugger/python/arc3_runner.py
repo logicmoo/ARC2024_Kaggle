@@ -120,6 +120,48 @@ class Arc3Runner:
         self.records.clear()
         return self.env
 
+
+    def available_games(self) -> list[Any]:
+        """Return all games visible in the current Arcade operation mode."""
+        games = list(self.arc.get_environments() or [])
+        return sorted(games, key=lambda game: str(getattr(game, "game_id", "")))
+
+    @staticmethod
+    def game_info(game: Any) -> dict[str, Any]:
+        """Normalize EnvironmentInfo without assuming a toolkit version."""
+        game_id = str(getattr(game, "game_id", "?"))
+        title = str(getattr(game, "title", game_id))
+        tags = list(getattr(game, "tags", []) or [])
+
+        level_count = None
+        for attr in ("level_count", "num_levels", "total_levels", "levels_count"):
+            value = getattr(game, attr, None)
+            if isinstance(value, int):
+                level_count = value
+                break
+
+        if level_count is None:
+            levels = getattr(game, "levels", None)
+            if isinstance(levels, (list, tuple)):
+                level_count = len(levels)
+
+        return {
+            "game_id": game_id,
+            "title": title,
+            "tags": tags,
+            "level_count": level_count,
+        }
+
+    def switch_game(self, game_id: str) -> Any:
+        """Open a different game and clear the prior run history."""
+        old_game_id = self.game_id
+        self.game_id = game_id
+        try:
+            return self.open()
+        except Exception:
+            self.game_id = old_game_id
+            raise
+
     @property
     def action_space(self) -> list[Any]:
         return list(self.env.action_space)
@@ -232,6 +274,107 @@ class Arc3Runner:
         self.current_observation = None
         self.records.clear()
         return self.env
+
+
+    def current_level_label(self) -> str:
+        for obj in (self.current_observation, self.env):
+            for attr in ("level", "level_index", "current_level", "level_number"):
+                value = getattr(obj, attr, None) if obj is not None else None
+                if value is not None:
+                    return str(value)
+        return "?"
+
+    def current_selection_summary(self) -> str:
+        return f"game={self.game_id} level={self.current_level_label()}"
+
+    def change_level(self, delta: int) -> Any:
+        current = self.current_level_label()
+        try:
+            target = int(current) + delta
+        except (TypeError, ValueError):
+            target = delta
+
+        for name in ("set_level", "select_level", "goto_level", "load_level"):
+            method = getattr(self.env, name, None)
+            if callable(method):
+                result = method(target)
+                self.current_observation = result
+                self.records.clear()
+                return result
+
+        raise RuntimeError("This environment does not expose direct level selection")
+
+    def show_record(self, index: int) -> None:
+        record = self.records[index]
+        print(f"\nStep {record.step}: {record.action} {record.data} state={record.state}")
+        if record.terminal_output:
+            print(record.terminal_output)
+        else:
+            print(json.dumps(record.observation, indent=2, ensure_ascii=False))
+
+    def redraw(self) -> Any:
+        render = getattr(self.env, "render", None)
+        if callable(render):
+            return render()
+        if self.current_observation is not None:
+            print(json.dumps(_jsonable(self.current_observation), indent=2, ensure_ascii=False))
+            return self.current_observation
+        print("No current observation to redraw.")
+        return None
+
+    def execute_queued_step(self) -> Any:
+        for name in ("debug_step", "step_queued", "run_next", "next_step"):
+            method = getattr(self.env, name, None)
+            if callable(method):
+                result = method()
+                self.current_observation = result
+                return result
+        raise RuntimeError("No queued debugger-step API is available yet")
+
+    def export_state(self, path: str | Path) -> Path:
+        output = Path(path)
+        payload = {
+            "game_id": self.game_id,
+            "level": self.current_level_label(),
+            "state": self.state_name(),
+            "observation": _jsonable(self.current_observation),
+        }
+        output.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        return output
+
+    def _control_menu_placeholder(self, label: str) -> None:
+        print(f"[control-menu hook] {label}")
+        print("Current selection:", self.current_selection_summary())
+
+    def control_menu_1_1(self) -> None:
+        self._control_menu_placeholder("Print/Edit GPT prompts")
+
+    def control_menu_1_2(self) -> None:
+        self._control_menu_placeholder("Send current image to GPT for Prolog objects and Turtle form")
+
+    def control_menu_1_3(self) -> None:
+        self._control_menu_placeholder("Redraw game from GPT-generated Turtle")
+
+    def control_menu_1_4(self) -> None:
+        self._control_menu_placeholder("GPT object-similarity matching")
+
+    def control_menu_1_5(self) -> None:
+        self._control_menu_placeholder("Print GPT hypothetical rules")
+
+    def control_menu_2_1(self) -> None:
+        self._control_menu_placeholder("Print/Edit Prolog description of Control Menu 2")
+
+    def control_menu_2_2(self) -> None:
+        self._control_menu_placeholder("Prolog extraction of objects and Turtle form")
+
+    def control_menu_2_3(self) -> None:
+        self._control_menu_placeholder("Redraw game from Turtle Prolog")
+
+    def control_menu_2_4(self) -> None:
+        self._control_menu_placeholder("Prolog object-similarity matching")
+
+    def control_menu_2_5(self) -> None:
+        self._control_menu_placeholder("Print Prolog hypothetical rules")
 
     def state_name(self) -> str | None:
         state = getattr(self.current_observation, "state", None)

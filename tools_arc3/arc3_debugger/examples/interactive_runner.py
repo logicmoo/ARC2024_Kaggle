@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import re
 from pathlib import Path
 from typing import Any
 
@@ -11,34 +12,158 @@ sys.path.insert(0, str(PROJECT_ROOT / "python"))
 
 from arc3_runner import Arc3Runner, action_name, is_complex_action
 
-
-ARROW_SEQUENCES = {
+KEY_SEQUENCES = {
     "\x1b[A": "UP",
     "\x1b[B": "DOWN",
     "\x1b[C": "RIGHT",
     "\x1b[D": "LEFT",
+    "\x1b[1;2A": "SHIFT_UP",
+    "\x1b[1;2B": "SHIFT_DOWN",
+    "\x1b[1;2C": "SHIFT_RIGHT",
+    "\x1b[1;2D": "SHIFT_LEFT",
+    "\x1b[1;5A": "CTRL_UP",
+    "\x1b[1;5B": "CTRL_DOWN",
+    "\x1b[1;5C": "CTRL_RIGHT",
+    "\x1b[1;5D": "CTRL_LEFT",
+    "\x1b[2A": "SHIFT_UP",
+    "\x1b[2B": "SHIFT_DOWN",
+    "\x1b[2C": "SHIFT_RIGHT",
+    "\x1b[2D": "SHIFT_LEFT",
+    "\x1b[5A": "CTRL_UP",
+    "\x1b[5B": "CTRL_DOWN",
+    "\x1b[5C": "CTRL_RIGHT",
+    "\x1b[5D": "CTRL_LEFT",
+    # Common rxvt/tmux modifier forms.
+    "\x1b[a": "SHIFT_UP",
+    "\x1b[b": "SHIFT_DOWN",
+    "\x1b[c": "SHIFT_RIGHT",
+    "\x1b[d": "SHIFT_LEFT",
+    "\x1bO2A": "SHIFT_UP",
+    "\x1bO2B": "SHIFT_DOWN",
+    "\x1bO2C": "SHIFT_RIGHT",
+    "\x1bO2D": "SHIFT_LEFT",
+    # Modern terminal Ctrl+digit encodings (kitty CSI-u / xterm modifyOtherKeys).
+    "\x1b[49;5u": "CTRL_1",
+    "\x1b[50;5u": "CTRL_2",
+    "\x1b[51;5u": "CTRL_3",
+    "\x1b[52;5u": "CTRL_4",
+    "\x1b[53;5u": "CTRL_5",
+    "\x1b[27;5;49~": "CTRL_1",
+    "\x1b[27;5;50~": "CTRL_2",
+    "\x1b[27;5;51~": "CTRL_3",
+    "\x1b[27;5;52~": "CTRL_4",
+    "\x1b[27;5;53~": "CTRL_5",
+    # Alt+digit fallback, usable on ordinary terminals.
+    "\x1b1": "CTRL_1",
+    "\x1b2": "CTRL_2",
+    "\x1b3": "CTRL_3",
+    "\x1b4": "CTRL_4",
+    "\x1b5": "CTRL_5",
 }
 
-FALLBACK_ACTION_KEYS = "1234567890abcdefghijklmnopqrstuvwxyz"
+FALLBACK_ACTION_KEYS = "890bcdfgijkmnotuxyz"
 
 
 def read_key() -> str:
-    """Read one keypress or one complete arrow-key sequence."""
+    """Read one keypress, including modified arrow escape sequences."""
     if os.name == "nt":
-        import msvcrt
+        # msvcrt.getwch() loses modifier state for arrow keys.  Use the
+        # Windows Console API so Shift+Arrow and Ctrl+Arrow remain distinct.
+        import ctypes
+        from ctypes import wintypes
 
-        key = msvcrt.getwch()
+        STD_INPUT_HANDLE = -10
+        KEY_EVENT = 0x0001
 
-        if key in ("\x00", "\xe0"):
-            second = msvcrt.getwch()
-            return {
-                "H": "UP",
-                "P": "DOWN",
-                "M": "RIGHT",
-                "K": "LEFT",
-            }.get(second, key + second)
+        SHIFT_PRESSED = 0x0010
+        LEFT_CTRL_PRESSED = 0x0008
+        RIGHT_CTRL_PRESSED = 0x0004
+        LEFT_ALT_PRESSED = 0x0002
+        RIGHT_ALT_PRESSED = 0x0001
 
-        return key
+        VK_LEFT = 0x25
+        VK_UP = 0x26
+        VK_RIGHT = 0x27
+        VK_DOWN = 0x28
+        VK_RETURN = 0x0D
+        VK_ESCAPE = 0x1B
+
+        class CHAR_UNION(ctypes.Union):
+            _fields_ = [("UnicodeChar", wintypes.WCHAR),
+                        ("AsciiChar", wintypes.CHAR)]
+
+        class KEY_EVENT_RECORD(ctypes.Structure):
+            _fields_ = [
+                ("bKeyDown", wintypes.BOOL),
+                ("wRepeatCount", wintypes.WORD),
+                ("wVirtualKeyCode", wintypes.WORD),
+                ("wVirtualScanCode", wintypes.WORD),
+                ("uChar", CHAR_UNION),
+                ("dwControlKeyState", wintypes.DWORD),
+            ]
+
+        class EVENT_UNION(ctypes.Union):
+            _fields_ = [("KeyEvent", KEY_EVENT_RECORD),
+                        ("_padding", ctypes.c_byte * 16)]
+
+        class INPUT_RECORD(ctypes.Structure):
+            _fields_ = [("EventType", wintypes.WORD),
+                        ("Event", EVENT_UNION)]
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        handle = kernel32.GetStdHandle(STD_INPUT_HANDLE)
+        record = INPUT_RECORD()
+        count = wintypes.DWORD()
+
+        arrows = {
+            VK_UP: "UP",
+            VK_DOWN: "DOWN",
+            VK_LEFT: "LEFT",
+            VK_RIGHT: "RIGHT",
+        }
+
+        while True:
+            ok = kernel32.ReadConsoleInputW(
+                handle, ctypes.byref(record), 1, ctypes.byref(count)
+            )
+            if not ok:
+                raise OSError(ctypes.get_last_error(), "ReadConsoleInputW failed")
+            if record.EventType != KEY_EVENT:
+                continue
+
+            event = record.Event.KeyEvent
+            if not event.bKeyDown:
+                continue
+
+            vk = event.wVirtualKeyCode
+            state = event.dwControlKeyState
+            shift = bool(state & SHIFT_PRESSED)
+            ctrl = bool(state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+            alt = bool(state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+
+            if vk in arrows:
+                prefix = ""
+                if ctrl and shift:
+                    prefix = "CTRL_SHIFT_"
+                elif ctrl:
+                    prefix = "CTRL_"
+                elif shift:
+                    prefix = "SHIFT_"
+                return prefix + arrows[vk]
+
+            if vk == VK_RETURN:
+                return "\r"
+            if vk == VK_ESCAPE:
+                return "\x1b"
+
+            char = event.uChar.UnicodeChar
+            if not char or char == "\x00":
+                continue
+
+            # Preserve Alt+1..5 as the portable control-menu fallback.
+            if alt and char in "12345":
+                return f"CTRL_{char}"
+            return char
 
     import select
     import termios
@@ -46,136 +171,81 @@ def read_key() -> str:
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
-
     try:
         tty.setraw(fd)
         first = sys.stdin.read(1)
-
         if first != "\x1b":
             return first
 
         sequence = first
-
-        # Arrow keys arrive as a short escape sequence. Read any immediately
-        # available bytes without blocking indefinitely.
-        while len(sequence) < 3:
-            ready, _, _ = select.select([sys.stdin], [], [], 0.03)
+        while len(sequence) < 16:
+            ready, _, _ = select.select([sys.stdin], [], [], 0.12)
             if not ready:
                 break
             sequence += sys.stdin.read(1)
+            # CSI/SS3 sequences end with a byte in the 0x40-0x7e range.
+            # Do not treat the initial '[' or 'O' introducer as the final byte.
+            if len(sequence) >= 3 and 0x40 <= ord(sequence[-1]) <= 0x7E:
+                break
+        mapped = KEY_SEQUENCES.get(sequence)
+        if mapped is not None:
+            return mapped
 
-        return ARROW_SEQUENCES.get(sequence, sequence)
+        # Generic CSI/SS3 arrow decoder.  This handles terminals that emit
+        # slightly different parameter forms for modified arrows.
+        match = re.fullmatch(r"\x1b(?:\[|O)(?:(\d+)(?:;(\d+))?)?([ABCD])", sequence)
+        if match:
+            first_param, modifier, final = match.groups()
+            direction = {"A": "UP", "B": "DOWN", "C": "RIGHT", "D": "LEFT"}[final]
+            # xterm modifier convention: 2=Shift, 5=Ctrl, 6=Ctrl+Shift.
+            effective_modifier = modifier or (first_param if first_param in {"2", "5", "6"} else None)
+            if effective_modifier == "2":
+                return f"SHIFT_{direction}"
+            if effective_modifier == "5":
+                return f"CTRL_{direction}"
+            if effective_modifier == "6":
+                return f"CTRL_SHIFT_{direction}"
+            return direction
+
+        return sequence
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def normalized_action_tokens(action: Any) -> set[str]:
-    """
-    Produce several normalized names so mappings remain useful across
-    toolkit versions and game-specific action enums.
-    """
-    values = {
-        action_name(action),
-        str(action),
-        repr(action),
-    }
-
-    tokens: set[str] = set()
-
-    for value in values:
-        normalized = value.upper()
-
-        for separator in ".:-/ ":
-            normalized = normalized.replace(separator, "_")
-
-        parts = [part for part in normalized.split("_") if part]
-        tokens.update(parts)
-        tokens.add("_".join(parts))
-
-    return tokens
-
-
-def infer_direction(action: Any) -> str | None:
-    """
-    Infer a directional meaning only when the action name makes it explicit.
-
-    We intentionally do not assume ACTION1 means UP, ACTION2 means DOWN, etc.
-    Games with opaque ACTION<n> names retain numbered fallback keys.
-    """
-    tokens = normalized_action_tokens(action)
-
-    aliases = {
-        "UP": {"UP", "NORTH", "MOVEUP", "MOVE_UP", "GOUP", "GO_UP"},
-        "DOWN": {"DOWN", "SOUTH", "MOVEDOWN", "MOVE_DOWN", "GODOWN", "GO_DOWN"},
-        "LEFT": {"LEFT", "WEST", "MOVELEFT", "MOVE_LEFT", "GOLEFT", "GO_LEFT"},
-        "RIGHT": {"RIGHT", "EAST", "MOVERIGHT", "MOVE_RIGHT", "GORIGHT", "GO_RIGHT"},
-    }
-
-    matches = [
-        direction
-        for direction, names in aliases.items()
-        if tokens.intersection(names)
-    ]
-
-    return matches[0] if len(matches) == 1 else None
-
-
-
 def build_keymap(runner: Arc3Runner) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    """Build standardized ARC controls plus safe fallbacks."""
     mapping: dict[str, Any] = {}
     rows: list[dict[str, Any]] = []
-    assigned_ids: set[int] = set()
+    assigned: set[int] = set()
 
     standard = {
-        "ACTION1": ("UP", "1", "↑ / 1"),
-        "ACTION2": ("DOWN", "2", "↓ / 2"),
-        "ACTION3": ("LEFT", "3", "← / 3"),
-        "ACTION4": ("RIGHT", "4", "→ / 4"),
-        "ACTION5": (" ", "5", "Space / 5"),
-        "ACTION6": ("6", None, "6"),
-        "ACTION7": ("\x1a", "7", "Ctrl-Z / 7"),
+        "ACTION1": (("UP", "1"), "↑ / 1"),
+        "ACTION2": (("DOWN", "2"), "↓ / 2"),
+        "ACTION3": (("LEFT", "3"), "← / 3"),
+        "ACTION4": (("RIGHT", "4"), "→ / 4"),
+        "ACTION5": ((" ", "5"), "Space / 5"),
+        "ACTION6": (("6",), "6"),
+        "ACTION7": (("\x1a", "7"), "Ctrl-Z / 7"),
     }
 
     for action in runner.action_space:
         name = action_name(action).upper()
         if name not in standard:
             continue
-        primary, alias, display = standard[name]
-        mapping[primary] = action
-        if alias is not None:
-            mapping[alias] = action
-        assigned_ids.add(id(action))
-        rows.append({"key": display, "action": action, "semantic": True})
+        keys, display = standard[name]
+        for key in keys:
+            mapping[key] = action
+        rows.append({"key": display, "action": action})
+        assigned.add(id(action))
 
+    fallback = iter(FALLBACK_ACTION_KEYS)
     for action in runner.action_space:
-        if id(action) in assigned_ids:
+        if id(action) in assigned:
             continue
-        direction = infer_direction(action)
-        if direction and direction not in mapping:
-            mapping[direction] = action
-            assigned_ids.add(id(action))
-            rows.append({
-                "key": {"UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→"}[direction],
-                "action": action,
-                "semantic": True,
-            })
-
-    reserved = {"r", "R", "h", "s", "a", "?", "q", " ", "1", "2", "3", "4", "5", "6", "7"}
-    fallback_keys = (
-        key for key in FALLBACK_ACTION_KEYS
-        if key not in reserved and key not in mapping
-    )
-
-    for action in runner.action_space:
-        if id(action) in assigned_ids:
-            continue
-        key = next(fallback_keys, None)
+        key = next(fallback, None)
         if key is None:
-            raise RuntimeError("Too many legal actions for available fallback keys.")
+            raise RuntimeError("Too many legal actions for available fallback keys")
         mapping[key] = action
-        assigned_ids.add(id(action))
-        rows.append({"key": key, "action": action, "semantic": False})
+        rows.append({"key": key, "action": action})
 
     return mapping, rows
 
@@ -185,169 +255,275 @@ def choose_coordinate() -> tuple[int, int] | None:
     x_text = input("x [0-63, blank cancels]: ").strip()
     if not x_text:
         return None
-
     y_text = input("y [0-63, blank cancels]: ").strip()
     if not y_text:
         return None
-
-    x = int(x_text)
-    y = int(y_text)
-
+    x, y = int(x_text), int(y_text)
     if not (0 <= x <= 63 and 0 <= y <= 63):
-        raise ValueError("Coordinates must be between 0 and 63.")
-
+        raise ValueError("Coordinates must be between 0 and 63")
     return x, y
 
 
-def print_controls(
-    runner: Arc3Runner,
-    mapping: dict[str, Any],
-    rows: list[dict[str, Any]],
-) -> None:
-    print("\nARC3 Interactive Debugger")
-    print("=========================")
-    print("Action keys:")
-
-    for row in rows:
-        action = row["action"]
-        suffix = " (asks for x,y)" if is_complex_action(action) else ""
-        print(f"  {row['key']:<2} {action_name(action)}{suffix}")
-
-    print("\nStandard aliases:")
-    print("  ↑/1 ACTION1   ↓/2 ACTION2")
-    print("  ←/3 ACTION3   →/4 ACTION4")
-    print("  Space/5 ACTION5   6 ACTION6   Ctrl-Z/7 ACTION7")
-    print("\nDebugger keys:")
-    print("  r  reset current level")
-    print("  R  restart from level 1")
-    print("  h  show history")
-    print("  s  show scorecard")
-    print("  a  show legal actions")
-    print("  ?  reprint controls")
-    print("  q  quit")
-    print()
+def print_controls(runner: Arc3Runner, rows: list[dict[str, Any]]) -> None:
+    print("\nARC3 DEBUGGER")
+    print("Actions:", end=" ")
+    print("  ".join(f"({row['key']}) {action_name(row['action'])}" for row in rows))
+    print("Game: (Shift+←/→) Prev/Next  (Shift+↑/↓) Prev/Next Level")
+    print("Steps: (Ctrl+←/→) Prev/Next  (Ctrl+↑/↓) First/Latest")
+    print("Reset: (r) Reset Level  (R) Restart Game")
+    print("Info: (L) Games/Levels  (l) Current  (a) Actions  (h) History  (s) Score  (?) Help")
+    print("Run: (Enter) Redraw  (p) Pause  (.) Step  (v) Replay")
+    print("Files: (w) Save History  (e) Export State")
+    print("Menus: (!) GPT  (@) Prolog  (Ctrl/Alt+1..5) Command  (Esc) Exit Menu")
+    print("Exit: (q) Quit  (Ctrl-C) Quit Now")
 
 
-def show_history(runner: Arc3Runner) -> None:
+def list_games(runner: Arc3Runner, games: list[Any], selected_index: int) -> None:
+    print("\nAvailable games:")
+    for index, game in enumerate(games):
+        info = runner.game_info(game)
+        marker = ">" if index == selected_index else " "
+        levels = info["level_count"] if info["level_count"] is not None else "?"
+        print(f" {marker} {index + 1:>2}. {info['game_id']:<12} levels={levels:<3} {info['title']}")
+
+
+def show_history(runner: Arc3Runner, cursor: int | None = None) -> None:
     history = runner.history()
-
     if not history:
         print("\nNo actions recorded.")
         return
-
     print("\nHistory:")
-    for item in history:
-        print(
-            f"  {item['step']:>3}: "
-            f"{item['action']} "
-            f"{item['data']} "
-            f"state={item['state']}"
-        )
+    for index, item in enumerate(history):
+        marker = ">" if cursor == index else " "
+        print(f" {marker} {item['step']:>3}: {item['action']} {item['data']} state={item['state']}")
+
+
+
+CONTROL_MENUS = {
+    1: {
+        "title": "GPT Control Menu",
+        1: "Print/Edit GPT prompts",
+        2: "Send current image to GPT; return Prolog objects and Turtle form",
+        3: "Redraw game from GPT-generated Turtle",
+        4: "Attempt object-similarity matching with GPT",
+        5: "Print hypothetical rules from GPT",
+    },
+    2: {
+        "title": "Prolog Control Menu",
+        1: "Print/Edit Prolog description of Control Menu 2",
+        2: "Extract current image into Prolog objects and Turtle form",
+        3: "Redraw game from Turtle Prolog",
+        4: "Attempt object-similarity matching with Prolog",
+        5: "Print hypothetical rules from Prolog",
+    },
+}
+
+
+def print_control_menu(menu_number: int) -> None:
+    menu = CONTROL_MENUS[menu_number]
+    print(f"\nMENU {menu_number}: {menu['title']}")
+    for number in range(1, 6):
+        print(f"(Ctrl/Alt+{number}) {menu[number]}")
+    print("(!) GPT  (@) Prolog  (Esc) Close")
+
+
+def dispatch_control_menu(runner: Arc3Runner, menu_number: int, command_number: int) -> None:
+    """Dispatch control-menu commands. Integration hooks are intentionally explicit."""
+    method_name = f"control_menu_{menu_number}_{command_number}"
+    method = getattr(runner, method_name, None)
+    if callable(method):
+        method()
+        return
+    print(f"Not implemented yet: {CONTROL_MENUS[menu_number][command_number]}")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Single-key ARC3 debugger runner"
-    )
+    parser = argparse.ArgumentParser(description="Single-key ARC3 debugger runner")
     parser.add_argument("game_id", nargs="?", default="ls20")
     parser.add_argument("--render-mode", default="terminal")
     args = parser.parse_args()
 
-    runner = Arc3Runner(
-        args.game_id,
-        render_mode=args.render_mode,
+    runner = Arc3Runner(args.game_id, render_mode=args.render_mode)
+    games = runner.available_games()
+    selected_game = next(
+        (
+            i
+            for i, game in enumerate(games)
+            if runner.game_info(game)["game_id"] == runner.game_id
+            or runner.game_info(game)["game_id"].startswith(runner.game_id + "-")
+        ),
+        0,
     )
-
+    history_cursor: int | None = None
+    paused = False
+    active_control_menu: int | None = None
     action_mapping, action_rows = build_keymap(runner)
-    print_controls(runner, action_mapping, action_rows)
+    print_controls(runner, action_rows)
 
     while True:
         print(
-            f"\n[{runner.game_id}] "
-            f"step={len(runner.records)} "
-            f"state={runner.state_name() or '-'} "
-            f"> ",
+            f"\n[{runner.game_id} level={runner.current_level_label()}] "
+            f"step={len(runner.records)} state={runner.state_name() or '-'} "
+            f"{'PAUSED ' if paused else ''}> ",
             end="",
             flush=True,
         )
-
         key = read_key()
-        lookup_key = key if key in {"UP", "DOWN", "LEFT", "RIGHT", "\x1a", " "} else key.lower()
+        lookup = key if key in KEY_SEQUENCES.values() or key in {" ", "\x1a"} else key.lower()
 
-        if key in {"UP", "DOWN", "LEFT", "RIGHT"}:
-            print({"UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→"}[key])
-        elif key == " ":
-            print("Space")
-        elif key == "\x1a":
-            print("Ctrl-Z")
-        elif key.isprintable():
-            print(key)
-        else:
-            print(repr(key))
+        labels = {
+            "UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→",
+            "SHIFT_UP": "Shift+↑", "SHIFT_DOWN": "Shift+↓",
+            "SHIFT_LEFT": "Shift+←", "SHIFT_RIGHT": "Shift+→",
+            "CTRL_UP": "Ctrl+↑", "CTRL_DOWN": "Ctrl+↓",
+            "CTRL_LEFT": "Ctrl+←", "CTRL_RIGHT": "Ctrl+→",
+            " ": "Space", "\x1a": "Ctrl-Z", "\r": "Enter", "\n": "Enter",
+            "CTRL_1": "Ctrl/Alt+1", "CTRL_2": "Ctrl/Alt+2",
+            "CTRL_3": "Ctrl/Alt+3", "CTRL_4": "Ctrl/Alt+4", "CTRL_5": "Ctrl/Alt+5",
+        }
+        print(labels.get(key, key if key.isprintable() else repr(key)))
 
         try:
-            if lookup_key in {"q", "\x03", "\x04"}:
+            if key in {"\x03", "\x04"} or lookup == "q":
                 break
-
-            if lookup_key == "?":
+            if lookup == "?":
                 action_mapping, action_rows = build_keymap(runner)
-                print_controls(runner, action_mapping, action_rows)
+                print_controls(runner, action_rows)
+                continue
+
+            if key == "!":
+                active_control_menu = 1
+                print_control_menu(active_control_menu)
+                continue
+            if key == "@":
+                active_control_menu = 2
+                print_control_menu(active_control_menu)
+                continue
+            if key in {"CTRL_1", "CTRL_2", "CTRL_3", "CTRL_4", "CTRL_5"}:
+                if active_control_menu is None:
+                    print("Select Control Menu 1 with Shift+1 (!) or Menu 2 with Shift+2 (@) first.")
+                    continue
+                command_number = int(key[-1])
+                dispatch_control_menu(runner, active_control_menu, command_number)
+                continue
+            if key == "\x1b":
+                active_control_menu = None
+                print("Control-menu mode cleared.")
+                continue
+
+            if key == "L":
+                games = runner.available_games()
+                list_games(runner, games, selected_game)
+                continue
+            if key == "l":
+                print(runner.current_selection_summary())
+                continue
+
+            if key in {"SHIFT_LEFT", "SHIFT_RIGHT"}:
+                games = runner.available_games()
+                if not games:
+                    print("No games available.")
+                    continue
+                selected_game = (selected_game + (-1 if key == "SHIFT_LEFT" else 1)) % len(games)
+                game_id = runner.game_info(games[selected_game])["game_id"]
+                runner.switch_game(game_id)
+                action_mapping, action_rows = build_keymap(runner)
+                history_cursor = None
+                print(f"Selected game {selected_game + 1}/{len(games)}: {game_id}")
+                continue
+
+            if key in {"SHIFT_UP", "SHIFT_DOWN"}:
+                delta = -1 if key == "SHIFT_UP" else 1
+                runner.change_level(delta)
+                history_cursor = None
+                print(runner.current_selection_summary())
+                continue
+
+            if key in {"CTRL_LEFT", "CTRL_RIGHT", "CTRL_UP", "CTRL_DOWN"}:
+                count = len(runner.records)
+                if count == 0:
+                    print("No recorded steps.")
+                    continue
+                if key == "CTRL_UP":
+                    history_cursor = 0
+                elif key == "CTRL_DOWN":
+                    history_cursor = count - 1
+                elif key == "CTRL_LEFT":
+                    history_cursor = max(0, (count - 1 if history_cursor is None else history_cursor - 1))
+                else:
+                    history_cursor = min(count - 1, (0 if history_cursor is None else history_cursor + 1))
+                runner.show_record(history_cursor)
                 continue
 
             if key == "R":
                 runner.restart_game()
+                history_cursor = None
                 action_mapping, action_rows = build_keymap(runner)
                 print("Game restarted from level 1.")
                 continue
-
-            if lookup_key == "r":
+            if key == "r":
                 runner.reset()
-                action_mapping, action_rows = build_keymap(runner)
+                history_cursor = None
                 print("Current level reset.")
                 continue
 
-            if lookup_key == "h":
-                show_history(runner)
+            if key == "h":
+                show_history(runner, history_cursor)
                 continue
-
-            if lookup_key == "s":
+            if key == "s":
                 print("\nScorecard:")
                 print(runner.scorecard())
                 continue
-
-            if lookup_key == "a":
-                print("\nLegal actions:")
+            if key == "a":
                 for row in runner.action_table():
-                    suffix = " complex" if row["complex"] else ""
-                    print(
-                        f"  {row['index']:>2}: "
-                        f"{row['name']}{suffix}"
-                    )
+                    print(f"  {row['index']:>2}: {row['name']}{' complex' if row['complex'] else ''}")
                 continue
 
-            action = action_mapping.get(lookup_key)
+            if key in {"\r", "\n"}:
+                runner.redraw()
+                continue
+            if key == "p":
+                paused = not paused
+                print("Paused." if paused else "Resumed.")
+                continue
+            if key == ".":
+                runner.execute_queued_step()
+                continue
+            if key == "v":
+                runner.replay()
+                history_cursor = None
+                print("Replay complete.")
+                continue
+            if key == "w":
+                output = runner.save_history(Path.cwd() / f"{runner.game_id}_history.json")
+                print(f"Saved history: {output}")
+                continue
+            if key == "e":
+                output = runner.export_state(Path.cwd() / f"{runner.game_id}_state.json")
+                print(f"Exported state: {output}")
+                continue
+
+            action = action_mapping.get(lookup)
             if action is None:
-                print("No action is mapped to that key. Press ? for controls.")
+                if isinstance(key, str) and key.startswith("\x1b"):
+                    print(f"Unrecognized key sequence: {key.encode('unicode_escape').decode()}")
+                else:
+                    print("No action mapped. Press ? for controls.")
                 continue
-
             if is_complex_action(action):
                 coordinates = choose_coordinate()
                 if coordinates is None:
                     print("Action cancelled.")
                     continue
-
-                x, y = coordinates
-                runner.step(action, x=x, y=y)
+                runner.step(action, x=coordinates[0], y=coordinates[1])
             else:
                 runner.step(action)
-
+            history_cursor = None
             print("state:", runner.state_name())
-
             if runner.is_win():
                 print("WIN")
             elif runner.is_game_over():
                 print("GAME OVER — press r to reset.")
-
         except Exception as exc:
             print(f"error: {exc}")
 
