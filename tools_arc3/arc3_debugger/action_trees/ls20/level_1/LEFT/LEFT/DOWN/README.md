@@ -1,14 +1,19 @@
 # `ls20` level `1` — LEFT / LEFT / DOWN
 
+## Navigation
+
+[Level start](../../../README.md) · [Parent](../README.md)
+
+### Actions
+
+[`LEFT`](LEFT/README.md)
+
+---
+
 - **Full game ID:** `ls20`
 - **State:** `NOT_FINISHED`
 - **Image hash:** `c21b4677850b6e9c`
 - **Incoming action:** `ACTION2`
-
-## Navigation
-
-- [Level start](../../../README.md)
-- [Parent state](../README.md)
 
 ## Image
 
@@ -16,480 +21,1090 @@
 
 ## Files
 
+- [image.png](image.png)
 - [state.json](state.json)
+- [object_registry.pl](../../../object_registry.pl) — shared level registry (24 canonical identities)
 - [differences.pl](differences.pl)
 - [objects.pl](objects.pl)
-- [redraw.pl](redraw.pl)
-- [redraw_diff.pl](redraw_diff.pl)
+- [rules.pl](rules.pl)
 - [similarities.pl](similarities.pl)
+- [turtle_from_diff.pl](turtle_from_diff.pl)
+- [turtle_from_image.pl](turtle_from_image.pl)
 
-## `objects.pl`
+## Embedded files
 
-```prolog
-coordinate_system(canvas_pixels, 640, 640, origin_top_left, x_right, y_down).
-cell_scale(10).
+*Canonical identities are shared through [`object_registry.pl`](../../../object_registry.pl) and are not repeated in every node.*
 
-color(yellow, rgb(255,220,0)).
-color(green, rgb(46,204,64)).
-color(light_gray, rgb(170,170,170)).
-color(dark_gray, rgb(102,102,102)).
-color(maroon, rgb(133,20,75)).
-color(blue, rgb(0,116,217)).
-color(light_blue, rgb(127,219,255)).
-color(black, rgb(0,0,0)).
+<details>
+<summary><code>state.json</code></summary>
 
-object(background, background).
-bbox(background, 0, 0, 640, 640).
-object_colors(background, [yellow]).
-geometry(background, rectangle(0,0,640,640)).
-layer(background, 0).
-turtle_program(background,
-    [penup,set_pos(0,0),setcolor(yellow),pendown,fill_rect(640,640),penup]).
+````json
+{
+  "state": "NOT_FINISHED",
+  "observation": {
+    "game_id": "ls20-9607627b",
+    "state": "NOT_FINISHED",
+    "levels_completed": 0,
+    "win_levels": 7,
+    "action_input": {
+      "id": "ACTION2",
+      "data": {},
+      "reasoning": null
+    },
+    "guid": "a992cb74-c0cd-4d3e-915e-9312cff80356",
+    "full_reset": false,
+    "available_actions": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "step_count": 2,
+  "game_id": "ls20",
+  "game_directory": "ls20",
+  "level": "1",
+  "image_hash": "c21b4677850b6e9c",
+  "incoming_action": "ACTION2",
+  "action_directory": "DOWN",
+  "action_data": {},
+  "parent_node": "..",
+  "action_path": [
+    "LEFT",
+    "LEFT",
+    "DOWN"
+  ]
+}
+````
 
-object(left_sidebar, boundary_strip).
-bbox(left_sidebar, 0, 0, 40, 520).
-object_colors(left_sidebar, [light_gray]).
-geometry(left_sidebar, rectangle(0,0,40,520)).
-layer(left_sidebar, 1).
-touches_canvas_edge(left_sidebar, left).
-touches_canvas_edge(left_sidebar, top).
-adjacent(left_sidebar, background, right_edge).
-turtle_program(left_sidebar,
-    [penup,set_pos(0,0),setcolor(light_gray),pendown,fill_rect(40,520),penup]).
+[Open `state.json`](state.json)
 
-object(main_green_structure, traversable_structure).
-bbox(main_green_structure, 140, 80, 400, 420).
-object_colors(main_green_structure, [green]).
-geometry(main_green_structure,
-    union_rectangles([
-        rect(320,80,90,90),
-        rect(340,160,50,90),
-        rect(140,250,400,150),
-        rect(190,400,50,100),
-        rect(340,400,200,100),
-        rect(290,450,50,50)
-    ])).
-connected(main_green_structure).
-layer(main_green_structure, 2).
-turtle_program(main_green_structure,
-    [penup,setcolor(green),
-     set_pos(320,80),pendown,fill_rect(90,90),penup,
-     set_pos(340,160),pendown,fill_rect(50,90),penup,
-     set_pos(140,250),pendown,fill_rect(400,150),penup,
-     set_pos(190,400),pendown,fill_rect(50,100),penup,
-     set_pos(340,400),pendown,fill_rect(200,100),penup,
-     set_pos(290,450),pendown,fill_rect(50,50),penup]).
+</details>
 
-object(main_cutout, open_negative_space).
-bbox(main_cutout, 240, 300, 100, 150).
-object_colors(main_cutout, [yellow]).
-geometry(main_cutout,
-    union_rectangles([
-        rect(290,300,50,150),
-        rect(240,400,50,50)
-    ])).
-open_to_background(main_cutout, left).
-adjacent(main_cutout, main_green_structure, upper_edge).
-adjacent(main_cutout, main_green_structure, right_edge).
-adjacent(main_cutout, main_green_structure, lower_edge).
-layer(main_cutout, 3).
-turtle_program(main_cutout,
-    [penup,setcolor(yellow),
-     set_pos(290,300),pendown,fill_rect(50,150),penup,
-     set_pos(240,400),pendown,fill_rect(50,50),penup]).
+<details>
+<summary><code>differences.pl</code></summary>
 
-object(top_terminal_panel, inset_panel).
-bbox(top_terminal_panel, 330, 90, 70, 70).
-object_colors(top_terminal_panel, [light_gray]).
-geometry(top_terminal_panel, rectangle(330,90,70,70)).
-embedded_in(top_terminal_panel, main_green_structure).
-adjacent(top_terminal_panel, main_green_structure, all_four_edges).
-layer(top_terminal_panel, 4).
-turtle_program(top_terminal_panel,
-    [penup,set_pos(330,90),setcolor(light_gray),pendown,fill_rect(70,70),penup]).
+````prolog
+transition(action3, action4).
+transition_action(action3, action4, action('ACTION2', {})).
 
-object(top_terminal_glyph, glyph).
-bbox(top_terminal_glyph, 350, 110, 30, 30).
-object_colors(top_terminal_glyph, [maroon]).
-geometry(top_terminal_glyph,
-    union_rectangles([
-        rect(350,110,30,10),
-        rect(370,120,10,20),
-        rect(350,130,10,10)
-    ])).
-component_count(top_terminal_glyph, 2).
-contains(top_terminal_panel, top_terminal_glyph).
-layer(top_terminal_glyph, 5).
-turtle_program(top_terminal_glyph,
-    [penup,setcolor(maroon),
-     set_pos(350,110),pendown,fill_rect(30,10),penup,
-     set_pos(370,120),pendown,fill_rect(10,20),penup,
-     set_pos(350,130),pendown,fill_rect(10,10),penup]).
+added_object(_) :- fail.
+removed_object(_) :- fail.
+changed_object(_, _, _) :- fail.
+moved_object(_, _, _, _) :- fail.
+recolored_object(_, _, _) :- fail.
+resized_object(_, _, _) :- fail.
 
-object(player_black, player_component).
-bbox(player_black, 210, 310, 20, 20).
-object_colors(player_black, [black]).
-geometry(player_black, rectangle(210,310,20,20)).
-contained_in(player_black, main_green_structure).
-adjacent(player_black, player_blue, edge_contact).
-layer(player_black, 6).
-turtle_program(player_black,
-    [penup,set_pos(210,310),setcolor(black),pendown,fill_rect(20,20),penup]).
+unchanged_object(yellow_playfield, all_observed_properties).
+unchanged_object(left_boundary_wall, all_observed_properties).
+unchanged_object(green_fortress, all_observed_properties).
+unchanged_object(fortress_main_body, all_observed_properties).
+unchanged_object(fortress_left_wing, all_observed_properties).
+unchanged_object(fortress_right_wing, all_observed_properties).
+unchanged_object(fortress_lower_bridge, all_observed_properties).
+unchanged_object(fortress_upper_stem, all_observed_properties).
+unchanged_object(fortress_inner_courtyard, all_observed_properties).
+unchanged_object(upper_chamber_frame, all_observed_properties).
+unchanged_object(upper_chamber_interior, all_observed_properties).
+unchanged_object(upper_burgundy_glyph, all_observed_properties).
+unchanged_object(blue_black_player, all_observed_properties).
+unchanged_object(player_black_core, all_observed_properties).
+unchanged_object(player_blue_tail, all_observed_properties).
+unchanged_object(bottom_center_gate, all_observed_properties).
+unchanged_object(gate_gray_header, all_observed_properties).
+unchanged_object(gate_burgundy_panel, all_observed_properties).
+unchanged_object(lower_left_symbol_card, all_observed_properties).
+unchanged_object(lower_left_burgundy_glyph, all_observed_properties).
+unchanged_object(bottom_status_panel, all_observed_properties).
+unchanged_object(bottom_status_track, all_observed_properties).
+unchanged_object(cyan_status_blocks, all_observed_properties).
 
-object(player_blue, player_component).
-bbox(player_blue, 200, 320, 20, 20).
-object_colors(player_blue, [blue]).
-geometry(player_blue,
-    union_rectangles([
-        rect(200,320,10,10),
-        rect(210,330,10,10)
-    ])).
-component_count(player_blue, 2).
-contained_in(player_blue, main_green_structure).
-adjacent(player_blue, player_black, edge_contact).
-layer(player_blue, 7).
-turtle_program(player_blue,
-    [penup,setcolor(blue),
-     set_pos(200,320),pendown,fill_rect(10,10),penup,
-     set_pos(210,330),pendown,fill_rect(10,10),penup]).
+observation(action4, visually_unchanged_from(action3)).
+observation(action4, no_added_objects).
+observation(action4, no_removed_objects).
+observation(action4, no_changed_objects).
 
-composite_object(player, [player_black,player_blue]).
-bbox(player, 200, 310, 30, 30).
-object_colors(player, [black,blue]).
-contained_in(player, main_green_structure).
+action_effect(action('ACTION2', {}), no_observable_visual_change).
 
-object(lower_terminal_cap, terminal_component).
-bbox(lower_terminal_cap, 240, 450, 50, 20).
-object_colors(lower_terminal_cap, [light_gray]).
-geometry(lower_terminal_cap, rectangle(240,450,50,20)).
-adjacent(lower_terminal_cap, lower_terminal_core, lower_edge).
-adjacent(lower_terminal_cap, main_green_structure, left_right_edges).
-layer(lower_terminal_cap, 8).
-turtle_program(lower_terminal_cap,
-    [penup,set_pos(240,450),setcolor(light_gray),pendown,fill_rect(50,20),penup]).
+hypothesis(action4, none).
+````
 
-object(lower_terminal_core, terminal_component).
-bbox(lower_terminal_core, 240, 470, 50, 30).
-object_colors(lower_terminal_core, [maroon]).
-geometry(lower_terminal_core, rectangle(240,470,50,30)).
-adjacent(lower_terminal_core, lower_terminal_cap, upper_edge).
-adjacent(lower_terminal_core, main_green_structure, left_right_edges).
-layer(lower_terminal_core, 9).
-turtle_program(lower_terminal_core,
-    [penup,set_pos(240,470),setcolor(maroon),pendown,fill_rect(50,30),penup]).
+[Open `differences.pl`](differences.pl)
 
-composite_object(lower_terminal, [lower_terminal_cap,lower_terminal_core]).
-bbox(lower_terminal, 240, 450, 50, 50).
-object_colors(lower_terminal, [light_gray,maroon]).
-embedded_in(lower_terminal, main_green_structure).
+</details>
 
-object(lower_left_panel, ui_panel).
-bbox(lower_left_panel, 10, 530, 100, 100).
-object_colors(lower_left_panel, [light_gray]).
-geometry(lower_left_panel, rectangle(10,530,100,100)).
-contained_in(lower_left_panel, background).
-layer(lower_left_panel, 10).
-turtle_program(lower_left_panel,
-    [penup,set_pos(10,530),setcolor(light_gray),pendown,fill_rect(100,100),penup]).
+<details>
+<summary><code>objects.pl</code></summary>
 
-object(lower_left_glyph, glyph).
-bbox(lower_left_glyph, 30, 550, 60, 60).
-object_colors(lower_left_glyph, [maroon]).
-geometry(lower_left_glyph,
-    union_rectangles([
-        rect(30,550,60,20),
-        rect(30,570,20,40),
-        rect(70,590,20,20)
-    ])).
-component_count(lower_left_glyph, 2).
-contains(lower_left_panel, lower_left_glyph).
-layer(lower_left_glyph, 11).
-turtle_program(lower_left_glyph,
-    [penup,setcolor(maroon),
-     set_pos(30,550),pendown,fill_rect(60,20),penup,
-     set_pos(30,570),pendown,fill_rect(20,40),penup,
-     set_pos(70,590),pendown,fill_rect(20,20),penup]).
+````prolog
+% Canonical object identities live in the level-wide registry.
+:- ensure_loaded('../../../object_registry.pl').
 
-object(bottom_toolbar, ui_panel).
-bbox(bottom_toolbar, 120, 600, 520, 40).
-object_colors(bottom_toolbar, [light_gray]).
-geometry(bottom_toolbar, rectangle(120,600,520,40)).
-touches_canvas_edge(bottom_toolbar, right).
-touches_canvas_edge(bottom_toolbar, bottom).
-layer(bottom_toolbar, 12).
-turtle_program(bottom_toolbar,
-    [penup,set_pos(120,600),setcolor(light_gray),pendown,fill_rect(520,40),penup]).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-object(toolbar_green_segment, status_segment).
-bbox(toolbar_green_segment, 130, 610, 30, 20).
-object_colors(toolbar_green_segment, [green]).
-geometry(toolbar_green_segment, rectangle(130,610,30,20)).
-contained_in(toolbar_green_segment, bottom_toolbar).
-adjacent(toolbar_green_segment, toolbar_dark_segment, right_edge).
-layer(toolbar_green_segment, 13).
-turtle_program(toolbar_green_segment,
-    [penup,set_pos(130,610),setcolor(green),pendown,fill_rect(30,20),penup]).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-object(toolbar_dark_segment, status_segment).
-bbox(toolbar_dark_segment, 160, 610, 390, 20).
-object_colors(toolbar_dark_segment, [dark_gray]).
-geometry(toolbar_dark_segment, rectangle(160,610,390,20)).
-contained_in(toolbar_dark_segment, bottom_toolbar).
-adjacent(toolbar_dark_segment, toolbar_green_segment, left_edge).
-layer(toolbar_dark_segment, 13).
-turtle_program(toolbar_dark_segment,
-    [penup,set_pos(160,610),setcolor(dark_gray),pendown,fill_rect(390,20),penup]).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-object(toolbar_blue_slot_1, status_slot).
-bbox(toolbar_blue_slot_1, 560, 610, 20, 20).
-object_colors(toolbar_blue_slot_1, [light_blue]).
-geometry(toolbar_blue_slot_1, rectangle(560,610,20,20)).
-contained_in(toolbar_blue_slot_1, bottom_toolbar).
-layer(toolbar_blue_slot_1, 13).
-turtle_program(toolbar_blue_slot_1,
-    [penup,set_pos(560,610),setcolor(light_blue),pendown,fill_rect(20,20),penup]).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-object(toolbar_blue_slot_2, status_slot).
-bbox(toolbar_blue_slot_2, 590, 610, 20, 20).
-object_colors(toolbar_blue_slot_2, [light_blue]).
-geometry(toolbar_blue_slot_2, rectangle(590,610,20,20)).
-contained_in(toolbar_blue_slot_2, bottom_toolbar).
-layer(toolbar_blue_slot_2, 13).
-turtle_program(toolbar_blue_slot_2,
-    [penup,set_pos(590,610),setcolor(light_blue),pendown,fill_rect(20,20),penup]).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-object(toolbar_blue_slot_3, status_slot).
-bbox(toolbar_blue_slot_3, 620, 610, 20, 20).
-object_colors(toolbar_blue_slot_3, [light_blue]).
-geometry(toolbar_blue_slot_3, rectangle(620,610,20,20)).
-contained_in(toolbar_blue_slot_3, bottom_toolbar).
-touches_canvas_edge(toolbar_blue_slot_3, right).
-layer(toolbar_blue_slot_3, 13).
-turtle_program(toolbar_blue_slot_3,
-    [penup,set_pos(620,610),setcolor(light_blue),pendown,fill_rect(20,20),penup]).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-aligned_vertical(top_terminal_panel, main_green_structure).
-aligned_vertical(top_terminal_glyph, lower_terminal).
-aligned_horizontal(player, main_cutout).
-above(top_terminal_panel, player).
-above(player, lower_terminal).
-left_of(lower_left_panel, bottom_toolbar).
-disjoint(lower_left_panel, bottom_toolbar).
-render_order([
-    background,
-    left_sidebar,
-    main_green_structure,
-    main_cutout,
-    top_terminal_panel,
-    top_terminal_glyph,
-    player_black,
-    player_blue,
-    lower_terminal_cap,
-    lower_terminal_core,
-    lower_left_panel,
-    lower_left_glyph,
-    bottom_toolbar,
-    toolbar_green_segment,
-    toolbar_dark_segment,
-    toolbar_blue_slot_1,
-    toolbar_blue_slot_2,
-    toolbar_blue_slot_3
-]).
-```
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-## `differences.pl`
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-```prolog
-comparison_basis(rendered_pixels_and_supplied_object_descriptions).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-cell_scale(10).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-color_equivalent(gray, light_gray).
-color_equivalent(cyan, light_blue).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-object_correspondence(background_1, background).
-object_correspondence(left_wall_1, left_sidebar).
-object_correspondence(structure_1, main_green_structure).
-object_correspondence(chamber_1, top_terminal_panel).
-object_correspondence(chamber_glyph_1, top_terminal_glyph).
-object_correspondence(player_1, player).
-object_correspondence(portal_cap_1, lower_terminal_cap).
-object_correspondence(portal_1, lower_terminal_core).
-object_correspondence(control_panel_1, lower_left_panel).
-object_correspondence(control_glyph_1, lower_left_glyph).
-object_correspondence(status_panel_1, bottom_toolbar).
-object_correspondence(status_green_1, toolbar_green_segment).
-object_correspondence(status_bar_1, toolbar_dark_segment).
-object_correspondence(status_slot_1, toolbar_blue_slot_1).
-object_correspondence(status_slot_2, toolbar_blue_slot_2).
-object_correspondence(status_slot_3, toolbar_blue_slot_3).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(unchanged_object(background_1, background)).
-observation(unchanged_object(left_wall_1, left_sidebar)).
-observation(unchanged_object(structure_1, main_green_structure)).
-observation(unchanged_object(chamber_1, top_terminal_panel)).
-observation(unchanged_object(chamber_glyph_1, top_terminal_glyph)).
-observation(unchanged_object(player_1, player)).
-observation(unchanged_object(portal_cap_1, lower_terminal_cap)).
-observation(unchanged_object(portal_1, lower_terminal_core)).
-observation(unchanged_object(control_panel_1, lower_left_panel)).
-observation(unchanged_object(control_glyph_1, lower_left_glyph)).
-observation(unchanged_object(status_panel_1, bottom_toolbar)).
-observation(unchanged_object(status_slot_1, toolbar_blue_slot_1)).
-observation(unchanged_object(status_slot_2, toolbar_blue_slot_2)).
-observation(unchanged_object(status_slot_3, toolbar_blue_slot_3)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(changed_object(
-    status_green_1,
-    toolbar_green_segment,
-    [resized(size(20,20), size(30,20)),
-     right_edge_shifted(150,160)]
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(changed_object(
-    status_bar_1,
-    toolbar_dark_segment,
-    [moved(point(150,610), point(160,610)),
-     resized(size(400,20), size(390,20)),
-     left_edge_shifted(150,160),
-     right_edge_unchanged(550)]
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(resized_object(
-    status_green_1,
-    toolbar_green_segment,
-    resize(size(20,20), size(30,20))
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(resized_object(
-    status_bar_1,
-    toolbar_dark_segment,
-    resize(size(400,20), size(390,20))
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(moved_object(
-    status_bar_1,
-    toolbar_dark_segment,
-    point(150,610),
-    point(160,610)
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(pixel_region_recolored(
-    rectangle(150,610,10,20),
-    dark_gray,
-    green
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(status_boundary_shift(
-    boundary(status_green_1, status_bar_1),
-    boundary(toolbar_green_segment, toolbar_dark_segment),
-    delta(10,0)
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(total_status_meter_extent_unchanged(
-    interval(130,550),
-    interval(130,550)
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-observation(no_scene_object_added).
-observation(no_scene_object_removed).
-observation(no_whole_object_recolored).
-observation(no_player_motion).
-observation(no_terminal_change).
-observation(no_canvas_size_change).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-representation_change(structure_1, main_green_structure,
-    explicit_negative_space(main_cutout)).
-representation_change(player_1, player,
-    decomposed_into([player_black, player_blue])).
-representation_change(lower_terminal_pair, lower_terminal,
-    composite_grouping([lower_terminal_cap, lower_terminal_core])).
-representation_change(gray, light_gray, palette_name_only).
-representation_change(cyan, light_blue, palette_name_only).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-representation_added_object(main_cutout).
-representation_added_component(player_black).
-representation_added_component(player_blue).
-representation_added_composite(player).
-representation_added_composite(lower_terminal).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-hypothesis(action_effect(
-    last_action,
-    advanced_status_meter(one_cell)
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-hypothesis(action_effect(
-    last_action,
-    transferred_status_area(dark_gray, green, rectangle(150,610,10,20))
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-hypothesis(status_meter_semantics(
-    toolbar_green_segment,
-    completed_or_available_amount
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-hypothesis(status_meter_semantics(
-    toolbar_dark_segment,
-    remaining_amount
-)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-hypothesis_confidence(advanced_status_meter(one_cell), high).
-hypothesis_confidence(status_meter_semantics, medium).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-added_object(Object) :-
-    observation(added_object(Object)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-removed_object(Object) :-
-    observation(removed_object(Object)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-changed_object(Previous, Current, Changes) :-
-    observation(changed_object(Previous, Current, Changes)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-moved_object(Previous, Current, From, To) :-
-    observation(moved_object(Previous, Current, From, To)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-recolored_object(Previous, Current, Recoloring) :-
-    observation(recolored_object(Previous, Current, Recoloring)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-resized_object(Previous, Current, Resizing) :-
-    observation(resized_object(Previous, Current, Resizing)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-unchanged_object(Previous, Current) :-
-    observation(unchanged_object(Previous, Current)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-action_effect(Action, Effect) :-
-    hypothesis(action_effect(Action, Effect)).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-scene_object_added(Object) :-
-    added_object(Object).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-scene_object_removed(Object) :-
-    removed_object(Object).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-representation_only_change(Previous, Current) :-
-    representation_change(Previous, Current, _),
-    \+ changed_object(Previous, Current, _).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-status_meter_advanced_by_cells(Cells) :-
-    observation(status_boundary_shift(_, _, delta(DX,0))),
-    cell_scale(Scale),
-    Cells is DX // Scale.
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-status_meter_advanced_by_pixels(Pixels) :-
-    observation(status_boundary_shift(_, _, delta(Pixels,0))).
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-only_rendered_change(rectangle(150,610,10,20)) :-
-    observation(pixel_region_recolored(
-        rectangle(150,610,10,20),
-        dark_gray,
-        green
-    )),
-    observation(no_player_motion),
-    observation(no_terminal_change),
-    observation(no_scene_object_added),
-    observation(no_scene_object_removed).
-```
+% State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
 
-## Actions
+% State-specific facts for this action-tree node.
+state_id(action4).
+incoming_action(action4, action('ACTION2', {})).
+previous_state(action4, action3).
 
-- [`LEFT`](LEFT/README.md)
+canvas_size(64, 64).
+coordinate_system(origin_top_left, x_right, y_down).
+grid_cell_size_pixels(10).
+
+visible(yellow_playfield).
+visible(left_boundary_wall).
+visible(green_fortress).
+visible(fortress_main_body).
+visible(fortress_left_wing).
+visible(fortress_right_wing).
+visible(fortress_lower_bridge).
+visible(fortress_upper_stem).
+visible(fortress_inner_courtyard).
+visible(upper_chamber_frame).
+visible(upper_chamber_interior).
+visible(upper_burgundy_glyph).
+visible(blue_black_player).
+visible(player_black_core).
+visible(player_blue_tail).
+visible(bottom_center_gate).
+visible(gate_gray_header).
+visible(gate_burgundy_panel).
+visible(lower_left_symbol_card).
+visible(lower_left_burgundy_glyph).
+visible(bottom_status_panel).
+visible(bottom_status_track).
+visible(cyan_status_blocks).
+
+bounding_box(yellow_playfield, 0, 0, 64, 64).
+bounding_box(left_boundary_wall, 0, 0, 4, 52).
+bounding_box(green_fortress, 14, 8, 40, 42).
+bounding_box(fortress_main_body, 14, 25, 40, 25).
+bounding_box(fortress_left_wing, 14, 25, 15, 15).
+bounding_box(fortress_right_wing, 34, 25, 20, 25).
+bounding_box(fortress_lower_bridge, 19, 45, 35, 5).
+bounding_box(fortress_upper_stem, 34, 17, 5, 8).
+bounding_box(fortress_inner_courtyard, 24, 30, 10, 15).
+bounding_box(upper_chamber_frame, 32, 8, 9, 9).
+bounding_box(upper_chamber_interior, 33, 9, 7, 7).
+bounding_box(upper_burgundy_glyph, 35, 11, 3, 3).
+bounding_box(blue_black_player, 20, 31, 3, 3).
+bounding_box(player_black_core, 21, 31, 2, 2).
+bounding_box(player_blue_tail, 20, 32, 2, 2).
+bounding_box(bottom_center_gate, 24, 45, 5, 5).
+bounding_box(gate_gray_header, 24, 45, 5, 2).
+bounding_box(gate_burgundy_panel, 24, 47, 5, 3).
+bounding_box(lower_left_symbol_card, 1, 53, 10, 10).
+bounding_box(lower_left_burgundy_glyph, 3, 55, 6, 6).
+bounding_box(bottom_status_panel, 12, 60, 52, 4).
+bounding_box(bottom_status_track, 13, 61, 42, 2).
+bounding_box(cyan_status_blocks, 56, 61, 8, 2).
+
+center(blue_black_player, 21, 32).
+center(bottom_center_gate, 26, 47).
+center(upper_chamber_interior, 36, 12).
+center(lower_left_symbol_card, 5, 57).
+
+color(yellow_playfield, yellow).
+color(left_boundary_wall, light_gray).
+color(green_fortress, green).
+color(fortress_main_body, green).
+color(fortress_left_wing, green).
+color(fortress_right_wing, green).
+color(fortress_lower_bridge, green).
+color(fortress_upper_stem, green).
+color(fortress_inner_courtyard, yellow).
+color(upper_chamber_frame, green).
+color(upper_chamber_interior, light_gray).
+color(upper_burgundy_glyph, burgundy).
+colors(blue_black_player, [blue, black]).
+color(player_black_core, black).
+color(player_blue_tail, blue).
+colors(bottom_center_gate, [light_gray, burgundy]).
+color(gate_gray_header, light_gray).
+color(gate_burgundy_panel, burgundy).
+color(lower_left_symbol_card, light_gray).
+color(lower_left_burgundy_glyph, burgundy).
+color(bottom_status_panel, light_gray).
+color(bottom_status_track, dark_gray).
+color(cyan_status_blocks, cyan).
+
+geometry(yellow_playfield, background_with_occlusions).
+geometry(left_boundary_wall, filled_vertical_rectangle).
+geometry(green_fortress, connected_compound_structure).
+geometry(fortress_main_body, stepped_block_region).
+geometry(fortress_left_wing, filled_rectangle).
+geometry(fortress_right_wing, filled_rectangle).
+geometry(fortress_lower_bridge, gate_interrupted_horizontal_bar).
+geometry(fortress_upper_stem, filled_vertical_rectangle).
+geometry(fortress_inner_courtyard, l_shaped_hole).
+geometry(upper_chamber_frame, one_cell_thick_rectangular_frame).
+geometry(upper_chamber_interior, filled_rectangle).
+geometry(upper_burgundy_glyph, hooked_angular_glyph).
+geometry(blue_black_player, asymmetric_five_cell_marker).
+geometry(player_black_core, three_cell_corner_cluster).
+geometry(player_blue_tail, two_cell_diagonal_tail).
+geometry(bottom_center_gate, vertically_partitioned_rectangle).
+geometry(gate_gray_header, filled_horizontal_rectangle).
+geometry(gate_burgundy_panel, filled_rectangle).
+geometry(lower_left_symbol_card, filled_square_panel).
+geometry(lower_left_burgundy_glyph, angular_thick_glyph).
+geometry(bottom_status_panel, filled_horizontal_panel).
+geometry(bottom_status_track, filled_horizontal_rectangle).
+geometry(cyan_status_blocks, three_separated_rectangular_blocks).
+
+component_of(fortress_main_body, green_fortress).
+component_of(fortress_left_wing, green_fortress).
+component_of(fortress_right_wing, green_fortress).
+component_of(fortress_lower_bridge, green_fortress).
+component_of(fortress_upper_stem, green_fortress).
+component_of(upper_chamber_frame, green_fortress).
+component_of(player_black_core, blue_black_player).
+component_of(player_blue_tail, blue_black_player).
+component_of(gate_gray_header, bottom_center_gate).
+component_of(gate_burgundy_panel, bottom_center_gate).
+component_of(lower_left_burgundy_glyph, lower_left_symbol_card).
+component_of(bottom_status_track, bottom_status_panel).
+component_of(cyan_status_blocks, bottom_status_panel).
+
+contains(green_fortress, fortress_inner_courtyard).
+contains(green_fortress, bottom_center_gate).
+contains(fortress_main_body, fortress_inner_courtyard).
+contains(fortress_main_body, blue_black_player).
+contains(upper_chamber_frame, upper_chamber_interior).
+contains(upper_chamber_interior, upper_burgundy_glyph).
+contains(lower_left_symbol_card, lower_left_burgundy_glyph).
+contains(bottom_status_panel, bottom_status_track).
+contains(bottom_status_panel, cyan_status_blocks).
+
+encloses(green_fortress, fortress_inner_courtyard).
+encloses(upper_chamber_frame, upper_chamber_interior).
+
+embedded_in(bottom_center_gate, fortress_lower_bridge).
+
+overlays(blue_black_player, fortress_left_wing).
+overlays(upper_burgundy_glyph, upper_chamber_interior).
+overlays(lower_left_burgundy_glyph, lower_left_symbol_card).
+overlays(bottom_status_track, bottom_status_panel).
+overlays(cyan_status_blocks, bottom_status_panel).
+
+adjacent(left_boundary_wall, yellow_playfield).
+adjacent(upper_chamber_frame, fortress_upper_stem).
+adjacent(fortress_upper_stem, fortress_main_body).
+adjacent(fortress_left_wing, fortress_right_wing).
+adjacent(fortress_left_wing, fortress_inner_courtyard).
+adjacent(fortress_right_wing, fortress_inner_courtyard).
+adjacent(fortress_lower_bridge, fortress_inner_courtyard).
+adjacent(fortress_lower_bridge, bottom_center_gate).
+adjacent(gate_gray_header, gate_burgundy_panel).
+adjacent(bottom_status_track, cyan_status_blocks).
+
+state(blue_black_player, stationary).
+state(green_fortress, solid).
+state(fortress_inner_courtyard, empty).
+state(bottom_center_gate, closed).
+state(bottom_center_gate, shifted_left).
+state(bottom_status_panel, active).
+state(cyan_status_blocks, three_lit_blocks).
+state(action4, visually_unchanged).
+
+component_box(fortress_main_body, 14, 25, 40, 5).
+component_box(fortress_main_body, 14, 30, 15, 10).
+component_box(fortress_main_body, 34, 30, 20, 20).
+component_box(fortress_main_body, 19, 40, 5, 10).
+component_box(fortress_main_body, 29, 45, 5, 5).
+
+component_box(fortress_lower_bridge, 19, 45, 5, 5).
+component_box(fortress_lower_bridge, 29, 45, 25, 5).
+
+component_box(fortress_inner_courtyard, 29, 30, 5, 15).
+component_box(fortress_inner_courtyard, 24, 40, 5, 5).
+
+component_box(upper_burgundy_glyph, 35, 11, 3, 1).
+component_box(upper_burgundy_glyph, 37, 12, 1, 2).
+component_box(upper_burgundy_glyph, 35, 13, 1, 1).
+
+component_box(lower_left_burgundy_glyph, 3, 55, 6, 2).
+component_box(lower_left_burgundy_glyph, 3, 57, 2, 4).
+component_box(lower_left_burgundy_glyph, 7, 59, 2, 2).
+
+component_box(cyan_status_blocks, 56, 61, 2, 2).
+component_box(cyan_status_blocks, 59, 61, 2, 2).
+component_box(cyan_status_blocks, 62, 61, 2, 2).
+
+turtle_program(yellow_playfield,
+    [penup, set_pos(0,0), setcolor(yellow), pendown, fill_rect(64,64)]).
+
+turtle_program(left_boundary_wall,
+    [penup, set_pos(0,0), setcolor(light_gray), pendown, fill_rect(4,52)]).
+
+turtle_program(green_fortress,
+    [penup, setcolor(green),
+     set_pos(32,8), pendown, fill_rect(9,1),
+     penup, set_pos(32,9), pendown, fill_rect(1,7),
+     penup, set_pos(40,9), pendown, fill_rect(1,7),
+     penup, set_pos(32,16), pendown, fill_rect(9,1),
+     penup, set_pos(34,17), pendown, fill_rect(5,8),
+     penup, set_pos(14,25), pendown, fill_rect(40,5),
+     penup, set_pos(14,30), pendown, fill_rect(15,10),
+     penup, set_pos(34,30), pendown, fill_rect(20,20),
+     penup, set_pos(19,40), pendown, fill_rect(5,10),
+     penup, set_pos(29,45), pendown, fill_rect(5,5)]).
+
+turtle_program(fortress_main_body,
+    [penup, setcolor(green),
+     set_pos(14,25), pendown, fill_rect(40,5),
+     penup, set_pos(14,30), pendown, fill_rect(15,10),
+     penup, set_pos(34,30), pendown, fill_rect(20,20),
+     penup, set_pos(19,40), pendown, fill_rect(5,10),
+     penup, set_pos(29,45), pendown, fill_rect(5,5)]).
+
+turtle_program(fortress_left_wing,
+    [penup, set_pos(14,25), setcolor(green), pendown, fill_rect(15,15)]).
+
+turtle_program(fortress_right_wing,
+    [penup, set_pos(34,25), setcolor(green), pendown, fill_rect(20,25)]).
+
+turtle_program(fortress_lower_bridge,
+    [penup, setcolor(green),
+     set_pos(19,45), pendown, fill_rect(5,5),
+     penup, set_pos(29,45), pendown, fill_rect(25,5)]).
+
+turtle_program(fortress_upper_stem,
+    [penup, set_pos(34,17), setcolor(green), pendown, fill_rect(5,8)]).
+
+turtle_program(fortress_inner_courtyard,
+    [penup, setcolor(yellow),
+     set_pos(29,30), pendown, fill_rect(5,15),
+     penup, set_pos(24,40), pendown, fill_rect(5,5)]).
+
+turtle_program(upper_chamber_frame,
+    [penup, setcolor(green),
+     set_pos(32,8), pendown, fill_rect(9,1),
+     penup, set_pos(32,9), pendown, fill_rect(1,7),
+     penup, set_pos(40,9), pendown, fill_rect(1,7),
+     penup, set_pos(32,16), pendown, fill_rect(9,1)]).
+
+turtle_program(upper_chamber_interior,
+    [penup, set_pos(33,9), setcolor(light_gray), pendown, fill_rect(7,7)]).
+
+turtle_program(upper_burgundy_glyph,
+    [penup, setcolor(burgundy),
+     set_pos(35,11), pendown, fill_rect(3,1),
+     penup, set_pos(37,12), pendown, fill_rect(1,2),
+     penup, set_pos(35,13), pendown, set_cell]).
+
+turtle_program(blue_black_player,
+    [penup, setcolor(black),
+     set_pos(21,31), pendown, set_cell,
+     penup, set_pos(21,32), pendown, set_cell,
+     penup, set_pos(22,32), pendown, set_cell,
+     penup, setcolor(blue),
+     set_pos(20,32), pendown, set_cell,
+     penup, set_pos(21,33), pendown, set_cell]).
+
+turtle_program(player_black_core,
+    [penup, setcolor(black),
+     set_pos(21,31), pendown, set_cell,
+     penup, set_pos(21,32), pendown, set_cell,
+     penup, set_pos(22,32), pendown, set_cell]).
+
+turtle_program(player_blue_tail,
+    [penup, setcolor(blue),
+     set_pos(20,32), pendown, set_cell,
+     penup, set_pos(21,33), pendown, set_cell]).
+
+turtle_program(bottom_center_gate,
+    [penup, set_pos(24,45), setcolor(light_gray), pendown, fill_rect(5,2),
+     penup, set_pos(24,47), setcolor(burgundy), pendown, fill_rect(5,3)]).
+
+turtle_program(gate_gray_header,
+    [penup, set_pos(24,45), setcolor(light_gray), pendown, fill_rect(5,2)]).
+
+turtle_program(gate_burgundy_panel,
+    [penup, set_pos(24,47), setcolor(burgundy), pendown, fill_rect(5,3)]).
+
+turtle_program(lower_left_symbol_card,
+    [penup, set_pos(1,53), setcolor(light_gray), pendown, fill_rect(10,10)]).
+
+turtle_program(lower_left_burgundy_glyph,
+    [penup, setcolor(burgundy),
+     set_pos(3,55), pendown, fill_rect(6,2),
+     penup, set_pos(3,57), pendown, fill_rect(2,4),
+     penup, set_pos(7,59), pendown, fill_rect(2,2)]).
+
+turtle_program(bottom_status_panel,
+    [penup, set_pos(12,60), setcolor(light_gray), pendown, fill_rect(52,4)]).
+
+turtle_program(bottom_status_track,
+    [penup, set_pos(13,61), setcolor(dark_gray), pendown, fill_rect(42,2)]).
+
+turtle_program(cyan_status_blocks,
+    [penup, setcolor(cyan),
+     set_pos(56,61), pendown, fill_rect(2,2),
+     penup, set_pos(59,61), pendown, fill_rect(2,2),
+     penup, set_pos(62,61), pendown, fill_rect(2,2)]).
+````
+
+[Open `objects.pl`](objects.pl)
+
+</details>
+
+<details>
+<summary><code>rules.pl</code></summary>
+
+````prolog
+observed_rule(
+    action2_visual_noop_at_action3,
+    rule(
+        transition(action3, action4, action('ACTION2', {})),
+        observable_effect(no_observable_visual_change),
+        evidence([
+            ref('differences.pl', transition(action3, action4)),
+            ref('differences.pl', transition_action(action3, action4, action('ACTION2', {}))),
+            ref('differences.pl', observation(action4, visually_unchanged_from(action3))),
+            ref('differences.pl', action_effect(action('ACTION2', {}), no_observable_visual_change))
+        ])
+    )
+).
+
+observed_rule(
+    action2_preserves_visible_configuration_at_action3,
+    rule(
+        transition(action3, action4, action('ACTION2', {})),
+        preserves([
+            blue_black_player,
+            player_black_core,
+            player_blue_tail,
+            bottom_center_gate,
+            gate_gray_header,
+            gate_burgundy_panel,
+            green_fortress,
+            fortress_inner_courtyard,
+            upper_burgundy_glyph,
+            lower_left_symbol_card,
+            lower_left_burgundy_glyph,
+            bottom_status_panel,
+            bottom_status_track,
+            cyan_status_blocks
+        ]),
+        evidence([
+            ref('differences.pl', observation(action4, no_added_objects)),
+            ref('differences.pl', observation(action4, no_removed_objects)),
+            ref('differences.pl', observation(action4, no_changed_objects)),
+            ref('differences.pl', unchanged_object(blue_black_player, all_observed_properties)),
+            ref('differences.pl', unchanged_object(bottom_center_gate, all_observed_properties)),
+            ref('differences.pl', unchanged_object(bottom_status_panel, all_observed_properties)),
+            ref('objects.pl', state(action4, visually_unchanged))
+        ])
+    )
+).
+
+hypothetical_rule(
+    repeat_action2_is_visual_noop_in_same_configuration,
+    medium_confidence,
+    rule(
+        conditions([
+            action(action('ACTION2', {})),
+            same_observed_configuration_as(action3),
+            state(blue_black_player, stationary),
+            state(bottom_center_gate, closed),
+            state(bottom_center_gate, shifted_left),
+            state(cyan_status_blocks, three_lit_blocks)
+        ]),
+        predicted_effects([
+            observable_effect(no_observable_visual_change),
+            remains_at(blue_black_player, 20, 31, 3, 3),
+            remains_at(bottom_center_gate, 24, 45, 5, 5),
+            remains_state(bottom_center_gate, closed),
+            remains_state(cyan_status_blocks, three_lit_blocks)
+        ]),
+        evidence([
+            ref('differences.pl', action_effect(action('ACTION2', {}), no_observable_visual_change)),
+            ref('objects.pl', bounding_box(blue_black_player, 20, 31, 3, 3)),
+            ref('objects.pl', bounding_box(bottom_center_gate, 24, 45, 5, 5)),
+            ref('objects.pl', state(bottom_center_gate, closed)),
+            ref('objects.pl', state(bottom_center_gate, shifted_left)),
+            limitation(single_observed_action2_transition)
+        ])
+    )
+).
+
+hypothetical_rule(
+    action2_is_contextually_inapplicable_at_current_player_pose,
+    low_confidence,
+    rule(
+        conditions([
+            action(action('ACTION2', {})),
+            center(blue_black_player, 21, 32),
+            overlays(blue_black_player, fortress_left_wing),
+            state(blue_black_player, stationary)
+        ]),
+        predicted_effects([
+            rejected_or_blocked_without_visible_change,
+            remains_stationary(blue_black_player)
+        ]),
+        evidence([
+            ref('objects.pl', center(blue_black_player, 21, 32)),
+            ref('objects.pl', overlays(blue_black_player, fortress_left_wing)),
+            ref('objects.pl', state(blue_black_player, stationary)),
+            ref('differences.pl', unchanged_object(blue_black_player, all_observed_properties)),
+            ref('differences.pl', observation(action4, visually_unchanged_from(action3))),
+            limitation(action2_semantics_not_identified),
+            alternative(hidden_or_delayed_state_change_not_excluded)
+        ])
+    )
+).
+````
+
+[Open `rules.pl`](rules.pl)
+
+</details>
+
+<details>
+<summary><code>similarities.pl</code></summary>
+
+````prolog
+object_match(yellow_playfield, yellow_playfield,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry])).
+object_match(left_boundary_wall, left_boundary_wall,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry])).
+object_match(green_fortress, green_fortress,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_structure])).
+object_match(fortress_main_body, fortress_main_body,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_boxes])).
+object_match(fortress_left_wing, fortress_left_wing,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry])).
+object_match(fortress_right_wing, fortress_right_wing,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry])).
+object_match(fortress_lower_bridge, fortress_lower_bridge,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_boxes])).
+object_match(fortress_upper_stem, fortress_upper_stem,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry])).
+object_match(fortress_inner_courtyard, fortress_inner_courtyard,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_boxes])).
+object_match(upper_chamber_frame, upper_chamber_frame,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, containment])).
+object_match(upper_chamber_interior, upper_chamber_interior,
+    confidence_evidence(1.0, [canonical_id, bounding_box, center, color, geometry])).
+object_match(upper_burgundy_glyph, upper_burgundy_glyph,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_boxes])).
+object_match(blue_black_player, blue_black_player,
+    confidence_evidence(1.0, [canonical_id, bounding_box, center, colors, geometry, state])).
+object_match(player_black_core, player_black_core,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, parent])).
+object_match(player_blue_tail, player_blue_tail,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, parent])).
+object_match(bottom_center_gate, bottom_center_gate,
+    confidence_evidence(1.0, [canonical_id, bounding_box, center, colors, geometry, state])).
+object_match(gate_gray_header, gate_gray_header,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, parent])).
+object_match(gate_burgundy_panel, gate_burgundy_panel,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, parent])).
+object_match(lower_left_symbol_card, lower_left_symbol_card,
+    confidence_evidence(1.0, [canonical_id, bounding_box, center, color, geometry])).
+object_match(lower_left_burgundy_glyph, lower_left_burgundy_glyph,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_boxes])).
+object_match(bottom_status_panel, bottom_status_panel,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, state])).
+object_match(bottom_status_track, bottom_status_track,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, parent])).
+object_match(cyan_status_blocks, cyan_status_blocks,
+    confidence_evidence(1.0, [canonical_id, bounding_box, color, geometry, component_boxes, state])).
+
+unmatched_previous_object(_) :- fail.
+unmatched_current_object(_) :- fail.
+````
+
+[Open `similarities.pl`](similarities.pl)
+
+</details>
+
+<details>
+<summary><code>turtle_from_diff.pl</code></summary>
+
+````prolog
+turtle_patch(action3, action4, []).
+````
+
+[Open `turtle_from_diff.pl`](turtle_from_diff.pl)
+
+</details>
+
+<details>
+<summary><code>turtle_from_image.pl</code></summary>
+
+````prolog
+object_identity(blue_black_player, player_marker, 'Small blue-and-black player marker').
+object_identity(bottom_center_gate, compound_rectangle, 'Two-color gate embedded at the bottom center of the fortress').
+object_identity(bottom_status_panel, interface_panel, 'Gray status panel along the bottom edge').
+object_identity(bottom_status_track, horizontal_bar, 'Long dark status track inside the bottom panel').
+object_identity(cyan_status_blocks, block_cluster, 'Three cyan status blocks at the right end of the bottom panel').
+object_identity(fortress_inner_courtyard, enclosed_hole, 'L-shaped yellow courtyard enclosed by the fortress').
+object_identity(fortress_left_wing, rectangular_block, 'Left green wing').
+object_identity(fortress_lower_bridge, horizontal_bar, 'Lower green connecting bridge').
+object_identity(fortress_main_body, block_region, 'Main green body of the fortress').
+object_identity(fortress_right_wing, rectangular_block, 'Right green wing').
+object_identity(fortress_upper_stem, vertical_bar, 'Green stem connecting the main body to the upper chamber').
+object_identity(gate_burgundy_panel, rectangular_block, 'Burgundy lower panel of the bottom-center gate').
+object_identity(gate_gray_header, horizontal_bar, 'Gray header of the bottom-center gate').
+object_identity(green_fortress, compound_block_structure, 'Large green fortress-like structure').
+object_identity(left_boundary_wall, vertical_bar, 'Left gray boundary wall').
+object_identity(lower_left_burgundy_glyph, compound_glyph, 'Burgundy angular glyph on the lower-left card').
+object_identity(lower_left_symbol_card, rectangular_panel, 'Gray symbol card near the lower-left corner').
+object_identity(player_black_core, pixel_cluster, 'Black core of the player marker').
+object_identity(player_blue_tail, pixel_cluster, 'Blue lower-left portion of the player marker').
+object_identity(upper_burgundy_glyph, compound_glyph, 'Burgundy hooked glyph inside the upper chamber').
+object_identity(upper_chamber_frame, rectangular_frame, 'Green frame around the upper chamber').
+object_identity(upper_chamber_interior, enclosed_rectangle, 'Gray interior of the upper chamber').
+object_identity(yellow_playfield, background_region, 'Yellow playfield').
+
+canvas_size(64, 64).
+coordinate_system(origin_top_left, x_right, y_down).
+grid_cell_size_pixels(10).
+
+visible(yellow_playfield).
+visible(left_boundary_wall).
+visible(green_fortress).
+visible(fortress_main_body).
+visible(fortress_left_wing).
+visible(fortress_right_wing).
+visible(fortress_lower_bridge).
+visible(fortress_upper_stem).
+visible(fortress_inner_courtyard).
+visible(upper_chamber_frame).
+visible(upper_chamber_interior).
+visible(upper_burgundy_glyph).
+visible(blue_black_player).
+visible(player_black_core).
+visible(player_blue_tail).
+visible(bottom_center_gate).
+visible(gate_gray_header).
+visible(gate_burgundy_panel).
+visible(lower_left_symbol_card).
+visible(lower_left_burgundy_glyph).
+visible(bottom_status_panel).
+visible(bottom_status_track).
+visible(cyan_status_blocks).
+
+turtle_program(yellow_playfield,
+    [penup,
+     set_pos(0,0),
+     setcolor(yellow),
+     pendown,
+     fill_rect(64,64)]).
+
+turtle_program(left_boundary_wall,
+    [penup,
+     set_pos(0,0),
+     setcolor(light_gray),
+     pendown,
+     fill_rect(4,52)]).
+
+turtle_program(green_fortress,
+    [penup,
+     setcolor(green),
+     set_pos(32,8),
+     pendown,
+     fill_rect(9,1),
+     penup,
+     set_pos(32,9),
+     pendown,
+     fill_rect(1,7),
+     penup,
+     set_pos(40,9),
+     pendown,
+     fill_rect(1,7),
+     penup,
+     set_pos(32,16),
+     pendown,
+     fill_rect(9,1),
+     penup,
+     set_pos(34,17),
+     pendown,
+     fill_rect(5,8),
+     penup,
+     set_pos(14,25),
+     pendown,
+     fill_rect(40,5),
+     penup,
+     set_pos(14,30),
+     pendown,
+     fill_rect(15,10),
+     penup,
+     set_pos(34,30),
+     pendown,
+     fill_rect(20,20),
+     penup,
+     set_pos(19,40),
+     pendown,
+     fill_rect(5,10),
+     penup,
+     set_pos(29,45),
+     pendown,
+     fill_rect(5,5)]).
+
+turtle_program(fortress_main_body,
+    [penup,
+     setcolor(green),
+     set_pos(14,25),
+     pendown,
+     fill_rect(40,5),
+     penup,
+     set_pos(14,30),
+     pendown,
+     fill_rect(15,10),
+     penup,
+     set_pos(34,30),
+     pendown,
+     fill_rect(20,20),
+     penup,
+     set_pos(19,40),
+     pendown,
+     fill_rect(5,10),
+     penup,
+     set_pos(29,45),
+     pendown,
+     fill_rect(5,5)]).
+
+turtle_program(fortress_left_wing,
+    [penup,
+     set_pos(14,25),
+     setcolor(green),
+     pendown,
+     fill_rect(15,15)]).
+
+turtle_program(fortress_right_wing,
+    [penup,
+     set_pos(34,25),
+     setcolor(green),
+     pendown,
+     fill_rect(20,25)]).
+
+turtle_program(fortress_lower_bridge,
+    [penup,
+     setcolor(green),
+     set_pos(19,45),
+     pendown,
+     fill_rect(5,5),
+     penup,
+     set_pos(29,45),
+     pendown,
+     fill_rect(25,5)]).
+
+turtle_program(fortress_upper_stem,
+    [penup,
+     set_pos(34,17),
+     setcolor(green),
+     pendown,
+     fill_rect(5,8)]).
+
+turtle_program(fortress_inner_courtyard,
+    [penup,
+     setcolor(yellow),
+     set_pos(29,30),
+     pendown,
+     fill_rect(5,15),
+     penup,
+     set_pos(24,40),
+     pendown,
+     fill_rect(5,5)]).
+
+turtle_program(upper_chamber_frame,
+    [penup,
+     setcolor(green),
+     set_pos(32,8),
+     pendown,
+     fill_rect(9,1),
+     penup,
+     set_pos(32,9),
+     pendown,
+     fill_rect(1,7),
+     penup,
+     set_pos(40,9),
+     pendown,
+     fill_rect(1,7),
+     penup,
+     set_pos(32,16),
+     pendown,
+     fill_rect(9,1)]).
+
+turtle_program(upper_chamber_interior,
+    [penup,
+     set_pos(33,9),
+     setcolor(light_gray),
+     pendown,
+     fill_rect(7,7)]).
+
+turtle_program(upper_burgundy_glyph,
+    [penup,
+     setcolor(burgundy),
+     set_pos(35,11),
+     pendown,
+     fill_rect(3,1),
+     penup,
+     set_pos(37,12),
+     pendown,
+     fill_rect(1,2),
+     penup,
+     set_pos(35,13),
+     pendown,
+     set_cell]).
+
+turtle_program(blue_black_player,
+    [penup,
+     setcolor(black),
+     set_pos(21,31),
+     pendown,
+     set_cell,
+     penup,
+     set_pos(21,32),
+     pendown,
+     set_cell,
+     penup,
+     set_pos(22,32),
+     pendown,
+     set_cell,
+     penup,
+     setcolor(blue),
+     set_pos(20,32),
+     pendown,
+     set_cell,
+     penup,
+     set_pos(21,33),
+     pendown,
+     set_cell]).
+
+turtle_program(player_black_core,
+    [penup,
+     setcolor(black),
+     set_pos(21,31),
+     pendown,
+     set_cell,
+     penup,
+     set_pos(21,32),
+     pendown,
+     set_cell,
+     penup,
+     set_pos(22,32),
+     pendown,
+     set_cell]).
+
+turtle_program(player_blue_tail,
+    [penup,
+     setcolor(blue),
+     set_pos(20,32),
+     pendown,
+     set_cell,
+     penup,
+     set_pos(21,33),
+     pendown,
+     set_cell]).
+
+turtle_program(bottom_center_gate,
+    [penup,
+     set_pos(24,45),
+     setcolor(light_gray),
+     pendown,
+     fill_rect(5,2),
+     penup,
+     set_pos(24,47),
+     setcolor(burgundy),
+     pendown,
+     fill_rect(5,3)]).
+
+turtle_program(gate_gray_header,
+    [penup,
+     set_pos(24,45),
+     setcolor(light_gray),
+     pendown,
+     fill_rect(5,2)]).
+
+turtle_program(gate_burgundy_panel,
+    [penup,
+     set_pos(24,47),
+     setcolor(burgundy),
+     pendown,
+     fill_rect(5,3)]).
+
+turtle_program(lower_left_symbol_card,
+    [penup,
+     set_pos(1,53),
+     setcolor(light_gray),
+     pendown,
+     fill_rect(10,10)]).
+
+turtle_program(lower_left_burgundy_glyph,
+    [penup,
+     setcolor(burgundy),
+     set_pos(3,55),
+     pendown,
+     fill_rect(6,2),
+     penup,
+     set_pos(3,57),
+     pendown,
+     fill_rect(2,4),
+     penup,
+     set_pos(7,59),
+     pendown,
+     fill_rect(2,2)]).
+
+turtle_program(bottom_status_panel,
+    [penup,
+     set_pos(12,60),
+     setcolor(light_gray),
+     pendown,
+     fill_rect(52,4)]).
+
+turtle_program(bottom_status_track,
+    [penup,
+     set_pos(13,61),
+     setcolor(dark_gray),
+     pendown,
+     fill_rect(42,2)]).
+
+turtle_program(cyan_status_blocks,
+    [penup,
+     setcolor(cyan),
+     set_pos(56,61),
+     pendown,
+     fill_rect(2,2),
+     penup,
+     set_pos(59,61),
+     pendown,
+     fill_rect(2,2),
+     penup,
+     set_pos(62,61),
+     pendown,
+     fill_rect(2,2)]).
+````
+
+[Open `turtle_from_image.pl`](turtle_from_image.pl)
+
+</details>

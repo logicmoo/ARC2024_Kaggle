@@ -1,232 +1,203 @@
-coordinate_unit(cell).
-previous_to_current_scale(10).
-comparison_basis(normalized_cell_grid).
+transition(action6, action7, action('ACTION1', {})).
 
-object_correspondence(background, background_yellow, identity).
-object_correspondence(left_sidebar, left_wall, identity).
-object_correspondence(main_structure, arena_green, identity).
-object_correspondence(upper_display, top_pad, identity).
-object_correspondence(upper_glyph, top_glyph, identity).
-object_correspondence(avatar, player_sprite(player_black, player_blue), color_component_split).
-object_correspondence(lower_barrier_gray, door_lintel, identity).
-object_correspondence(lower_barrier_maroon, door_maroon, identity).
-object_correspondence(lower_icon_panel, inventory_card, identity).
-object_correspondence(lower_icon_glyph, inventory_glyph, identity).
-object_correspondence(status_panel, status_tray, identity).
-object_correspondence(status_green, status_green_segment, identity).
-object_correspondence(status_dark, status_dark_segment, identity).
-object_correspondence(status_light_1, status_aqua_1, identity).
-object_correspondence(status_light_2, status_aqua_2, identity).
-object_correspondence(status_light_3, status_aqua_3, identity).
+added_object(_Object) :-
+    fail.
 
-color_equivalent(light_blue, aqua).
-color_equivalent(C, C).
+removed_object(_Object) :-
+    fail.
 
-representation_split(avatar, [player_black, player_blue]).
-representation_added_object(arena_cavity).
-representation_reclassified(background, arena_cavity, exposed_background_to_explicit_cavity).
-representation_renamed(light_blue, aqua).
+recolored_object(_Object, _OldColor, _NewColor) :-
+    fail.
 
-observed_semantic_addition(_) :- fail.
-observed_semantic_removal(_) :- fail.
-observed_recoloring(_, _, _) :- fail.
+moved_object(
+    bottom_center_gate,
+    point(19, 40),
+    point(19, 35),
+    delta(0, -5)
+).
+moved_object(
+    gate_gray_header,
+    point(19, 40),
+    point(19, 35),
+    delta(0, -5)
+).
+moved_object(
+    gate_burgundy_panel,
+    point(19, 42),
+    point(19, 37),
+    delta(0, -5)
+).
 
-added_object(Object) :-
-    observed_semantic_addition(Object).
-
-removed_object(Object) :-
-    observed_semantic_removal(Object).
-
-recolored_object(ObjectPair, OldColor, NewColor) :-
-    observed_recoloring(ObjectPair, OldColor, NewColor).
-
-observed_move(lower_barrier_gray, door_lintel, 0, -5).
-observed_move(lower_barrier_maroon, door_maroon, 0, -5).
-
-moved_object(Previous, Current, DX, DY) :-
-    observed_move(Previous, Current, DX, DY).
-
-observed_resize(
-    status_green-status_green_segment,
+resized_object(
+    green_status_block,
     size(5, 2),
     size(6, 2)
 ).
-observed_resize(
-    status_dark-status_dark_segment,
+resized_object(
+    bottom_status_track,
     size(37, 2),
     size(36, 2)
 ).
 
-resized_object(ObjectPair, OldSize, NewSize) :-
-    observed_resize(ObjectPair, OldSize, NewSize).
-
-observed_change(
-    main_structure,
-    arena_green,
-    geometry_added(cell_rectangle(19, 40, 5, 5))
+changed_object(
+    bottom_center_gate,
+    bounding_box(19, 40, 5, 5),
+    bounding_box(19, 35, 5, 5)
 ).
-observed_change(
-    lower_barrier_gray,
-    door_lintel,
-    displacement(0, -5)
+changed_object(
+    bottom_center_gate,
+    center(21, 42),
+    center(21, 37)
 ).
-observed_change(
-    lower_barrier_maroon,
-    door_maroon,
-    displacement(0, -5)
+changed_object(
+    bottom_center_gate,
+    state_set([closed, shifted_far_left, raised]),
+    state_set([closed, shifted_far_left, raised, raised_again])
 ).
-observed_change(
-    status_green,
-    status_green_segment,
-    resized(size(5, 2), size(6, 2))
+changed_object(
+    gate_gray_header,
+    bounding_box(19, 40, 5, 2),
+    bounding_box(19, 35, 5, 2)
 ).
-observed_change(
-    status_dark,
-    status_dark_segment,
-    resized_and_left_edge_shifted(size(37, 2), size(36, 2), 1)
+changed_object(
+    gate_burgundy_panel,
+    bounding_box(19, 42, 5, 3),
+    bounding_box(19, 37, 5, 3)
 ).
-
-changed_object(Previous, Current, Change) :-
-    observed_change(Previous, Current, Change).
-
-unchanged_object(background, background_yellow).
-unchanged_object(left_sidebar, left_wall).
-unchanged_object(upper_display, top_pad).
-unchanged_object(upper_glyph, top_glyph).
-unchanged_object(avatar, player_sprite(player_black, player_blue)).
-unchanged_object(lower_icon_panel, inventory_card).
-unchanged_object(lower_icon_glyph, inventory_glyph).
-unchanged_object(status_panel, status_tray).
-unchanged_object(status_light_1, status_aqua_1).
-unchanged_object(status_light_2, status_aqua_2).
-unchanged_object(status_light_3, status_aqua_3).
-
-unchanged_bbox(background, background_yellow, bbox(0, 0, 63, 63)).
-unchanged_bbox(left_sidebar, left_wall, bbox(0, 0, 3, 51)).
-unchanged_bbox(main_structure, arena_green, bbox(14, 8, 53, 49)).
-unchanged_bbox(upper_display, top_pad, bbox(33, 9, 39, 15)).
-unchanged_bbox(upper_glyph, top_glyph, bbox(35, 11, 37, 13)).
-unchanged_bbox(avatar, player_sprite(player_black, player_blue), bbox(20, 31, 22, 33)).
-unchanged_bbox(lower_icon_panel, inventory_card, bbox(1, 53, 10, 62)).
-unchanged_bbox(lower_icon_glyph, inventory_glyph, bbox(3, 55, 8, 60)).
-unchanged_bbox(status_panel, status_tray, bbox(12, 60, 63, 63)).
-unchanged_bbox(status_light_1, status_aqua_1, bbox(56, 61, 57, 62)).
-unchanged_bbox(status_light_2, status_aqua_2, bbox(59, 61, 60, 62)).
-unchanged_bbox(status_light_3, status_aqua_3, bbox(62, 61, 63, 62)).
-
-unchanged_color(background, background_yellow, yellow).
-unchanged_color(left_sidebar, left_wall, gray).
-unchanged_color(main_structure, arena_green, green).
-unchanged_color(upper_display, top_pad, gray).
-unchanged_color(upper_glyph, top_glyph, maroon).
-unchanged_color(lower_barrier_gray, door_lintel, gray).
-unchanged_color(lower_barrier_maroon, door_maroon, maroon).
-unchanged_color(lower_icon_panel, inventory_card, gray).
-unchanged_color(lower_icon_glyph, inventory_glyph, maroon).
-unchanged_color(status_panel, status_tray, gray).
-unchanged_color(status_green, status_green_segment, green).
-unchanged_color(status_dark, status_dark_segment, dark_gray).
-unchanged_color(status_light_1, status_aqua_1, light_blue).
-unchanged_color(status_light_2, status_aqua_2, light_blue).
-unchanged_color(status_light_3, status_aqua_3, light_blue).
-
-observed_bbox_change(
-    lower_barrier_gray,
-    door_lintel,
-    bbox(19, 40, 23, 41),
-    bbox(19, 35, 23, 36)
+changed_object(
+    green_status_block,
+    bounding_box(13, 61, 5, 2),
+    bounding_box(13, 61, 6, 2)
 ).
-observed_bbox_change(
-    lower_barrier_maroon,
-    door_maroon,
-    bbox(19, 42, 23, 44),
-    bbox(19, 37, 23, 39)
+changed_object(
+    green_status_block,
+    center(15, 62),
+    center(16, 62)
 ).
-observed_bbox_change(
-    status_green,
-    status_green_segment,
-    bbox(13, 61, 17, 62),
-    bbox(13, 61, 18, 62)
+changed_object(
+    bottom_status_track,
+    bounding_box(18, 61, 37, 2),
+    bounding_box(19, 61, 36, 2)
 ).
-observed_bbox_change(
-    status_dark,
-    status_dark_segment,
-    bbox(18, 61, 54, 62),
-    bbox(19, 61, 54, 62)
+changed_object(
+    bottom_status_track,
+    center(36, 62),
+    center(37, 62)
 ).
 
-observed_region_change(
-    cell_rectangle(19, 35, 5, 2),
-    green,
-    gray
+boundary_shifted(
+    green_status_block,
+    right_edge,
+    from(18),
+    to(19)
 ).
-observed_region_change(
-    cell_rectangle(19, 37, 5, 3),
-    green,
-    maroon
-).
-observed_region_change(
-    cell_rectangle(19, 40, 5, 2),
-    gray,
-    green
-).
-observed_region_change(
-    cell_rectangle(19, 42, 5, 3),
-    maroon,
-    green
-).
-observed_region_change(
-    cell_rectangle(18, 61, 1, 2),
-    dark_gray,
-    green
+boundary_shifted(
+    bottom_status_track,
+    left_edge,
+    from(18),
+    to(19)
 ).
 
-recolored_region(Region, OldColor, NewColor) :-
-    observed_region_change(Region, OldColor, NewColor).
+added_relation(embedded_in(bottom_center_gate, fortress_left_wing)).
+added_relation(overlays(bottom_center_gate, fortress_left_wing)).
+removed_relation(adjacent(fortress_lower_bridge, bottom_center_gate)).
 
-observation(moved_object(P, C, DX, DY)) :-
-    observed_move(P, C, DX, DY).
-observation(resized_object(Pair, OldSize, NewSize)) :-
-    observed_resize(Pair, OldSize, NewSize).
-observation(changed_object(P, C, Change)) :-
-    observed_change(P, C, Change).
-observation(recolored_region(Region, OldColor, NewColor)) :-
-    observed_region_change(Region, OldColor, NewColor).
+unchanged_object(yellow_playfield, appearance_and_extent).
+unchanged_object(left_boundary_wall, appearance_and_extent).
+unchanged_object(green_fortress, appearance_and_extent).
+unchanged_object(fortress_main_body, appearance_and_extent).
+unchanged_object(fortress_left_wing, appearance_and_extent).
+unchanged_object(fortress_right_wing, appearance_and_extent).
+unchanged_object(fortress_lower_bridge, appearance_and_extent).
+unchanged_object(fortress_upper_stem, appearance_and_extent).
+unchanged_object(fortress_inner_courtyard, appearance_and_extent).
+unchanged_object(upper_chamber_frame, appearance_and_extent).
+unchanged_object(upper_chamber_interior, appearance_and_extent).
+unchanged_object(upper_burgundy_glyph, appearance_and_extent).
+unchanged_object(blue_black_player, appearance_and_extent).
+unchanged_object(player_black_core, appearance_and_extent).
+unchanged_object(player_blue_tail, appearance_and_extent).
+unchanged_object(lower_left_symbol_card, appearance_and_extent).
+unchanged_object(lower_left_burgundy_glyph, appearance_and_extent).
+unchanged_object(bottom_status_panel, appearance_and_extent).
+unchanged_object(cyan_status_blocks, appearance_and_extent).
+
+observed_difference(
+    moved_object(
+        bottom_center_gate,
+        point(19, 40),
+        point(19, 35),
+        delta(0, -5)
+    )
+).
+observed_difference(
+    moved_object(
+        gate_gray_header,
+        point(19, 40),
+        point(19, 35),
+        delta(0, -5)
+    )
+).
+observed_difference(
+    moved_object(
+        gate_burgundy_panel,
+        point(19, 42),
+        point(19, 37),
+        delta(0, -5)
+    )
+).
+observed_difference(
+    resized_object(green_status_block, size(5, 2), size(6, 2))
+).
+observed_difference(
+    resized_object(bottom_status_track, size(37, 2), size(36, 2))
+).
+observed_difference(
+    added_relation(embedded_in(bottom_center_gate, fortress_left_wing))
+).
+observed_difference(
+    added_relation(overlays(bottom_center_gate, fortress_left_wing))
+).
+observed_difference(
+    removed_relation(adjacent(fortress_lower_bridge, bottom_center_gate))
+).
+
+observed_transition_effect(
+    action('ACTION1', {}),
+    gate_translated(bottom_center_gate, delta(0, -5))
+).
+observed_transition_effect(
+    action('ACTION1', {}),
+    status_progress_advanced(
+        green_status_block,
+        bottom_status_track,
+        cells(1)
+    )
+).
 
 hypothesized_action_effect(
-    unknown_action,
-    moved(door_assembly, north, 5)
+    action('ACTION1', {}),
+    raises(bottom_center_gate, cells(5))
 ).
 hypothesized_action_effect(
-    unknown_action,
-    opened_passage_below_player
-).
-hypothesized_action_effect(
-    unknown_action,
-    filled_vacated_door_region_with_green
-).
-hypothesized_action_effect(
-    unknown_action,
-    increased_green_status_by_cells(2)
-).
-hypothesized_action_effect(
-    unknown_action,
-    decreased_dark_status_by_cells(2)
+    action('ACTION1', {}),
+    advances_status_progress(cells(1))
 ).
 
 action_effect(Action, Effect) :-
     hypothesized_action_effect(Action, Effect).
 
-hypothesis(action_effect(Action, Effect)) :-
-    hypothesized_action_effect(Action, Effect).
-
-hypothesis(door_assembly_moved_as_unit) :-
-    observed_move(lower_barrier_gray, door_lintel, 0, -5),
-    observed_move(lower_barrier_maroon, door_maroon, 0, -5).
-
-hypothesis(status_transfer(dark_gray, green, cells(2))) :-
-    observed_region_change(
-        cell_rectangle(18, 61, 1, 2),
-        dark_gray,
-        green
-    ).
+hypothesis(
+    action_effect(
+        action('ACTION1', {}),
+        raises(bottom_center_gate, cells(5))
+    ),
+    strongly_supported
+).
+hypothesis(
+    action_effect(
+        action('ACTION1', {}),
+        advances_status_progress(cells(1))
+    ),
+    strongly_supported
+).

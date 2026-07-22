@@ -275,12 +275,30 @@ class GptArcAnalyzer:
         store.refresh_readme(initial)
         return store.object_registry_path, True
 
+    def _write_registry_facts(
+        self,
+        store: ActionTreeStore,
+        facts: dict[str, str],
+    ) -> Path:
+        lines = [
+            "% Canonical friendly object identities for this entire ARC3 level.",
+            "% Names are created once and reused from the beginning to the end.",
+            "",
+        ]
+        lines.extend(facts[name] for name in sorted(facts))
+        store.object_registry_path.write_text(
+            "\n".join(lines) + "\n",
+            encoding="utf-8",
+        )
+        return store.object_registry_path
+
     def _repair_objects_output(
         self,
         store: ActionTreeStore,
         node: StateNode,
         candidate: str,
-    ) -> str:
+    ) -> tuple[str, bool]:
+        """Repair only when the candidate uses bad IDs or cannot be normalized."""
         repaired = self._respond(
             self.prompts()["repair_objects"],
             [("Current ARC3 state:", node.image_path)],
@@ -290,16 +308,83 @@ class GptArcAnalyzer:
                 + candidate
             ),
         )
-        if store.identity_facts(repaired):
-            return repaired
+        return repaired, True
 
-        # Last-resort nonfatal normalization: prepend the canonical declarations.
-        # The model's remaining facts are retained for inspection, but the cache is
-        # never left without the level's friendly IDs.
-        registry = store.registry_text().rstrip()
+    def _normalize_objects_output(
+        self,
+        store: ActionTreeStore,
+        node: StateNode,
+        candidate: str,
+        *,
+        allow_gpt_repair: bool = True,
+    ) -> tuple[str, bool]:
+        """Keep canonical identities once in object_registry.pl.
+
+        Node objects.pl files contain only state-specific facts plus a relative
+        ensure_loaded/1 reference to the shared registry. Legacy repeated identity
+        declarations are migrated into the registry and removed from the node.
+        """
+        self.ensure_identity_registry(store, force=False)
+        text = _strip_fences(candidate)
+        repair_called = False
+
+        if store.opaque_tokens(text) and allow_gpt_repair:
+            text, repair_called = self._repair_objects_output(store, node, text)
+            text = _strip_fences(text)
+
+        remaining_opaque = store.opaque_tokens(text)
+        if remaining_opaque:
+            raise RuntimeError(
+                "Could not normalize objects.pl because opaque IDs remain: "
+                + ", ".join(remaining_opaque)
+            )
+
+        registry = store.registry_identities()
+
+        # Accept legacy object_identity/3 declarations and the new compact
+        # new_object_identity/3 convention, then store them only in the registry.
+        candidate_facts = store.identity_facts(text)
+        candidate_facts.update(store.new_identity_facts(text))
+
+        for name, fact in candidate_facts.items():
+            if store.OPAQUE_ID_RE.match(name):
+                raise RuntimeError(f"Opaque object identity is not allowed: {name}")
+            registry.setdefault(name, fact)
+
         if not registry:
-            raise RuntimeError("Unable to repair objects.pl because object_registry.pl is empty")
-        return registry + "\n\n% Model-produced state facts follow.\n" + candidate.lstrip()
+            raise RuntimeError(
+                "object_registry.pl is empty after identity bootstrap."
+            )
+
+        self._write_registry_facts(store, registry)
+
+        body_lines: list[str] = []
+        for line in text.splitlines():
+            if store.FRIENDLY_ID_RE.match(line):
+                continue
+            if store.NEW_FRIENDLY_ID_RE.match(line):
+                continue
+            if store.REGISTRY_LOAD_RE.match(line):
+                continue
+            body_lines.append(line)
+
+        body = "\n".join(body_lines).strip()
+        registry_ref = store.registry_reference(node)
+
+        normalized_lines = [
+            "% Canonical object identities live in the level-wide registry.",
+            f":- ensure_loaded('{registry_ref}').",
+            "",
+            "% State-specific facts for this action-tree node.",
+        ]
+        if body:
+            normalized_lines.append(body)
+        else:
+            normalized_lines.append("% No additional state-specific facts.")
+
+        normalized = "\n".join(normalized_lines).rstrip() + "\n"
+        store.validate_friendly_objects(normalized, node)
+        return normalized, repair_called
 
     def ensure_objects(
         self,
@@ -309,9 +394,6 @@ class GptArcAnalyzer:
         force: bool = False,
     ) -> tuple[Path, bool]:
         output = node.objects_path
-        if output.exists() and output.stat().st_size and not force:
-            store.update_registry_from_objects(node)
-            return output, False
 
         self.ensure_identity_registry(store, force=False)
 
@@ -319,19 +401,43 @@ class GptArcAnalyzer:
         if parent is not None:
             self.ensure_objects(store, parent, force=False)
 
-        text = self._respond(
+        # Old or partially generated cached files are normalized in place instead
+        # of causing every descendant analysis to fail.
+        if output.exists() and output.stat().st_size and not force:
+            existing = output.read_text(encoding="utf-8")
+            normalized, repair_called = self._normalize_objects_output(
+                store,
+                node,
+                existing,
+                allow_gpt_repair=True,
+            )
+            if normalized != existing:
+                output.write_text(normalized, encoding="utf-8")
+            store.update_registry_from_objects(node)
+            store.refresh_readme(node)
+            if parent is not None:
+                store.refresh_readme(parent)
+            return output, repair_called
+
+        candidate = self._respond(
             self.prompts()["objects"],
             [("Current ARC3 state:", node.image_path)],
             supplemental_text=self._identity_context(store, node),
         )
-        if not store.identity_facts(text):
-            text = self._repair_objects_output(store, node, text)
-        store.validate_friendly_objects(text, node)
-        output.write_text(text, encoding="utf-8")
+        normalized, repair_called = self._normalize_objects_output(
+            store,
+            node,
+            candidate,
+            allow_gpt_repair=True,
+        )
+        output.write_text(normalized, encoding="utf-8")
         store.update_registry_from_objects(node)
         store.refresh_readme(node)
         if parent is not None:
             store.refresh_readme(parent)
+
+        # A primary objects call was made, regardless of whether a repair call was
+        # also necessary.
         return output, True
 
     def ensure_differences(

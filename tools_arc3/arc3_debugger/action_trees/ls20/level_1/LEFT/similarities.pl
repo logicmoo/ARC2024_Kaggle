@@ -1,40 +1,37 @@
-object_match(previous_background, current_background,
-    match_info(1.0, [same_color(yellow), same_extent, unchanged])).
+:- ensure_loaded('object_registry.pl').
 
-object_match(previous_left_wall, current_left_wall,
-    match_info(1.0, [same_color(light_gray), same_bbox(0, 0, 39, 519), same_shape])).
+object_identity(green_status_block, status_indicator,
+    'Single green progress block at the left end of the bottom status track').
 
-object_match(previous_green_structure, current_green_structure,
-    match_info(0.99, [same_color(green), same_position, same_shape, locally_occluded_by_moved_gate])).
+object_match(yellow_playfield, yellow_playfield, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(left_boundary_wall, left_boundary_wall, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(green_fortress, green_fortress, 0.99-[same_identity, same_bounding_box, same_color, persistent_structure, gate_notch_relocated]).
+object_match(fortress_main_body, fortress_main_body, 0.99-[same_identity, same_bounding_box, same_color, persistent_component, gate_notch_relocated]).
+object_match(fortress_left_wing, fortress_left_wing, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(fortress_right_wing, fortress_right_wing, 0.99-[same_identity, same_bounding_box, same_color, persistent_component, gate_notch_filled]).
+object_match(fortress_lower_bridge, fortress_lower_bridge, 0.99-[same_identity, same_bounding_box, same_color, persistent_component, gate_notch_relocated]).
+object_match(fortress_upper_stem, fortress_upper_stem, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(fortress_inner_courtyard, fortress_inner_courtyard, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(upper_chamber_frame, upper_chamber_frame, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(upper_chamber_interior, upper_chamber_interior, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(upper_burgundy_glyph, upper_burgundy_glyph, 1.0-[same_identity, same_bounding_box, same_color, same_geometry]).
+object_match(blue_black_player, blue_black_player, 1.0-[same_identity, same_bounding_box, same_colors, same_geometry, same_center, same_state]).
+object_match(player_black_core, player_black_core, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_parent]).
+object_match(player_blue_tail, player_blue_tail, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_parent]).
+object_match(bottom_center_gate, bottom_center_gate, 1.0-[same_identity, same_size, same_colors, same_geometry, same_state, translated(-5, 0)]).
+object_match(gate_gray_header, gate_gray_header, 1.0-[same_identity, same_size, same_color, same_geometry, same_parent, translated(-5, 0)]).
+object_match(gate_burgundy_panel, gate_burgundy_panel, 1.0-[same_identity, same_size, same_color, same_geometry, same_parent, translated(-5, 0)]).
+object_match(lower_left_symbol_card, lower_left_symbol_card, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_center]).
+object_match(lower_left_burgundy_glyph, lower_left_burgundy_glyph, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_parent]).
+object_match(bottom_status_panel, bottom_status_panel, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_state]).
+object_match(bottom_status_track, bottom_status_track, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_parent]).
+object_match(cyan_status_blocks, cyan_status_blocks, 1.0-[same_identity, same_bounding_box, same_color, same_geometry, same_components, same_state]).
 
-object_match(previous_avatar, current_avatar,
-    match_info(1.0, [same_colors([blue, black]), same_bbox(200, 310, 229, 339), same_shape, same_position])).
-
-object_match(previous_top_panel, current_top_panel,
-    match_info(1.0, [same_colors([light_gray, maroon]), same_bbox(330, 90, 399, 159), same_shape, same_position])).
-
-object_match(previous_lower_left_panel, current_lower_left_panel,
-    match_info(1.0, [same_colors([light_gray, maroon]), same_bbox(10, 530, 109, 629), same_shape, same_position])).
-
-object_match(previous_gate, current_gate,
-    match_info(1.0, [same_colors([light_gray, maroon]), same_size(50, 50), same_shape, displacement(-50, 0), moved_left])).
-
-object_match(previous_bottom_panel, current_bottom_panel,
-    match_info(0.99, [same_color(light_gray), same_bbox(120, 600, 639, 639), same_shape, same_position])).
-
-object_match(previous_bottom_dark_track, current_bottom_dark_track,
-    match_info(0.97, [same_color(dark_gray), same_vertical_extent(610, 629), shared_right_edge(549), shortened_from_left_by(10)])).
-
-object_match(previous_cyan_indicator_1, current_cyan_indicator_1,
-    match_info(1.0, [same_color(cyan), same_bbox(560, 610, 579, 629), same_shape, same_position])).
-
-object_match(previous_cyan_indicator_2, current_cyan_indicator_2,
-    match_info(1.0, [same_color(cyan), same_bbox(590, 610, 609, 629), same_shape, same_position])).
-
-object_match(previous_cyan_indicator_3, current_cyan_indicator_3,
-    match_info(1.0, [same_color(cyan), same_bbox(620, 610, 639, 629), same_shape, same_position])).
-
+unmatched_current(green_status_block).
 unmatched_objects(previous, []).
+unmatched_objects(current, [green_status_block]).
 
-unmatched_object(current, bottom_green_progress_segment,
-    unmatched_info(0.99, [new_object, color(green), bbox(130, 610, 139, 629), replaces_leftmost_part_of_dark_track])).
+unmatched_evidence(green_status_block, 1.0,
+    [newly_visible, bounding_box(13, 61, 1, 2), color(green),
+     geometry(filled_rectangle), overlays(bottom_status_track),
+     contained_by(bottom_status_panel)]).

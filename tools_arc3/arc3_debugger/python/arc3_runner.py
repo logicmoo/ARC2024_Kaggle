@@ -455,7 +455,30 @@ class Arc3Runner:
 
     def gpt_command_2(self) -> None:
         store, node = self._require_node()
-        result = self._analyzer().ensure_full_analysis(store, node)
+        print(f"Full GPT analysis: {node.path}")
+        try:
+            result = self._analyzer().ensure_full_analysis(store, node)
+        except Exception as exc:
+            expected = (
+                "object_registry.pl",
+                "objects.pl",
+                "differences.pl",
+                "turtle_from_image.pl",
+                "similarities.pl",
+                "turtle_from_diff.pl",
+                "rules.pl",
+            )
+            completed = [
+                name
+                for name in expected
+                if (store.level_root / name).exists() or (node.path / name).exists()
+            ]
+            detail = ", ".join(completed) if completed else "none"
+            raise RuntimeError(
+                f"Full analysis stopped. Files already created or cached: {detail}. "
+                f"Cause: {exc}"
+            ) from exc
+
         ordered = (
             ("object_registry.pl", result["registry_path"], result["registry_called"]),
             ("objects.pl", result["objects_path"], result["objects_called"]),
@@ -467,10 +490,11 @@ class Arc3Runner:
         )
         for label, path, called in ordered:
             if path is None:
-                print(f"{label}: no parent / not applicable")
+                print(f"{label}: not applicable at the level root")
             else:
-                print(f"{label}: {path} ({'GPT' if called else 'cached'})")
+                print(f"{label}: {path} ({'generated/repaired' if called else 'cached'})")
         print(f"README.md: {node.readme_path}")
+        print("Full GPT analysis complete.")
 
     def gpt_command_3(self) -> None:
         store, node = self._require_node()

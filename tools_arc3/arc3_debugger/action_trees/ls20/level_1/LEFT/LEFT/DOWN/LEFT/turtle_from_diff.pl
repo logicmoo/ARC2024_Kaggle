@@ -1,0 +1,12 @@
+turtle_patch(action4, action5,
+    [patch_object(fortress_lower_bridge,
+        [penup, set_pos(24,45), setcolor(green),
+         pendown, fill_rect(30,5)]),
+     patch_object(bottom_center_gate,
+        [penup, set_pos(19,45), setcolor(light_gray),
+         pendown, fill_rect(5,2),
+         penup, set_pos(19,47), setcolor(burgundy),
+         pendown, fill_rect(5,3)]),
+     patch_object(green_status_block,
+        [penup, set_pos(13,61), setcolor(green),
+         pendown, fill_rect(4,2)])]).

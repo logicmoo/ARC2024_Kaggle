@@ -1,256 +1,169 @@
-:- discontiguous previous_object/1.
-:- discontiguous current_object/1.
-:- discontiguous correspondence/2.
-:- discontiguous changed_object/3.
-:- discontiguous unchanged_object/2.
-:- discontiguous observation/1.
-:- discontiguous hypothesis/2.
+% differences.pl
+% Observed transition: action5 --ACTION1--> action6.
 
-previous_object(background).
-previous_object(left_sidebar).
-previous_object(main_green_structure).
-previous_object(top_panel).
-previous_object(top_burgundy_glyph).
-previous_object(avatar).
-previous_object(avatar_black).
-previous_object(avatar_navy).
-previous_object(avatar_blue).
-previous_object(lower_connector_gray).
-previous_object(lower_connector_burgundy).
-previous_object(lower_left_panel).
-previous_object(lower_left_burgundy_glyph).
-previous_object(status_tray).
-previous_object(status_green_segment).
-previous_object(status_dark_segment).
-previous_object(status_blue_segment_1).
-previous_object(status_blue_segment_2).
-previous_object(status_blue_segment_3).
+added_object(_) :-
+    fail.
 
-current_object(background).
-current_object(left_sidebar).
-current_object(main_structure).
-current_object(upper_display).
-current_object(upper_glyph).
-current_object(avatar).
-current_object(lower_barrier_gray).
-current_object(lower_barrier_maroon).
-current_object(lower_icon_panel).
-current_object(lower_icon_glyph).
-current_object(status_panel).
-current_object(status_green).
-current_object(status_dark).
-current_object(status_light_1).
-current_object(status_light_2).
-current_object(status_light_3).
+removed_object(_) :-
+    fail.
 
-correspondence(background,background).
-correspondence(left_sidebar,left_sidebar).
-correspondence(main_green_structure,main_structure).
-correspondence(top_panel,upper_display).
-correspondence(top_burgundy_glyph,upper_glyph).
-correspondence(avatar,avatar).
-correspondence(lower_connector_gray,lower_barrier_gray).
-correspondence(lower_connector_burgundy,lower_barrier_maroon).
-correspondence(lower_left_panel,lower_icon_panel).
-correspondence(lower_left_burgundy_glyph,lower_icon_glyph).
-correspondence(status_tray,status_panel).
-correspondence(status_green_segment,status_green).
-correspondence(status_dark_segment,status_dark).
-correspondence(status_blue_segment_1,status_light_1).
-correspondence(status_blue_segment_2,status_light_2).
-correspondence(status_blue_segment_3,status_light_3).
+recolored_object(_, _, _) :-
+    fail.
 
-renamed_object(main_green_structure,main_structure).
-renamed_object(top_panel,upper_display).
-renamed_object(top_burgundy_glyph,upper_glyph).
-renamed_object(lower_connector_gray,lower_barrier_gray).
-renamed_object(lower_connector_burgundy,lower_barrier_maroon).
-renamed_object(lower_left_panel,lower_icon_panel).
-renamed_object(lower_left_burgundy_glyph,lower_icon_glyph).
-renamed_object(status_tray,status_panel).
-renamed_object(status_green_segment,status_green).
-renamed_object(status_dark_segment,status_dark).
-renamed_object(status_blue_segment_1,status_light_1).
-renamed_object(status_blue_segment_2,status_light_2).
-renamed_object(status_blue_segment_3,status_light_3).
+moved_object(bottom_center_gate,
+             box(19,45,5,5),
+             box(19,40,5,5),
+             delta(0,-5)).
+moved_object(gate_gray_header,
+             box(19,45,5,2),
+             box(19,40,5,2),
+             delta(0,-5)).
+moved_object(gate_burgundy_panel,
+             box(19,47,5,3),
+             box(19,42,5,3),
+             delta(0,-5)).
 
-representation_merged_into(avatar_black,avatar).
-representation_merged_into(avatar_navy,avatar).
-representation_merged_into(avatar_blue,avatar).
+resized_object(fortress_lower_bridge,
+               size(30,5),
+               size(35,5)).
+resized_object(green_status_block,
+               size(4,2),
+               size(5,2)).
+resized_object(bottom_status_track,
+               size(38,2),
+               size(37,2)).
 
-color_alias(burgundy,maroon).
-same_rgb_color(burgundy,maroon,rgb(133,20,75)).
+changed_object(bottom_center_gate,
+               bounding_box,
+               change(box(19,45,5,5), box(19,40,5,5))).
+changed_object(bottom_center_gate,
+               center,
+               change(point(21,47), point(21,42))).
+changed_object(bottom_center_gate,
+               state,
+               added(raised)).
 
-bbox_convention_change(half_open_xywh,inclusive_xyxy).
+changed_object(gate_gray_header,
+               bounding_box,
+               change(box(19,45,5,2), box(19,40,5,2))).
+changed_object(gate_burgundy_panel,
+               bounding_box,
+               change(box(19,47,5,3), box(19,42,5,3))).
 
-normalized_bbox(previous,background,0,0,640,640).
-normalized_bbox(current,background,0,0,640,640).
-normalized_bbox(previous,left_sidebar,0,0,40,520).
-normalized_bbox(current,left_sidebar,0,0,40,520).
-normalized_bbox(previous,main_green_structure,140,80,540,500).
-normalized_bbox(current,main_structure,140,80,540,500).
-normalized_bbox(previous,top_panel,330,90,400,160).
-normalized_bbox(current,upper_display,330,90,400,160).
-normalized_bbox(previous,top_burgundy_glyph,350,110,380,140).
-normalized_bbox(current,upper_glyph,350,110,380,140).
-normalized_bbox(previous,avatar,200,310,230,340).
-normalized_bbox(current,avatar,200,310,230,340).
-normalized_bbox(previous,lower_connector_gray,190,450,240,470).
-normalized_bbox(current,lower_barrier_gray,190,400,240,420).
-normalized_bbox(previous,lower_connector_burgundy,190,470,240,500).
-normalized_bbox(current,lower_barrier_maroon,190,420,240,450).
-normalized_bbox(previous,lower_left_panel,10,530,110,630).
-normalized_bbox(current,lower_icon_panel,10,530,110,630).
-normalized_bbox(previous,lower_left_burgundy_glyph,30,550,90,610).
-normalized_bbox(current,lower_icon_glyph,30,550,90,610).
-normalized_bbox(previous,status_tray,120,600,640,640).
-normalized_bbox(current,status_panel,120,600,640,640).
-normalized_bbox(previous,status_green_segment,130,610,170,630).
-normalized_bbox(current,status_green,130,610,180,630).
-normalized_bbox(previous,status_dark_segment,170,610,550,630).
-normalized_bbox(current,status_dark,180,610,550,630).
-normalized_bbox(previous,status_blue_segment_1,560,610,580,630).
-normalized_bbox(current,status_light_1,560,610,580,630).
-normalized_bbox(previous,status_blue_segment_2,590,610,610,630).
-normalized_bbox(current,status_light_2,590,610,610,630).
-normalized_bbox(previous,status_blue_segment_3,620,610,640,630).
-normalized_bbox(current,status_light_3,620,610,640,630).
+changed_object(fortress_lower_bridge,
+               bounding_box,
+               change(box(24,45,30,5), box(19,45,35,5))).
+changed_object(fortress_lower_bridge,
+               component_box,
+               change(box(24,45,30,5), box(19,45,35,5))).
 
-unchanged_object(background,background).
-unchanged_object(left_sidebar,left_sidebar).
-unchanged_object(top_panel,upper_display).
-unchanged_object(top_burgundy_glyph,upper_glyph).
-unchanged_object(lower_left_panel,lower_icon_panel).
-unchanged_object(lower_left_burgundy_glyph,lower_icon_glyph).
-unchanged_object(status_tray,status_panel).
-unchanged_object(status_blue_segment_1,status_light_1).
-unchanged_object(status_blue_segment_2,status_light_2).
-unchanged_object(status_blue_segment_3,status_light_3).
+changed_object(fortress_main_body,
+               component_boxes,
+               change(
+                   [box(14,25,40,5),
+                    box(14,30,15,10),
+                    box(34,30,20,20),
+                    box(19,40,5,5),
+                    box(24,45,30,5)],
+                   [box(14,25,40,5),
+                    box(14,30,15,10),
+                    box(34,30,20,20),
+                    box(19,45,35,5)])).
+changed_object(fortress_main_body,
+               occupied_region,
+               extended_into(box(19,45,5,5))).
+changed_object(green_fortress,
+               occupied_region,
+               extended_into(box(19,45,5,5))).
 
-moved_object(lower_connector_gray,lower_barrier_gray,0,-50).
-moved_object(lower_connector_burgundy,lower_barrier_maroon,0,-50).
+changed_object(green_status_block,
+               bounding_box,
+               change(box(13,61,4,2), box(13,61,5,2))).
+changed_object(green_status_block,
+               occupied_region,
+               extended_into(box(17,61,1,2))).
 
-recolored_object(avatar_navy,navy,blue).
+changed_object(bottom_status_track,
+               bounding_box,
+               change(box(17,61,38,2), box(18,61,37,2))).
+changed_object(bottom_status_track,
+               occupied_region,
+               removed_from(box(17,61,1,2))).
+changed_object(bottom_status_track,
+               center,
+               added(point(36,62))).
 
-resized_object(status_green_segment,size(40,20),size(50,20)).
-resized_object(status_dark_segment,size(380,20),size(370,20)).
+changed_object(lower_left_symbol_card,
+               center_annotation,
+               change(point(5,57), point(5,58))).
 
-changed_object(
-    main_green_structure,
-    main_structure,
-    relocated_region(rectangle(190,400,50,50),
-                     rectangle(190,450,50,50))
-).
+relation_removed(left_of(bottom_center_gate, fortress_lower_bridge)).
+relation_added(left_of(bottom_center_gate, fortress_inner_courtyard)).
+relation_added(above(upper_chamber_frame, blue_black_player)).
+relation_added(above(blue_black_player, bottom_center_gate)).
+relation_added(above(bottom_center_gate, fortress_lower_bridge)).
+relation_added(below(fortress_lower_bridge, bottom_center_gate)).
 
-changed_object(
-    lower_connector_gray,
-    lower_barrier_gray,
-    bbox_change(box(190,450,240,470),
-                box(190,400,240,420))
-).
+unchanged_object(yellow_playfield, intrinsic_visual_form).
+unchanged_object(left_boundary_wall, intrinsic_visual_form).
+unchanged_object(fortress_left_wing, intrinsic_visual_form).
+unchanged_object(fortress_right_wing, intrinsic_visual_form).
+unchanged_object(fortress_upper_stem, intrinsic_visual_form).
+unchanged_object(fortress_inner_courtyard, intrinsic_visual_form).
+unchanged_object(upper_chamber_frame, intrinsic_visual_form).
+unchanged_object(upper_chamber_interior, intrinsic_visual_form).
+unchanged_object(upper_burgundy_glyph, intrinsic_visual_form).
+unchanged_object(blue_black_player, intrinsic_visual_form).
+unchanged_object(player_black_core, intrinsic_visual_form).
+unchanged_object(player_blue_tail, intrinsic_visual_form).
+unchanged_object(lower_left_symbol_card, observed_pixels_and_bounding_box).
+unchanged_object(lower_left_burgundy_glyph, intrinsic_visual_form).
+unchanged_object(bottom_status_panel, intrinsic_visual_form).
+unchanged_object(cyan_status_blocks, intrinsic_visual_form).
 
-changed_object(
-    lower_connector_burgundy,
-    lower_barrier_maroon,
-    bbox_change(box(190,470,240,500),
-                box(190,420,240,450))
-).
+unchanged_color(yellow_playfield, yellow).
+unchanged_color(left_boundary_wall, light_gray).
+unchanged_color(green_fortress, green).
+unchanged_color(fortress_main_body, green).
+unchanged_color(fortress_left_wing, green).
+unchanged_color(fortress_right_wing, green).
+unchanged_color(fortress_lower_bridge, green).
+unchanged_color(fortress_upper_stem, green).
+unchanged_color(fortress_inner_courtyard, yellow).
+unchanged_color(upper_chamber_frame, green).
+unchanged_color(upper_chamber_interior, light_gray).
+unchanged_color(upper_burgundy_glyph, burgundy).
+unchanged_color(blue_black_player, [blue,black]).
+unchanged_color(player_black_core, black).
+unchanged_color(player_blue_tail, blue).
+unchanged_color(bottom_center_gate, [light_gray,burgundy]).
+unchanged_color(gate_gray_header, light_gray).
+unchanged_color(gate_burgundy_panel, burgundy).
+unchanged_color(lower_left_symbol_card, light_gray).
+unchanged_color(lower_left_burgundy_glyph, burgundy).
+unchanged_color(bottom_status_panel, light_gray).
+unchanged_color(bottom_status_track, dark_gray).
+unchanged_color(green_status_block, green).
+unchanged_color(cyan_status_blocks, cyan).
 
-changed_object(
-    avatar,
-    avatar,
-    cell_color_change(cell(20,32),navy,blue)
-).
+observed_transition(action5, action6, action('ACTION1', {})).
 
-changed_object(
-    status_green_segment,
-    status_green,
-    rectangle_change(rectangle(130,610,40,20),
-                     rectangle(130,610,50,20))
-).
+action_effect(action('ACTION1', {}),
+              observed(moved_up(bottom_center_gate, 5))).
+action_effect(action('ACTION1', {}),
+              observed(moved_up(gate_gray_header, 5))).
+action_effect(action('ACTION1', {}),
+              observed(moved_up(gate_burgundy_panel, 5))).
+action_effect(action('ACTION1', {}),
+              observed(extended_left(fortress_lower_bridge, 5))).
+action_effect(action('ACTION1', {}),
+              observed(increased_width(green_status_block, 1))).
+action_effect(action('ACTION1', {}),
+              observed(decreased_width_from_left(bottom_status_track, 1))).
 
-changed_object(
-    status_dark_segment,
-    status_dark,
-    rectangle_change(rectangle(170,610,380,20),
-                     rectangle(180,610,370,20))
-).
-
-preserved_bbox(main_green_structure,main_structure).
-preserved_bbox(avatar,avatar).
-preserved_bbox(status_tray,status_panel).
-
-preserved_right_edge(status_dark_segment,status_dark,550).
-shared_boundary_change(status_green_segment,status_dark_segment,170,180).
-
-added_green_region(rectangle(190,450,50,50)).
-added_green_region(rectangle(170,610,10,20)).
-removed_green_region(rectangle(190,400,50,50)).
-
-added_maroon_region(rectangle(190,420,50,30)).
-removed_maroon_region(rectangle(190,470,50,30)).
-
-added_gray_region(rectangle(190,400,50,20)).
-removed_gray_region(rectangle(190,450,50,20)).
-
-removed_navy_region(rectangle(200,320,10,10)).
-added_blue_region(rectangle(200,320,10,10)).
-
-removed_dark_gray_region(rectangle(170,610,10,20)).
-
-added_object(Object) :-
-    current_object(Object),
-    \+ correspondence(_,Object),
-    \+ representation_merged_into(_,Object).
-
-removed_object(Object) :-
-    previous_object(Object),
-    \+ correspondence(Object,_),
-    \+ representation_merged_into(Object,_).
-
-observation(moved_object(lower_connector_gray,lower_barrier_gray,0,-50)).
-observation(moved_object(lower_connector_burgundy,lower_barrier_maroon,0,-50)).
-observation(recolored_object(avatar_navy,navy,blue)).
-observation(resized_object(status_green_segment,size(40,20),size(50,20))).
-observation(resized_object(status_dark_segment,size(380,20),size(370,20))).
-observation(added_green_region(rectangle(190,450,50,50))).
-observation(removed_green_region(rectangle(190,400,50,50))).
-observation(shared_boundary_change(status_green_segment,status_dark_segment,170,180)).
-observation(no_semantic_object_addition).
-observation(no_semantic_object_removal).
-
-hypothesis(
-    action_effect(barrier_toggle,
-                  translated(barrier_pair,delta(0,-50))),
-    high
-).
-
-hypothesis(
-    action_effect(barrier_toggle,
-                  exchanged_occupancy(
-                      rectangle(190,400,50,50),
-                      green_floor,
-                      barrier_pair)),
-    high
-).
-
-hypothesis(
-    action_effect(player_action,
-                  progress_increment(cells(1))),
-    medium
-).
-
-hypothesis(
-    action_effect(player_action,
-                  status_boundary_shift(10)),
-    medium
-).
-
-hypothesis(
-    action_effect(player_action,
-                  avatar_palette_normalization(navy,blue)),
-    low
-).
-
-action_effect(Action,Effect) :-
-    hypothesis(action_effect(Action,Effect),_).
+hypothesized_action_effect(action('ACTION1', {}),
+                           raises(bottom_center_gate)).
+hypothesized_action_effect(action('ACTION1', {}),
+                           advances(bottom_status_panel)).
+hypothesized_action_effect(action('ACTION1', {}),
+                           fills_vacated_gate_area_with(fortress_lower_bridge)).

@@ -1,14 +1,54 @@
-object_match(previous(background_yellow), current(background_yellow), match(1.00, [same_color(yellow), same_extent, unchanged])).
-object_match(previous(left_gray_border), current(left_gray_border), match(1.00, [same_color(gray), same_position, same_shape, unchanged])).
-object_match(previous(main_green_structure), current(main_green_structure), match(0.98, [same_color(green), same_position, same_overall_shape, local_occlusion_change_due_to_moved_block])).
-object_match(previous(top_gray_panel), current(top_gray_panel), match(1.00, [same_color(gray), same_position, same_dimensions, unchanged])).
-object_match(previous(top_maroon_glyph), current(top_maroon_glyph), match(1.00, [same_color(maroon), same_position, same_shape, unchanged])).
-object_match(previous(left_black_blue_marker), current(left_black_blue_marker), match(1.00, [same_colors([black,blue]), same_position, same_shape, unchanged])).
-object_match(previous(lower_left_gray_panel), current(lower_left_gray_panel), match(1.00, [same_color(gray), same_position, same_dimensions, unchanged])).
-object_match(previous(lower_left_maroon_glyph), current(lower_left_maroon_glyph), match(1.00, [same_color(maroon), same_position, same_shape, unchanged])).
-object_match(previous(maroon_gray_block), current(maroon_gray_block), match(1.00, [same_colors([gray,maroon]), same_dimensions, same_orientation, translation(-50,0)])).
-object_match(previous(bottom_status_bar), current(bottom_status_bar), match(0.99, [same_position, same_dimensions, same_gray_track, same_cyan_cells])).
-object_match(previous(bottom_green_indicator), current(bottom_green_indicator), match(0.92, [same_color(green), same_left_anchor, increased_width])).
+:- ensure_loaded('../../object_registry.pl').
 
-unmatched_objects(previous, []).
-unmatched_objects(current, []).
+object_match(yellow_playfield, yellow_playfield,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(left_boundary_wall, left_boundary_wall,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(green_fortress, green_fortress,
+    match_confidence(0.99, [same_identity, same_extent, same_color, local_fill_change])).
+object_match(fortress_main_body, fortress_main_body,
+    match_confidence(0.99, [same_identity, same_bounding_box, same_color, local_fill_change])).
+object_match(fortress_left_wing, fortress_left_wing,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(fortress_right_wing, fortress_right_wing,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(fortress_lower_bridge, fortress_lower_bridge,
+    match_confidence(0.99, [same_identity, same_bounding_box, same_color, reconfigured_around_shifted_gate])).
+object_match(fortress_upper_stem, fortress_upper_stem,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(fortress_inner_courtyard, fortress_inner_courtyard,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(upper_chamber_frame, upper_chamber_frame,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(upper_chamber_interior, upper_chamber_interior,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(upper_burgundy_glyph, upper_burgundy_glyph,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(blue_black_player, blue_black_player,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_colors, same_geometry, same_center])).
+object_match(player_black_core, player_black_core,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_component_relationship])).
+object_match(player_blue_tail, player_blue_tail,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_component_relationship])).
+object_match(bottom_center_gate, bottom_center_gate,
+    match_confidence(1.0, [same_identity, same_dimensions, same_colors, same_geometry, moved_by(-5, 0)])).
+object_match(gate_gray_header, gate_gray_header,
+    match_confidence(1.0, [same_identity, same_dimensions, same_color, same_geometry, moved_by(-5, 0)])).
+object_match(gate_burgundy_panel, gate_burgundy_panel,
+    match_confidence(1.0, [same_identity, same_dimensions, same_color, same_geometry, moved_by(-5, 0)])).
+object_match(lower_left_symbol_card, lower_left_symbol_card,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(lower_left_burgundy_glyph, lower_left_burgundy_glyph,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(bottom_status_panel, bottom_status_panel,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(bottom_status_track, bottom_status_track,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_geometry])).
+object_match(cyan_status_blocks, cyan_status_blocks,
+    match_confidence(1.0, [same_identity, same_bounding_box, same_color, same_components])).
+
+unmatched_previous_object(_) :-
+    fail.
+
+unmatched_current_object(_) :-
+    fail.

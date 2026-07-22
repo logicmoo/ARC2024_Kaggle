@@ -81,3 +81,17 @@ git status .
 rm -rf  action_trees/ls20/level_1/arc3_debugger/
 git status .
 git diff .
+git commit -am "identities"
+git push
+git status .
+rm -rf action_trees/
+mkdir -p action_trees/ls20/level_1
+git status 
+ls  ../../kaggle_arc/muarc_output
+git status .
+git add  action_trees/ls20/level_1
+git status .
+rm -rf  action_trees/ls20/level_1
+mkdir -p  action_trees/ls20/level_1
+git add  action_trees/ls20/level_1
+git status .

@@ -426,3 +426,48 @@ repair pass instead of aborting with “no object_identity/3 facts.”
 
 After the registry exists, every state and every action-tree branch receives the
 same canonical names.
+
+
+### Identity normalization and old caches
+
+`object_registry.pl` is authoritative. GPT child-state responses do not have to
+repeat every `object_identity/3` declaration perfectly. The debugger prepends
+the canonical registry automatically and merges any genuinely new friendly
+declarations.
+
+If an older cached `objects.pl` lacks identity declarations, it is normalized
+in place instead of breaking analysis for every descendant action node. GPT is
+only asked for a repair when opaque identifiers such as `obj_1` remain.
+
+Command `(g)` then `(2)` prints completed/cached artifacts and only reports an
+error when the normalized result is still unusable.
+
+
+### Every state file is embedded in the generated README
+
+Every state-node `README.md` embeds the contents of all text artifacts associated
+with that node. This includes `state.json`, the shared `object_registry.pl`,
+every generated `.pl` file, and future text artifacts added to the node.
+
+`image.png` remains embedded visually near the top. `README.md` itself is
+excluded to prevent recursive self-embedding. Four-backtick fences are used so
+artifact content containing ordinary triple-backtick Markdown remains valid.
+
+
+## Reduced identity and README redundancy
+
+`object_registry.pl` is the only canonical identity database for a level.
+Individual `objects.pl` files now load it with a relative directive:
+
+```prolog
+:- ensure_loaded('../../object_registry.pl').
+```
+
+A node `objects.pl` contains only facts specific to that state. GPT should emit
+`new_object_identity/3` only when a genuinely new object first appears; the
+debugger moves that declaration into the shared registry and removes it from
+the node file.
+
+Generated READMEs still contain every local text artifact, but each artifact is
+inside a collapsible GitHub `<details>` section. The shared registry is embedded
+once in the level-start README and linked, rather than repeated, in descendants.

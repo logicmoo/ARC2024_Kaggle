@@ -1,291 +1,333 @@
-canvas(arc3_state, 640, 640).
+% Canonical object identities live in the level-wide registry.
+:- ensure_loaded('../../../../../../../../object_registry.pl').
+
+% State-specific facts for this action-tree node.
+state_id(action9).
+incoming_action(action9, action('ACTION1', {})).
+previous_state(action9, action8).
+
+canvas_size(64, 64).
 coordinate_system(origin_top_left, x_right, y_down).
-cell_size(10, 10).
+grid_cell_size_pixels(10).
 
-color(yellow, 255, 220, 0, '#ffdc00').
-color(silver, 170, 170, 170, '#aaaaaa').
-color(green, 46, 204, 64, '#2ecc40').
-color(maroon, 133, 20, 75, '#85144b').
-color(blue, 0, 116, 217, '#0074d9').
-color(black, 0, 0, 0, '#000000').
-color(dark_gray, 102, 102, 102, '#666666').
-color(light_blue, 127, 219, 255, '#7fdbff').
+visible(yellow_playfield).
+visible(left_boundary_wall).
+visible(green_fortress).
+visible(fortress_main_body).
+visible(fortress_left_wing).
+visible(fortress_right_wing).
+visible(fortress_lower_bridge).
+visible(fortress_upper_stem).
+visible(fortress_inner_courtyard).
+visible(upper_chamber_frame).
+visible(upper_chamber_interior).
+visible(upper_burgundy_glyph).
+visible(bottom_center_gate).
+visible(gate_gray_header).
+visible(gate_burgundy_panel).
+visible(blue_black_player).
+visible(player_black_core).
+visible(player_blue_tail).
+visible(lower_left_symbol_card).
+visible(lower_left_burgundy_glyph).
+visible(bottom_status_panel).
+visible(bottom_status_track).
+visible(green_status_block).
+visible(cyan_status_blocks).
 
-object(background, background).
-bbox(background, 0, 0, 639, 639).
-geometry(background, rectangle).
-dimensions(background, 640, 640).
-uniform_color(background, yellow).
-z_index(background, 0).
-contains(arc3_state, background).
-turtle_program(background,
-    [penup, setcolor(yellow), set_pos(0,0), fill_rect(640,640)]).
+bounding_box(yellow_playfield, 0, 0, 64, 64).
+bounding_box(left_boundary_wall, 0, 0, 4, 52).
+bounding_box(green_fortress, 14, 8, 40, 42).
+bounding_box(fortress_main_body, 14, 25, 40, 25).
+bounding_box(fortress_left_wing, 14, 25, 15, 15).
+bounding_box(fortress_right_wing, 34, 25, 20, 25).
+bounding_box(fortress_lower_bridge, 19, 45, 35, 5).
+bounding_box(fortress_upper_stem, 34, 17, 5, 8).
+bounding_box(fortress_inner_courtyard, 24, 30, 10, 15).
+bounding_box(upper_chamber_frame, 32, 8, 9, 9).
+bounding_box(upper_chamber_interior, 33, 9, 7, 7).
+bounding_box(upper_burgundy_glyph, 35, 11, 3, 3).
+bounding_box(bottom_center_gate, 19, 25, 5, 5).
+bounding_box(gate_gray_header, 19, 25, 5, 2).
+bounding_box(gate_burgundy_panel, 19, 27, 5, 3).
+bounding_box(blue_black_player, 20, 31, 3, 3).
+bounding_box(player_black_core, 21, 31, 2, 2).
+bounding_box(player_blue_tail, 20, 31, 2, 3).
+bounding_box(lower_left_symbol_card, 1, 53, 10, 10).
+bounding_box(lower_left_burgundy_glyph, 3, 55, 6, 6).
+bounding_box(bottom_status_panel, 12, 60, 52, 4).
+bounding_box(green_status_block, 13, 61, 7, 2).
+bounding_box(bottom_status_track, 20, 61, 35, 2).
+bounding_box(cyan_status_blocks, 56, 61, 8, 2).
 
-object(left_wall, wall).
-bbox(left_wall, 0, 0, 39, 519).
-geometry(left_wall, rectangle).
-dimensions(left_wall, 40, 520).
-uniform_color(left_wall, silver).
-z_index(left_wall, 1).
-contains(arc3_state, left_wall).
-touches_canvas_edge(left_wall, left).
-touches_canvas_edge(left_wall, top).
-turtle_program(left_wall,
-    [penup, setcolor(silver), set_pos(0,0), fill_rect(40,520)]).
+center(green_fortress, 34, 29).
+center(upper_chamber_frame, 36, 12).
+center(upper_chamber_interior, 36, 12).
+center(bottom_center_gate, 21, 27).
+center(gate_gray_header, 21, 26).
+center(gate_burgundy_panel, 21, 28).
+center(blue_black_player, 21, 32).
+center(player_black_core, 22, 32).
+center(player_blue_tail, 21, 32).
+center(lower_left_symbol_card, 5, 58).
+center(green_status_block, 16, 62).
+center(bottom_status_track, 37, 62).
+center(cyan_status_blocks, 60, 62).
 
-object(green_terrain, terrain).
-bbox(green_terrain, 140, 80, 539, 499).
-geometry(green_terrain, connected_orthogonal_region).
-uniform_color(green_terrain, green).
-connected(green_terrain).
-z_index(green_terrain, 1).
-contains(arc3_state, green_terrain).
-region(green_terrain, 320, 80, 90, 90).
-region(green_terrain, 340, 170, 50, 80).
-region(green_terrain, 140, 250, 400, 50).
-region(green_terrain, 140, 300, 150, 100).
-region(green_terrain, 340, 300, 200, 150).
-region(green_terrain, 190, 400, 50, 100).
-region(green_terrain, 240, 450, 300, 50).
-turtle_program(green_terrain,
+color(yellow_playfield, yellow).
+color(left_boundary_wall, light_gray).
+color(green_fortress, green).
+color(fortress_main_body, green).
+color(fortress_left_wing, green).
+color(fortress_right_wing, green).
+color(fortress_lower_bridge, green).
+color(fortress_upper_stem, green).
+color(fortress_inner_courtyard, yellow).
+color(upper_chamber_frame, green).
+color(upper_chamber_interior, light_gray).
+color(upper_burgundy_glyph, burgundy).
+colors(bottom_center_gate, [light_gray, burgundy]).
+color(gate_gray_header, light_gray).
+color(gate_burgundy_panel, burgundy).
+colors(blue_black_player, [blue, black]).
+color(player_black_core, black).
+color(player_blue_tail, blue).
+color(lower_left_symbol_card, light_gray).
+color(lower_left_burgundy_glyph, burgundy).
+color(bottom_status_panel, light_gray).
+color(bottom_status_track, dark_gray).
+color(green_status_block, green).
+color(cyan_status_blocks, cyan).
+
+geometry(yellow_playfield, background_with_occlusions).
+geometry(left_boundary_wall, filled_vertical_rectangle).
+geometry(green_fortress, connected_compound_structure).
+geometry(fortress_main_body, stepped_block_region).
+geometry(fortress_left_wing, filled_rectangle).
+geometry(fortress_right_wing, filled_rectangle).
+geometry(fortress_lower_bridge, filled_horizontal_bar).
+geometry(fortress_upper_stem, filled_vertical_rectangle).
+geometry(fortress_inner_courtyard, l_shaped_hole).
+geometry(upper_chamber_frame, one_cell_thick_rectangular_frame).
+geometry(upper_chamber_interior, filled_rectangle).
+geometry(upper_burgundy_glyph, hooked_angular_glyph).
+geometry(bottom_center_gate, vertically_partitioned_rectangle).
+geometry(gate_gray_header, filled_horizontal_rectangle).
+geometry(gate_burgundy_panel, filled_rectangle).
+geometry(blue_black_player, asymmetric_two_color_marker).
+geometry(player_black_core, filled_rectangular_cluster).
+geometry(player_blue_tail, bent_three_cell_cluster).
+geometry(lower_left_symbol_card, filled_square_panel).
+geometry(lower_left_burgundy_glyph, angular_thick_glyph).
+geometry(bottom_status_panel, filled_horizontal_panel).
+geometry(bottom_status_track, filled_horizontal_rectangle).
+geometry(green_status_block, filled_horizontal_rectangle).
+geometry(cyan_status_blocks, three_separated_rectangular_blocks).
+
+component_of(fortress_main_body, green_fortress).
+component_of(fortress_left_wing, green_fortress).
+component_of(fortress_right_wing, green_fortress).
+component_of(fortress_lower_bridge, green_fortress).
+component_of(fortress_upper_stem, green_fortress).
+component_of(upper_chamber_frame, green_fortress).
+component_of(gate_gray_header, bottom_center_gate).
+component_of(gate_burgundy_panel, bottom_center_gate).
+component_of(player_black_core, blue_black_player).
+component_of(player_blue_tail, blue_black_player).
+component_of(lower_left_burgundy_glyph, lower_left_symbol_card).
+component_of(green_status_block, bottom_status_panel).
+component_of(bottom_status_track, bottom_status_panel).
+component_of(cyan_status_blocks, bottom_status_panel).
+
+contains(green_fortress, fortress_inner_courtyard).
+contains(fortress_main_body, fortress_inner_courtyard).
+contains(upper_chamber_frame, upper_chamber_interior).
+contains(upper_chamber_interior, upper_burgundy_glyph).
+contains(blue_black_player, player_black_core).
+contains(blue_black_player, player_blue_tail).
+contains(lower_left_symbol_card, lower_left_burgundy_glyph).
+contains(bottom_status_panel, green_status_block).
+contains(bottom_status_panel, bottom_status_track).
+contains(bottom_status_panel, cyan_status_blocks).
+
+encloses(green_fortress, fortress_inner_courtyard).
+encloses(upper_chamber_frame, upper_chamber_interior).
+
+adjacent(left_boundary_wall, yellow_playfield).
+adjacent(upper_chamber_frame, fortress_upper_stem).
+adjacent(fortress_upper_stem, fortress_main_body).
+adjacent(fortress_left_wing, fortress_inner_courtyard).
+adjacent(fortress_right_wing, fortress_inner_courtyard).
+adjacent(fortress_lower_bridge, fortress_inner_courtyard).
+adjacent(gate_gray_header, gate_burgundy_panel).
+adjacent(player_black_core, player_blue_tail).
+adjacent(green_status_block, bottom_status_track).
+adjacent(bottom_status_track, cyan_status_blocks).
+
+embedded_in(bottom_center_gate, fortress_left_wing).
+embedded_in(bottom_center_gate, green_fortress).
+embedded_in(blue_black_player, fortress_left_wing).
+embedded_in(blue_black_player, green_fortress).
+
+overlays(bottom_center_gate, fortress_left_wing).
+overlays(blue_black_player, fortress_left_wing).
+overlays(upper_burgundy_glyph, upper_chamber_interior).
+overlays(lower_left_burgundy_glyph, lower_left_symbol_card).
+overlays(green_status_block, bottom_status_panel).
+overlays(bottom_status_track, bottom_status_panel).
+overlays(cyan_status_blocks, bottom_status_panel).
+
+left_of(bottom_center_gate, fortress_inner_courtyard).
+left_of(blue_black_player, fortress_inner_courtyard).
+left_of(green_status_block, bottom_status_track).
+left_of(bottom_status_track, cyan_status_blocks).
+above(upper_chamber_frame, bottom_center_gate).
+above(bottom_center_gate, blue_black_player).
+above(bottom_center_gate, fortress_lower_bridge).
+above(blue_black_player, fortress_lower_bridge).
+below(bottom_center_gate, upper_chamber_frame).
+below(blue_black_player, bottom_center_gate).
+below(fortress_lower_bridge, blue_black_player).
+
+state(green_fortress, solid).
+state(fortress_inner_courtyard, empty).
+state(bottom_center_gate, closed).
+state(bottom_center_gate, shifted_far_left).
+state(bottom_center_gate, raised_to_main_body_top).
+state(blue_black_player, visible).
+state(blue_black_player, stationary_below_gate).
+state(bottom_status_panel, active).
+state(green_status_block, lit).
+state(green_status_block, expanded_by_one_cell).
+state(cyan_status_blocks, three_lit_blocks).
+state(action9, gate_moved_up).
+state(action9, player_revealed).
+state(action9, status_progress_advanced).
+
+component_box(fortress_main_body, 14, 25, 40, 5).
+component_box(fortress_main_body, 14, 30, 15, 10).
+component_box(fortress_main_body, 34, 30, 20, 20).
+component_box(fortress_main_body, 19, 45, 35, 5).
+component_box(fortress_lower_bridge, 19, 45, 35, 5).
+component_box(fortress_inner_courtyard, 29, 30, 5, 15).
+component_box(fortress_inner_courtyard, 24, 40, 5, 5).
+component_box(upper_burgundy_glyph, 35, 11, 3, 1).
+component_box(upper_burgundy_glyph, 37, 12, 1, 2).
+component_box(upper_burgundy_glyph, 35, 13, 1, 1).
+component_box(player_black_core, 21, 31, 2, 2).
+component_box(player_blue_tail, 20, 31, 1, 2).
+component_box(player_blue_tail, 21, 33, 1, 1).
+component_box(lower_left_burgundy_glyph, 3, 55, 6, 2).
+component_box(lower_left_burgundy_glyph, 3, 57, 2, 4).
+component_box(lower_left_burgundy_glyph, 7, 59, 2, 2).
+component_box(cyan_status_blocks, 56, 61, 2, 2).
+component_box(cyan_status_blocks, 59, 61, 2, 2).
+component_box(cyan_status_blocks, 62, 61, 2, 2).
+
+turtle_program(yellow_playfield,
+    [penup, set_pos(0,0), setcolor(yellow), pendown, fill_rect(64,64)]).
+
+turtle_program(left_boundary_wall,
+    [penup, set_pos(0,0), setcolor(light_gray), pendown, fill_rect(4,52)]).
+
+turtle_program(green_fortress,
     [penup, setcolor(green),
-     set_pos(320,80), fill_rect(90,90),
-     set_pos(340,170), fill_rect(50,80),
-     set_pos(140,250), fill_rect(400,50),
-     set_pos(140,300), fill_rect(150,100),
-     set_pos(340,300), fill_rect(200,150),
-     set_pos(190,400), fill_rect(50,100),
-     set_pos(240,450), fill_rect(300,50)]).
+     set_pos(32,8), pendown, fill_rect(9,1),
+     penup, set_pos(32,9), pendown, fill_rect(1,7),
+     penup, set_pos(40,9), pendown, fill_rect(1,7),
+     penup, set_pos(32,16), pendown, fill_rect(9,1),
+     penup, set_pos(34,17), pendown, fill_rect(5,8),
+     penup, set_pos(14,25), pendown, fill_rect(40,5),
+     penup, set_pos(14,30), pendown, fill_rect(15,10),
+     penup, set_pos(34,30), pendown, fill_rect(20,15),
+     penup, set_pos(19,40), pendown, fill_rect(5,10),
+     penup, set_pos(24,45), pendown, fill_rect(30,5)]).
 
-object(top_portal_tile, portal_tile).
-bbox(top_portal_tile, 330, 90, 399, 159).
-geometry(top_portal_tile, rectangle).
-dimensions(top_portal_tile, 70, 70).
-uniform_color(top_portal_tile, silver).
-z_index(top_portal_tile, 2).
-contains(arc3_state, top_portal_tile).
-contained_in(top_portal_tile, green_terrain).
-bordered_by(top_portal_tile, green_terrain, 10).
-turtle_program(top_portal_tile,
-    [penup, setcolor(silver), set_pos(330,90), fill_rect(70,70)]).
+turtle_program(fortress_main_body,
+    [penup, setcolor(green),
+     set_pos(14,25), pendown, fill_rect(40,5),
+     penup, set_pos(14,30), pendown, fill_rect(15,10),
+     penup, set_pos(34,30), pendown, fill_rect(20,20),
+     penup, set_pos(19,40), pendown, fill_rect(5,10),
+     penup, set_pos(24,45), pendown, fill_rect(30,5)]).
 
-object(top_portal_glyph, glyph).
-bbox(top_portal_glyph, 350, 110, 379, 139).
-geometry(top_portal_glyph, disconnected_orthogonal_glyph).
-uniform_color(top_portal_glyph, maroon).
-component_count(top_portal_glyph, 2).
-z_index(top_portal_glyph, 3).
-contains(top_portal_tile, top_portal_glyph).
-region(top_portal_glyph, 350, 110, 30, 10).
-region(top_portal_glyph, 370, 120, 10, 20).
-region(top_portal_glyph, 350, 130, 10, 10).
-turtle_program(top_portal_glyph,
-    [penup, setcolor(maroon),
-     set_pos(350,110), fill_rect(30,10),
-     set_pos(370,120), fill_rect(10,20),
-     set_pos(350,130), fill_rect(10,10)]).
+turtle_program(fortress_left_wing,
+    [penup, set_pos(14,25), setcolor(green), pendown, fill_rect(15,15)]).
 
-object(center_console, console).
-bbox(center_console, 190, 250, 239, 299).
-geometry(center_console, stacked_rectangles).
-dimensions(center_console, 50, 50).
-z_index(center_console, 2).
-contains(arc3_state, center_console).
-overlaid_on(center_console, green_terrain).
-region(center_console, 190, 250, 50, 20, silver).
-region(center_console, 190, 270, 50, 30, maroon).
-turtle_program(center_console,
-    [penup,
-     setcolor(silver), set_pos(190,250), fill_rect(50,20),
-     setcolor(maroon), set_pos(190,270), fill_rect(50,30)]).
+turtle_program(fortress_right_wing,
+    [penup, set_pos(34,25), setcolor(green), pendown, fill_rect(20,25)]).
 
-object(center_console_cap, console_part).
-bbox(center_console_cap, 190, 250, 239, 269).
-geometry(center_console_cap, rectangle).
-dimensions(center_console_cap, 50, 20).
-uniform_color(center_console_cap, silver).
-z_index(center_console_cap, 2).
-contains(center_console, center_console_cap).
-adjacent(center_console_cap, center_console_body, below).
-turtle_program(center_console_cap,
-    [penup, setcolor(silver), set_pos(190,250), fill_rect(50,20)]).
+turtle_program(fortress_lower_bridge,
+    [penup, set_pos(19,45), setcolor(green), pendown, fill_rect(35,5)]).
 
-object(center_console_body, console_part).
-bbox(center_console_body, 190, 270, 239, 299).
-geometry(center_console_body, rectangle).
-dimensions(center_console_body, 50, 30).
-uniform_color(center_console_body, maroon).
-z_index(center_console_body, 2).
-contains(center_console, center_console_body).
-adjacent(center_console_body, center_console_cap, above).
-adjacent(center_console_body, green_terrain, left_right_and_below).
-turtle_program(center_console_body,
-    [penup, setcolor(maroon), set_pos(190,270), fill_rect(50,30)]).
+turtle_program(fortress_upper_stem,
+    [penup, set_pos(34,17), setcolor(green), pendown, fill_rect(5,8)]).
 
-object(player, avatar).
-bbox(player, 200, 310, 229, 339).
-geometry(player, asymmetric_composite_sprite).
-dimensions(player, 30, 30).
-z_index(player, 3).
-contains(arc3_state, player).
-overlaid_on(player, green_terrain).
-below(player, center_console).
-horizontal_gap(player, center_console, 10).
-region(player, 200, 310, 20, 20, blue).
-region(player, 210, 320, 20, 10, black).
-region(player, 210, 330, 10, 10, blue).
-turtle_program(player,
-    [penup,
-     setcolor(blue), set_pos(200,310), fill_rect(20,20),
-     setcolor(black), set_pos(210,320), fill_rect(20,10),
-     setcolor(blue), set_pos(210,330), fill_rect(10,10)]).
+turtle_program(fortress_inner_courtyard,
+    [penup, setcolor(yellow),
+     set_pos(29,30), pendown, fill_rect(5,15),
+     penup, set_pos(24,40), pendown, fill_rect(5,5)]).
 
-object(player_blue_body, avatar_part).
-bbox(player_blue_body, 200, 310, 219, 339).
-geometry(player_blue_body, bent_vertical_region).
-uniform_color(player_blue_body, blue).
-z_index(player_blue_body, 3).
-contains(player, player_blue_body).
-region(player_blue_body, 200, 310, 20, 20).
-region(player_blue_body, 210, 330, 10, 10).
-turtle_program(player_blue_body,
+turtle_program(upper_chamber_frame,
+    [penup, setcolor(green),
+     set_pos(32,8), pendown, fill_rect(9,1),
+     penup, set_pos(32,9), pendown, fill_rect(1,7),
+     penup, set_pos(40,9), pendown, fill_rect(1,7),
+     penup, set_pos(32,16), pendown, fill_rect(9,1)]).
+
+turtle_program(upper_chamber_interior,
+    [penup, set_pos(33,9), setcolor(light_gray), pendown, fill_rect(7,7)]).
+
+turtle_program(upper_burgundy_glyph,
+    [penup, setcolor(burgundy),
+     set_pos(35,11), pendown, fill_rect(3,1),
+     penup, set_pos(37,12), pendown, fill_rect(1,2),
+     penup, set_pos(35,13), pendown, set_cell]).
+
+turtle_program(bottom_center_gate,
+    [penup, set_pos(19,25), setcolor(light_gray), pendown, fill_rect(5,2),
+     penup, set_pos(19,27), setcolor(burgundy), pendown, fill_rect(5,3)]).
+
+turtle_program(gate_gray_header,
+    [penup, set_pos(19,25), setcolor(light_gray), pendown, fill_rect(5,2)]).
+
+turtle_program(gate_burgundy_panel,
+    [penup, set_pos(19,27), setcolor(burgundy), pendown, fill_rect(5,3)]).
+
+turtle_program(blue_black_player,
     [penup, setcolor(blue),
-     set_pos(200,310), fill_rect(20,20),
-     set_pos(210,330), fill_rect(10,10)]).
+     set_pos(20,31), pendown, fill_rect(1,2),
+     penup, set_pos(21,33), pendown, set_cell,
+     penup, set_pos(21,31), setcolor(black), pendown, fill_rect(2,2)]).
 
-object(player_black_arm, avatar_part).
-bbox(player_black_arm, 210, 320, 229, 329).
-geometry(player_black_arm, rectangle).
-dimensions(player_black_arm, 20, 10).
-uniform_color(player_black_arm, black).
-z_index(player_black_arm, 4).
-contains(player, player_black_arm).
-overlaps(player_black_arm, player_blue_body).
-turtle_program(player_black_arm,
-    [penup, setcolor(black), set_pos(210,320), fill_rect(20,10)]).
+turtle_program(player_black_core,
+    [penup, set_pos(21,31), setcolor(black), pendown, fill_rect(2,2)]).
 
-object(bottom_left_portal_tile, portal_tile).
-bbox(bottom_left_portal_tile, 10, 530, 109, 629).
-geometry(bottom_left_portal_tile, rectangle).
-dimensions(bottom_left_portal_tile, 100, 100).
-uniform_color(bottom_left_portal_tile, silver).
-z_index(bottom_left_portal_tile, 1).
-contains(arc3_state, bottom_left_portal_tile).
-turtle_program(bottom_left_portal_tile,
-    [penup, setcolor(silver), set_pos(10,530), fill_rect(100,100)]).
+turtle_program(player_blue_tail,
+    [penup, setcolor(blue),
+     set_pos(20,31), pendown, fill_rect(1,2),
+     penup, set_pos(21,33), pendown, set_cell]).
 
-object(bottom_left_portal_glyph, glyph).
-bbox(bottom_left_portal_glyph, 30, 550, 89, 609).
-geometry(bottom_left_portal_glyph, disconnected_orthogonal_glyph).
-uniform_color(bottom_left_portal_glyph, maroon).
-component_count(bottom_left_portal_glyph, 2).
-z_index(bottom_left_portal_glyph, 2).
-contains(bottom_left_portal_tile, bottom_left_portal_glyph).
-region(bottom_left_portal_glyph, 30, 550, 60, 20).
-region(bottom_left_portal_glyph, 70, 570, 20, 40).
-region(bottom_left_portal_glyph, 30, 590, 20, 20).
-turtle_program(bottom_left_portal_glyph,
-    [penup, setcolor(maroon),
-     set_pos(30,550), fill_rect(60,20),
-     set_pos(70,570), fill_rect(20,40),
-     set_pos(30,590), fill_rect(20,20)]).
+turtle_program(lower_left_symbol_card,
+    [penup, set_pos(1,53), setcolor(light_gray), pendown, fill_rect(10,10)]).
 
-object(status_bar_frame, interface_panel).
-bbox(status_bar_frame, 120, 600, 639, 639).
-geometry(status_bar_frame, rectangle).
-dimensions(status_bar_frame, 520, 40).
-uniform_color(status_bar_frame, silver).
-z_index(status_bar_frame, 1).
-contains(arc3_state, status_bar_frame).
-touches_canvas_edge(status_bar_frame, right).
-touches_canvas_edge(status_bar_frame, bottom).
-turtle_program(status_bar_frame,
-    [penup, setcolor(silver), set_pos(120,600), fill_rect(520,40)]).
+turtle_program(lower_left_burgundy_glyph,
+    [penup, setcolor(burgundy),
+     set_pos(3,55), pendown, fill_rect(6,2),
+     penup, set_pos(3,57), pendown, fill_rect(2,4),
+     penup, set_pos(7,59), pendown, fill_rect(2,2)]).
 
-object(status_green_segment, status_segment).
-bbox(status_green_segment, 130, 610, 199, 629).
-geometry(status_green_segment, rectangle).
-dimensions(status_green_segment, 70, 20).
-uniform_color(status_green_segment, green).
-z_index(status_green_segment, 2).
-contains(status_bar_frame, status_green_segment).
-adjacent(status_green_segment, status_dark_segment, right).
-turtle_program(status_green_segment,
-    [penup, setcolor(green), set_pos(130,610), fill_rect(70,20)]).
+turtle_program(bottom_status_panel,
+    [penup, set_pos(12,60), setcolor(light_gray), pendown, fill_rect(52,4)]).
 
-object(status_dark_segment, status_segment).
-bbox(status_dark_segment, 200, 610, 549, 629).
-geometry(status_dark_segment, rectangle).
-dimensions(status_dark_segment, 350, 20).
-uniform_color(status_dark_segment, dark_gray).
-z_index(status_dark_segment, 2).
-contains(status_bar_frame, status_dark_segment).
-adjacent(status_dark_segment, status_green_segment, left).
-turtle_program(status_dark_segment,
-    [penup, setcolor(dark_gray), set_pos(200,610), fill_rect(350,20)]).
+turtle_program(green_status_block,
+    [penup, set_pos(13,61), setcolor(green), pendown, fill_rect(7,2)]).
 
-object(status_blue_segment_1, status_segment).
-bbox(status_blue_segment_1, 560, 610, 579, 629).
-geometry(status_blue_segment_1, rectangle).
-dimensions(status_blue_segment_1, 20, 20).
-uniform_color(status_blue_segment_1, light_blue).
-z_index(status_blue_segment_1, 2).
-contains(status_bar_frame, status_blue_segment_1).
-horizontal_gap(status_blue_segment_1, status_dark_segment, 10).
-turtle_program(status_blue_segment_1,
-    [penup, setcolor(light_blue), set_pos(560,610), fill_rect(20,20)]).
+turtle_program(bottom_status_track,
+    [penup, set_pos(20,61), setcolor(dark_gray), pendown, fill_rect(35,2)]).
 
-object(status_blue_segment_2, status_segment).
-bbox(status_blue_segment_2, 590, 610, 609, 629).
-geometry(status_blue_segment_2, rectangle).
-dimensions(status_blue_segment_2, 20, 20).
-uniform_color(status_blue_segment_2, light_blue).
-z_index(status_blue_segment_2, 2).
-contains(status_bar_frame, status_blue_segment_2).
-horizontal_gap(status_blue_segment_2, status_blue_segment_1, 10).
-turtle_program(status_blue_segment_2,
-    [penup, setcolor(light_blue), set_pos(590,610), fill_rect(20,20)]).
-
-object(status_blue_segment_3, status_segment).
-bbox(status_blue_segment_3, 620, 610, 639, 629).
-geometry(status_blue_segment_3, rectangle).
-dimensions(status_blue_segment_3, 20, 20).
-uniform_color(status_blue_segment_3, light_blue).
-z_index(status_blue_segment_3, 2).
-contains(status_bar_frame, status_blue_segment_3).
-horizontal_gap(status_blue_segment_3, status_blue_segment_2, 10).
-touches_canvas_edge(status_blue_segment_3, right).
-turtle_program(status_blue_segment_3,
-    [penup, setcolor(light_blue), set_pos(620,610), fill_rect(20,20)]).
-
-left_of(left_wall, green_terrain).
-above(green_terrain, status_bar_frame).
-above(green_terrain, bottom_left_portal_tile).
-left_of(bottom_left_portal_tile, status_bar_frame).
-aligned_to_grid(left_wall, 10).
-aligned_to_grid(green_terrain, 10).
-aligned_to_grid(top_portal_tile, 10).
-aligned_to_grid(top_portal_glyph, 10).
-aligned_to_grid(center_console, 10).
-aligned_to_grid(player, 10).
-aligned_to_grid(bottom_left_portal_tile, 10).
-aligned_to_grid(bottom_left_portal_glyph, 10).
-aligned_to_grid(status_bar_frame, 10).
-
-render_order([
-    background,
-    left_wall,
-    green_terrain,
-    top_portal_tile,
-    top_portal_glyph,
-    center_console,
-    player,
-    bottom_left_portal_tile,
-    bottom_left_portal_glyph,
-    status_bar_frame,
-    status_green_segment,
-    status_dark_segment,
-    status_blue_segment_1,
-    status_blue_segment_2,
-    status_blue_segment_3
-]).
+turtle_program(cyan_status_blocks,
+    [penup, setcolor(cyan),
+     set_pos(56,61), pendown, fill_rect(2,2),
+     penup, set_pos(59,61), pendown, fill_rect(2,2),
+     penup, set_pos(62,61), pendown, fill_rect(2,2)]).

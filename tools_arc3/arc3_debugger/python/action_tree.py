@@ -277,10 +277,18 @@ class ActionTreeStore:
     FRIENDLY_ID_RE = re.compile(
         r"^\s*object_identity\(\s*([a-z][a-zA-Z0-9_]*)\s*,.*\)\.\s*$"
     )
+    NEW_FRIENDLY_ID_RE = re.compile(
+        r"^\s*new_object_identity\(\s*([a-z][a-zA-Z0-9_]*)\s*,"
+        r"\s*([^,]+)\s*,\s*(.+)\)\.\s*$"
+    )
+    REGISTRY_LOAD_RE = re.compile(
+        r"^\s*:-\s*(?:ensure_loaded|consult|include)\s*\(.*object_registry\.pl.*\)\.\s*$"
+    )
     OPAQUE_ID_RE = re.compile(r"^(?:obj(?:ect)?|item|thing|shape)_?\d+$", re.IGNORECASE)
+    OPAQUE_TOKEN_RE = re.compile(r"\b(?:obj(?:ect)?|item|thing|shape)_?\d+\b", re.IGNORECASE)
 
     def identity_facts(self, source: str) -> dict[str, str]:
-        """Extract one required object_identity/3 fact per friendly object."""
+        """Extract canonical object_identity/3 declarations."""
         facts: dict[str, str] = {}
         for line in source.splitlines():
             match = self.FRIENDLY_ID_RE.match(line)
@@ -288,42 +296,86 @@ class ActionTreeStore:
                 facts[match.group(1)] = line.strip()
         return facts
 
-    def validate_friendly_objects(self, source: str, node: StateNode) -> None:
-        facts = self.identity_facts(source)
-        if not facts:
-            raise RuntimeError(
-                "GPT objects output has no object_identity/3 facts. Friendly canonical "
-                "IDs are required before objects.pl can be cached."
+    def new_identity_facts(self, source: str) -> dict[str, str]:
+        """Convert new_object_identity/3 candidates into canonical declarations."""
+        facts: dict[str, str] = {}
+        for line in source.splitlines():
+            match = self.NEW_FRIENDLY_ID_RE.match(line)
+            if not match:
+                continue
+            name, object_type, label = match.groups()
+            facts[name] = (
+                f"object_identity({name}, {object_type.strip()}, {label.strip()})."
             )
-        opaque = sorted(name for name in facts if self.OPAQUE_ID_RE.match(name))
+        return facts
+
+    def opaque_tokens(self, source: str) -> list[str]:
+        """Return opaque numbered object tokens appearing anywhere in Prolog."""
+        return sorted(set(self.OPAQUE_TOKEN_RE.findall(source)))
+
+    def registry_reference(self, node: StateNode) -> str:
+        """Relative Prolog path from a node to the level-wide registry."""
+        return _rel_link(node.path, self.object_registry_path)
+
+    def validate_friendly_objects(self, source: str, node: StateNode) -> None:
+        """Validate either the registry itself or a registry-backed node file."""
+        opaque = self.opaque_tokens(source)
         if opaque:
             raise RuntimeError(
-                "GPT returned opaque object IDs instead of friendly names: "
+                "Prolog source contains opaque numbered object IDs: "
                 + ", ".join(opaque)
             )
 
-        # Existing names may be absent from a frame. The friendly atom itself is
-        # canonical; descriptive type/label wording may become more precise later.
-        # The registry therefore preserves the first declaration for each name.
+        # Registry source validates itself by containing friendly declarations.
+        if self.identity_facts(source):
+            return
+
+        # Node objects.pl files validate through the authoritative registry.
+        if not self.registry_identities():
+            raise RuntimeError(
+                "object_registry.pl is empty; canonical friendly object names "
+                "must be bootstrapped before objects.pl is cached."
+            )
+
+        if not any(self.REGISTRY_LOAD_RE.match(line) for line in source.splitlines()):
+            raise RuntimeError(
+                "objects.pl does not load the level-wide object_registry.pl."
+            )
 
     def registry_identities(self) -> dict[str, str]:
         return self.identity_facts(self.registry_text())
 
     def update_registry_from_objects(self, node: StateNode) -> Path:
+        """Merge only newly declared identities; state files remain identity-light."""
         if not node.objects_path.exists() or not node.objects_path.stat().st_size:
             return self.object_registry_path
+
         source = node.objects_path.read_text(encoding="utf-8")
-        self.validate_friendly_objects(source, node)
         registry = self.registry_identities()
-        for name, fact in self.identity_facts(source).items():
+
+        candidates = self.identity_facts(source)
+        candidates.update(self.new_identity_facts(source))
+
+        for name, fact in candidates.items():
+            if self.OPAQUE_ID_RE.match(name):
+                raise RuntimeError(f"Opaque object identity is not allowed: {name}")
             registry.setdefault(name, fact)
+
+        if not registry:
+            raise RuntimeError(
+                "No canonical identities are available for this level."
+            )
+
         lines = [
             "% Canonical friendly object identities for this entire ARC3 level.",
             "% Names are created once and reused from the beginning to the end.",
             "",
         ]
         lines.extend(registry[name] for name in sorted(registry))
-        self.object_registry_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        self.object_registry_path.write_text(
+            "\n".join(lines) + "\n",
+            encoding="utf-8",
+        )
         self.refresh_readme(node)
         return self.object_registry_path
 
@@ -334,8 +386,6 @@ class ActionTreeStore:
         title = "Initial state" if not action_path else " / ".join(action_path)
         children = self.child_nodes(node)
 
-        # Navigation belongs at the top so a GitHub-rendered README can be used
-        # directly as the action-tree browser.
         lines: list[str] = [
             f"# `{self.game_dir_name}` level `{self.level}` — {title}",
             "",
@@ -352,10 +402,7 @@ class ActionTreeStore:
             nav_links.append(
                 f"[Parent]({_rel_link(node.path, parent.readme_path)})"
             )
-        if nav_links:
-            lines.append(" · ".join(nav_links))
-        else:
-            lines.append("**Level start**")
+        lines.append(" · ".join(nav_links) if nav_links else "**Level start**")
 
         lines.extend(["", "### Actions", ""])
         if not children:
@@ -386,6 +433,9 @@ class ActionTreeStore:
                 f"- **Action data:** `{json.dumps(action_data, ensure_ascii=False)}`"
             )
 
+        registry_count = len(self.registry_identities())
+        registry_link = _rel_link(node.path, self.object_registry_path)
+
         lines.extend(
             [
                 "",
@@ -395,34 +445,116 @@ class ActionTreeStore:
                 "",
                 "## Files",
                 "",
+                "- [image.png](image.png)",
                 "- [state.json](state.json)",
-                f"- [object_registry.pl]({_rel_link(node.path, self.object_registry_path)})",
+                (
+                    f"- [object_registry.pl]({registry_link}) — shared level registry "
+                    f"({registry_count} canonical identities)"
+                ),
             ]
         )
 
-        prolog_files = sorted(
-            path for path in node.path.glob("*.pl")
-            if path.resolve() != self.object_registry_path.resolve()
-        )
-        if prolog_files:
-            for pl_file in prolog_files:
-                lines.append(f"- [{pl_file.name}]({pl_file.name})")
-        else:
-            lines.append("- Prolog analysis: *not generated yet*")
+        # Embed all local text artifacts. The shared level registry is embedded
+        # only in the level-start README; descendants link to it instead.
+        artifact_paths: list[Path] = []
+        seen: set[Path] = set()
 
-        for filename in ("objects.pl", "differences.pl"):
-            file_path = node.path / filename
-            if file_path.exists() and file_path.stat().st_size:
+        def add_artifact(path: Path) -> None:
+            resolved = path.resolve()
+            if path.exists() and path.is_file() and resolved not in seen:
+                seen.add(resolved)
+                artifact_paths.append(path)
+
+        add_artifact(node.state_path)
+        if node.path == self.level_root:
+            add_artifact(self.object_registry_path)
+
+        for path in sorted(node.path.iterdir(), key=lambda p: p.name.lower()):
+            if not path.is_file():
+                continue
+            if path.name in {
+                "README.md",
+                "image.png",
+                "state.json",
+                "object_registry.pl",
+            }:
+                continue
+            add_artifact(path)
+
+        for artifact in artifact_paths:
+            if artifact.resolve() == node.state_path.resolve():
+                continue
+            if artifact.resolve() == self.object_registry_path.resolve():
+                continue
+            lines.append(f"- [{artifact.name}]({_rel_link(node.path, artifact)})")
+
+        lines.extend(["", "## Embedded files", ""])
+
+        if node.path != self.level_root:
+            lines.extend(
+                [
+                    (
+                        f"*Canonical identities are shared through "
+                        f"[`object_registry.pl`]({registry_link}) and are not "
+                        "repeated in every node.*"
+                    ),
+                    "",
+                ]
+            )
+
+        language_by_suffix = {
+            ".pl": "prolog",
+            ".json": "json",
+            ".py": "python",
+            ".md": "markdown",
+            ".txt": "text",
+            ".log": "text",
+            ".yaml": "yaml",
+            ".yml": "yaml",
+            ".toml": "toml",
+        }
+
+        for artifact in artifact_paths:
+            relative_link = _rel_link(node.path, artifact)
+            try:
+                content = artifact.read_text(encoding="utf-8").rstrip()
+            except UnicodeDecodeError:
+                continue
+
+            lines.extend(
+                [
+                    "<details>",
+                    f"<summary><code>{artifact.name}</code></summary>",
+                    "",
+                ]
+            )
+
+            if content:
+                language = language_by_suffix.get(
+                    artifact.suffix.lower(), "text"
+                )
                 lines.extend(
                     [
-                        "",
-                        f"## `{filename}`",
-                        "",
-                        "```prolog",
-                        file_path.read_text(encoding="utf-8").rstrip(),
-                        "```",
+                        f"````{language}",
+                        content,
+                        "````",
                     ]
                 )
+            else:
+                lines.append("*Empty file.*")
 
-        node.readme_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            lines.extend(
+                [
+                    "",
+                    f"[Open `{artifact.name}`]({relative_link})",
+                    "",
+                    "</details>",
+                    "",
+                ]
+            )
+
+        node.readme_path.write_text(
+            "\n".join(lines).rstrip() + "\n",
+            encoding="utf-8",
+        )
         return node.readme_path
