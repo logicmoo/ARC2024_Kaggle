@@ -95,3 +95,8 @@ rm -rf  action_trees/ls20/level_1
 mkdir -p  action_trees/ls20/level_1
 git add  action_trees/ls20/level_1
 git status .
+git commit -am "new sample"
+git push
+git status .
+git add action_trees/
+git status .
