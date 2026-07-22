@@ -197,3 +197,4 @@ cd /opt/arcprize/
 vi .gitattributes
 git add .gitattributes 
 git config --global core.fileMode false
+git status .
