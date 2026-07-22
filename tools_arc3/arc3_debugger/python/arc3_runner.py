@@ -3,12 +3,16 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 from dataclasses import asdict, dataclass, is_dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 import arc_agi
+
+from action_tree import ActionTreeStore, StateNode
+from image_codec import extract_latest_frame, frame_to_png_bytes
 
 try:
     from arcengine import GameAction, GameState
@@ -21,47 +25,32 @@ except ImportError as exc:
 
 def _jsonable(value: Any, depth: int = 0) -> Any:
     """Best-effort conversion of toolkit values into compact JSON-safe data."""
-    if depth > 4:
+    if depth > 5:
         return repr(value)
-
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
-
     if isinstance(value, Enum):
         return value.name
-
     if is_dataclass(value):
         return _jsonable(asdict(value), depth + 1)
-
     if isinstance(value, Mapping):
-        return {
-            str(k): _jsonable(v, depth + 1)
-            for k, v in value.items()
-        }
-
+        return {str(k): _jsonable(v, depth + 1) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [_jsonable(v, depth + 1) for v in value]
-
     if hasattr(value, "model_dump"):
         try:
             return _jsonable(value.model_dump(), depth + 1)
         except Exception:
             pass
-
     if hasattr(value, "dict"):
         try:
             return _jsonable(value.dict(), depth + 1)
         except Exception:
             pass
-
     if hasattr(value, "__dict__"):
-        public = {
-            k: v for k, v in vars(value).items()
-            if not k.startswith("_")
-        }
+        public = {k: v for k, v in vars(value).items() if not k.startswith("_")}
         if public:
             return _jsonable(public, depth + 1)
-
     return repr(value)
 
 
@@ -71,9 +60,7 @@ def action_name(action: Any) -> str:
 
 def is_complex_action(action: Any) -> bool:
     method = getattr(action, "is_complex", None)
-    if callable(method):
-        return bool(method())
-    return False
+    return bool(method()) if callable(method) else False
 
 
 @dataclass
@@ -84,13 +71,15 @@ class StepRecord:
     state: str | None
     observation: Any
     terminal_output: str = ""
+    frame_path: str | None = None
+    tree_node: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
 class Arc3Runner:
-    """Small debuggable wrapper around arc_agi.Arcade environments."""
+    """Debuggable ARC3 environment with a persistent deterministic action tree."""
 
     def __init__(
         self,
@@ -98,10 +87,16 @@ class Arc3Runner:
         render_mode: str | None = "terminal",
         arc_api_key: str | None = None,
         capture_terminal: bool = False,
+        tree_root: str | Path | None = None,
     ) -> None:
         self.game_id = game_id
         self.render_mode = render_mode
         self.capture_terminal = capture_terminal
+        self.tree_root = Path(
+            tree_root
+            or os.environ.get("ARC3_TREE_ROOT")
+            or Path(__file__).resolve().parents[1] / "action_trees"
+        ).resolve()
         self.arc = (
             arc_agi.Arcade(arc_api_key=arc_api_key)
             if arc_api_key
@@ -110,41 +105,46 @@ class Arc3Runner:
         self.env: Any = None
         self.current_observation: Any = None
         self.records: list[StepRecord] = []
+        self.tree_store: ActionTreeStore | None = None
+        self.current_node: StateNode | None = None
+        self._gpt_analyzer: Any = None
         self.open()
 
+    def _make_environment(self) -> Any:
+        kwargs = {"render_mode": self.render_mode}
+        try:
+            return self.arc.make(self.game_id, include_frame_data=True, **kwargs)
+        except TypeError:
+            return self.arc.make(self.game_id, **kwargs)
+
     def open(self) -> Any:
-        self.env = self.arc.make(self.game_id, render_mode=self.render_mode)
+        self.env = self._make_environment()
         if self.env is None:
             raise RuntimeError(f"Failed to create ARC3 environment: {self.game_id}")
-        self.current_observation = None
+        self.current_observation = getattr(self.env, "observation_space", None)
         self.records.clear()
+        self._start_action_tree()
         return self.env
 
-
     def available_games(self) -> list[Any]:
-        """Return all games visible in the current Arcade operation mode."""
         games = list(self.arc.get_environments() or [])
         return sorted(games, key=lambda game: str(getattr(game, "game_id", "")))
 
     @staticmethod
     def game_info(game: Any) -> dict[str, Any]:
-        """Normalize EnvironmentInfo without assuming a toolkit version."""
         game_id = str(getattr(game, "game_id", "?"))
         title = str(getattr(game, "title", game_id))
         tags = list(getattr(game, "tags", []) or [])
-
         level_count = None
         for attr in ("level_count", "num_levels", "total_levels", "levels_count"):
             value = getattr(game, attr, None)
             if isinstance(value, int):
                 level_count = value
                 break
-
         if level_count is None:
             levels = getattr(game, "levels", None)
             if isinstance(levels, (list, tuple)):
                 level_count = len(levels)
-
         return {
             "game_id": game_id,
             "title": title,
@@ -153,7 +153,6 @@ class Arc3Runner:
         }
 
     def switch_game(self, game_id: str) -> Any:
-        """Open a different game and clear the prior run history."""
         old_game_id = self.game_id
         self.game_id = game_id
         try:
@@ -180,13 +179,11 @@ class Arc3Runner:
     def resolve_action(self, action: Any) -> Any:
         if action in self.action_space:
             return action
-
         if isinstance(action, int):
             try:
                 return self.action_space[action]
             except IndexError as exc:
                 raise ValueError(f"Action index out of range: {action}") from exc
-
         wanted = str(action).upper()
         for candidate in self.action_space:
             names = {
@@ -196,11 +193,9 @@ class Arc3Runner:
             }
             if wanted in names or any(name.endswith("." + wanted) for name in names):
                 return candidate
-
         enum_member = getattr(GameAction, wanted, None)
         if enum_member is not None and enum_member in self.action_space:
             return enum_member
-
         legal = ", ".join(action_name(a) for a in self.action_space)
         raise ValueError(f"Unknown or illegal action {action!r}. Legal actions: {legal}")
 
@@ -215,21 +210,20 @@ class Arc3Runner:
     ) -> Any:
         resolved = self.resolve_action(action)
         payload = dict(data or {})
-
         if x is not None:
             payload["x"] = int(x)
         if y is not None:
             payload["y"] = int(y)
+        if is_complex_action(resolved) and ("x" not in payload or "y" not in payload):
+            raise ValueError(f"{action_name(resolved)} is complex and requires x and y.")
 
-        if is_complex_action(resolved):
-            if "x" not in payload or "y" not in payload:
-                raise ValueError(
-                    f"{action_name(resolved)} is complex and requires x and y."
-                )
-
+        parent_node = self.current_node
         stream = io.StringIO()
-        manager = contextlib.redirect_stdout(stream) if self.capture_terminal else contextlib.nullcontext()
-
+        manager = (
+            contextlib.redirect_stdout(stream)
+            if self.capture_terminal
+            else contextlib.nullcontext()
+        )
         with manager:
             if reasoning is None:
                 observation = self.env.step(resolved, data=payload)
@@ -240,12 +234,15 @@ class Arc3Runner:
                     reasoning=dict(reasoning),
                 )
 
-        terminal_output = stream.getvalue()
         self.current_observation = observation
-
+        terminal_output = stream.getvalue()
         state_value = getattr(observation, "state", None) if observation is not None else None
-        state_name = getattr(state_value, "name", str(state_value)) if state_value is not None else None
-
+        state_name = (
+            getattr(state_value, "name", str(state_value))
+            if state_value is not None
+            else None
+        )
+        node = self._capture_transition(parent_node, action_name(resolved), payload)
         self.records.append(
             StepRecord(
                 step=len(self.records),
@@ -254,127 +251,22 @@ class Arc3Runner:
                 state=state_name,
                 observation=_jsonable(observation),
                 terminal_output=terminal_output,
+                frame_path=str(node.image_path) if node else None,
+                tree_node=str(node.path) if node else None,
             )
         )
         return observation
 
     def reset(self, *, clear_history: bool = True) -> Any:
-        """Reset the current level."""
         result = self.env.reset()
         self.current_observation = result
         if clear_history:
             self.records.clear()
+        self._start_action_tree()
         return result
 
     def restart_game(self) -> Any:
-        """Recreate the environment and return to level 1."""
-        self.env = self.arc.make(self.game_id, render_mode=self.render_mode)
-        if self.env is None:
-            raise RuntimeError(f"Failed to restart ARC3 game: {self.game_id}")
-        self.current_observation = None
-        self.records.clear()
-        return self.env
-
-
-    def current_level_label(self) -> str:
-        for obj in (self.current_observation, self.env):
-            for attr in ("level", "level_index", "current_level", "level_number"):
-                value = getattr(obj, attr, None) if obj is not None else None
-                if value is not None:
-                    return str(value)
-        return "?"
-
-    def current_selection_summary(self) -> str:
-        return f"game={self.game_id} level={self.current_level_label()}"
-
-    def change_level(self, delta: int) -> Any:
-        current = self.current_level_label()
-        try:
-            target = int(current) + delta
-        except (TypeError, ValueError):
-            target = delta
-
-        for name in ("set_level", "select_level", "goto_level", "load_level"):
-            method = getattr(self.env, name, None)
-            if callable(method):
-                result = method(target)
-                self.current_observation = result
-                self.records.clear()
-                return result
-
-        raise RuntimeError("This environment does not expose direct level selection")
-
-    def show_record(self, index: int) -> None:
-        record = self.records[index]
-        print(f"\nStep {record.step}: {record.action} {record.data} state={record.state}")
-        if record.terminal_output:
-            print(record.terminal_output)
-        else:
-            print(json.dumps(record.observation, indent=2, ensure_ascii=False))
-
-    def redraw(self) -> Any:
-        render = getattr(self.env, "render", None)
-        if callable(render):
-            return render()
-        if self.current_observation is not None:
-            print(json.dumps(_jsonable(self.current_observation), indent=2, ensure_ascii=False))
-            return self.current_observation
-        print("No current observation to redraw.")
-        return None
-
-    def execute_queued_step(self) -> Any:
-        for name in ("debug_step", "step_queued", "run_next", "next_step"):
-            method = getattr(self.env, name, None)
-            if callable(method):
-                result = method()
-                self.current_observation = result
-                return result
-        raise RuntimeError("No queued debugger-step API is available yet")
-
-    def export_state(self, path: str | Path) -> Path:
-        output = Path(path)
-        payload = {
-            "game_id": self.game_id,
-            "level": self.current_level_label(),
-            "state": self.state_name(),
-            "observation": _jsonable(self.current_observation),
-        }
-        output.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-        return output
-
-    def _control_menu_placeholder(self, label: str) -> None:
-        print(f"[control-menu hook] {label}")
-        print("Current selection:", self.current_selection_summary())
-
-    def control_menu_1_1(self) -> None:
-        self._control_menu_placeholder("Print/Edit GPT prompts")
-
-    def control_menu_1_2(self) -> None:
-        self._control_menu_placeholder("Send current image to GPT for Prolog objects and Turtle form")
-
-    def control_menu_1_3(self) -> None:
-        self._control_menu_placeholder("Redraw game from GPT-generated Turtle")
-
-    def control_menu_1_4(self) -> None:
-        self._control_menu_placeholder("GPT object-similarity matching")
-
-    def control_menu_1_5(self) -> None:
-        self._control_menu_placeholder("Print GPT hypothetical rules")
-
-    def control_menu_2_1(self) -> None:
-        self._control_menu_placeholder("Print/Edit Prolog description of Control Menu 2")
-
-    def control_menu_2_2(self) -> None:
-        self._control_menu_placeholder("Prolog extraction of objects and Turtle form")
-
-    def control_menu_2_3(self) -> None:
-        self._control_menu_placeholder("Redraw game from Turtle Prolog")
-
-    def control_menu_2_4(self) -> None:
-        self._control_menu_placeholder("Prolog object-similarity matching")
-
-    def control_menu_2_5(self) -> None:
-        self._control_menu_placeholder("Print Prolog hypothetical rules")
+        return self.open()
 
     def state_name(self) -> str | None:
         state = getattr(self.current_observation, "state", None)
@@ -403,26 +295,235 @@ class Arc3Runner:
     ) -> Any:
         source = list(records) if records is not None else self.history()
         self.reset(clear_history=True)
-
         observation = self.current_observation
         for record in source:
             item = record.as_dict() if isinstance(record, StepRecord) else dict(record)
-            observation = self.step(
-                item["action"],
-                data=item.get("data") or {},
-            )
+            observation = self.step(item["action"], data=item.get("data") or {})
         return observation
 
     def scorecard(self) -> Any:
         return self.arc.get_scorecard()
 
+    def current_level_label(self) -> str:
+        for obj in (self.current_observation, self.env):
+            for attr in ("level", "level_index", "current_level", "level_number"):
+                value = getattr(obj, attr, None) if obj is not None else None
+                if value is not None:
+                    return str(value)
+        return "1"
+
+    def current_selection_summary(self) -> str:
+        node = str(self.current_node.path) if self.current_node else "none"
+        return f"game={self.game_id} level={self.current_level_label()} node={node}"
+
+    def change_level(self, delta: int) -> Any:
+        current = self.current_level_label()
+        try:
+            target = int(current) + delta
+        except (TypeError, ValueError):
+            target = delta
+        for name in ("set_level", "select_level", "goto_level", "load_level"):
+            method = getattr(self.env, name, None)
+            if callable(method):
+                result = method(target)
+                self.current_observation = result
+                self.records.clear()
+                self._start_action_tree()
+                return result
+        raise RuntimeError("This environment does not expose direct level selection")
+
+    def show_record(self, index: int) -> None:
+        record = self.records[index]
+        print(f"\nStep {record.step}: {record.action} {record.data} state={record.state}")
+        if record.frame_path:
+            print(f"image: {record.frame_path}")
+        if record.tree_node:
+            print(f"tree: {record.tree_node}")
+        if record.terminal_output:
+            print(record.terminal_output)
+        else:
+            print(json.dumps(record.observation, indent=2, ensure_ascii=False))
+
+    def redraw(self) -> Any:
+        render = getattr(self.env, "render", None)
+        if callable(render):
+            return render()
+        if self.current_node is not None:
+            print(f"Current image: {self.current_node.image_path}")
+            return self.current_node.image_path
+        if self.current_observation is not None:
+            print(json.dumps(_jsonable(self.current_observation), indent=2, ensure_ascii=False))
+            return self.current_observation
+        print("No current observation to redraw.")
+        return None
+
+    def execute_queued_step(self) -> Any:
+        for name in ("debug_step", "step_queued", "run_next", "next_step"):
+            method = getattr(self.env, name, None)
+            if callable(method):
+                result = method()
+                self.current_observation = result
+                return result
+        raise RuntimeError("No queued debugger-step API is available yet")
+
+    def export_state(self, path: str | Path) -> Path:
+        output = Path(path)
+        payload = {
+            "game_id": self.game_id,
+            "level": self.current_level_label(),
+            "state": self.state_name(),
+            "tree_node": str(self.current_node.path) if self.current_node else None,
+            "image": str(self.current_node.image_path) if self.current_node else None,
+            "observation": _jsonable(self.current_observation),
+        }
+        output.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        return output
+
+    def _state_payload(self) -> dict[str, Any]:
+        return {
+            "state": self.state_name(),
+            "observation": _jsonable(self.current_observation),
+            "step_count": len(self.records),
+        }
+
+    def _current_png(self) -> bytes:
+        frame = extract_latest_frame(
+            self.current_observation,
+            getattr(self.env, "observation_space", None),
+            self.env,
+        )
+        return frame_to_png_bytes(frame)
+
+    def _start_action_tree(self) -> None:
+        self.tree_store = ActionTreeStore(
+            self.tree_root,
+            self.game_id,
+            self.current_level_label(),
+        )
+        try:
+            self.current_node = self.tree_store.create_initial(
+                self._current_png(),
+                self._state_payload(),
+            )
+        except Exception as exc:
+            self.current_node = None
+            print(f"warning: frame capture unavailable: {exc}")
+
+    def _capture_transition(
+        self,
+        parent: StateNode | None,
+        action: str,
+        data: Mapping[str, Any],
+    ) -> StateNode | None:
+        if self.tree_store is None:
+            self._start_action_tree()
+        try:
+            png = self._current_png()
+            if self.tree_store is None:
+                return None
+            if parent is None:
+                node = self.tree_store.create_initial(png, self._state_payload())
+            else:
+                node = self.tree_store.create_transition(
+                    parent,
+                    action,
+                    data,
+                    png,
+                    self._state_payload(),
+                )
+            self.current_node = node
+            return node
+        except Exception as exc:
+            print(f"warning: unable to store action-tree frame: {exc}")
+            return None
+
+    def _require_node(self) -> tuple[ActionTreeStore, StateNode]:
+        if self.tree_store is None or self.current_node is None:
+            raise RuntimeError("No captured state node is available")
+        return self.tree_store, self.current_node
+
+    def _analyzer(self):
+        if self._gpt_analyzer is None:
+            from gpt_bridge import GptArcAnalyzer
+
+            prompts_path = Path(__file__).resolve().parents[1] / "prompts" / "gpt_prompts.json"
+            self._gpt_analyzer = GptArcAnalyzer(prompts_path)
+        return self._gpt_analyzer
+
+    def gpt_command_1(self) -> None:
+        self._analyzer().edit_prompts()
+
+    def gpt_command_2(self) -> None:
+        store, node = self._require_node()
+        result = self._analyzer().ensure_objects_and_differences(store, node)
+        print(
+            f"objects.pl: {result['objects_path']} "
+            f"({'GPT' if result['objects_called'] else 'cached'})"
+        )
+        if result["differences_path"] is not None:
+            print(
+                f"differences.pl: {result['differences_path']} "
+                f"({'GPT' if result['differences_called'] else 'cached'})"
+            )
+        else:
+            print("differences.pl: initial state has no parent")
+        print(f"README.md: {node.readme_path}")
+
+    def gpt_command_3(self) -> None:
+        store, node = self._require_node()
+        output, called = self._analyzer().ensure_differences(store, node)
+        print(f"differences.pl: {output or 'no parent'} ({'GPT' if called else 'cached/no-op'})")
+
+    def gpt_command_4(self) -> None:
+        store, node = self._require_node()
+        output, called = self._analyzer().generate_single_artifact(
+            store, node, "redraw", "redraw.pl"
+        )
+        print(f"redraw.pl: {output} ({'GPT' if called else 'cached'})")
+
+    def gpt_command_5(self) -> None:
+        store, node = self._require_node()
+        output, called = self._analyzer().generate_pair_artifact(
+            store, node, "redraw_diff", "redraw_diff.pl"
+        )
+        print(f"redraw_diff.pl: {output or 'no parent'} ({'GPT' if called else 'cached/no-op'})")
+
+    def gpt_command_6(self) -> None:
+        store, node = self._require_node()
+        output, called = self._analyzer().generate_pair_artifact(
+            store, node, "similarity", "similarities.pl"
+        )
+        print(f"similarities.pl: {output or 'no parent'} ({'GPT' if called else 'cached/no-op'})")
+
+    def _mode_command_placeholder(self, label: str) -> None:
+        print(f"[mode hook] {label}")
+
+    def prolog_command_1(self) -> None:
+        self._mode_command_placeholder("Print/Edit Prolog description")
+
+    def prolog_command_2(self) -> None:
+        self._mode_command_placeholder("Current image to Prolog objects and Turtle form")
+
+    def prolog_command_3(self) -> None:
+        self._mode_command_placeholder("Diff from previous image")
+
+    def prolog_command_4(self) -> None:
+        self._mode_command_placeholder("Redraw game from generated Turtle")
+
+    def prolog_command_5(self) -> None:
+        self._mode_command_placeholder("Redraw game from diff")
+
+    def prolog_command_6(self) -> None:
+        self._mode_command_placeholder("Attempt object-similarity matching")
+
     def summary_for_prolog(self) -> dict[str, Any]:
-        """Stable, intentionally small interface for a symbolic controller."""
         return {
             "game_id": self.game_id,
+            "level": self.current_level_label(),
             "state": self.state_name(),
             "legal_actions": self.action_table(),
             "step_count": len(self.records),
+            "tree_node": str(self.current_node.path) if self.current_node else None,
             "observation": _jsonable(self.current_observation),
             "history": [
                 {
@@ -430,6 +531,8 @@ class Arc3Runner:
                     "action": r.action,
                     "data": r.data,
                     "state": r.state,
+                    "frame_path": r.frame_path,
+                    "tree_node": r.tree_node,
                 }
                 for r in self.records
             ],

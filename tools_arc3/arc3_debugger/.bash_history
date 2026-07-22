@@ -28,3 +28,23 @@ pip install  typing_extensions
  
 python examples/prolog_controlled_runner.py
 pip install arc_agi
+git diff
+cd tools_arc3/arc3_debugger/
+git diff .
+git status .
+ls
+cd arc3_debugger/
+git status .
+git diff .
+git add action_trees/ls20/level_1/
+ls
+git add prompts/
+git add notebooks/
+git add examples/
+git add python/
+git add action_trees/ls20/level_1/
+git status .
+diff README.md 
+git diff README.md 
+git add action_trees/
+git status .

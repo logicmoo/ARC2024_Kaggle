@@ -61,7 +61,7 @@ KEY_SEQUENCES = {
     "\x1b5": "CTRL_5",
 }
 
-FALLBACK_ACTION_KEYS = "890bcdfgijkmnotuxyz"
+FALLBACK_ACTION_KEYS = "bdfijkmnoqtuxyz"
 
 
 def read_key() -> str:
@@ -217,14 +217,15 @@ def build_keymap(runner: Arc3Runner) -> tuple[dict[str, Any], list[dict[str, Any
     rows: list[dict[str, Any]] = []
     assigned: set[int] = set()
 
+    # Number keys are reserved for GPT/Prolog mode commands.
     standard = {
-        "ACTION1": (("UP", "1"), "↑ / 1"),
-        "ACTION2": (("DOWN", "2"), "↓ / 2"),
-        "ACTION3": (("LEFT", "3"), "← / 3"),
-        "ACTION4": (("RIGHT", "4"), "→ / 4"),
-        "ACTION5": ((" ", "5"), "Space / 5"),
-        "ACTION6": (("6",), "6"),
-        "ACTION7": (("\x1a", "7"), "Ctrl-Z / 7"),
+        "ACTION1": (("UP",), "↑"),
+        "ACTION2": (("DOWN",), "↓"),
+        "ACTION3": (("LEFT",), "←"),
+        "ACTION4": (("RIGHT",), "→"),
+        "ACTION5": ((" ",), "Space"),
+        "ACTION6": (("c",), "c"),
+        "ACTION7": (("\x1a",), "Ctrl-Z"),
     }
 
     for action in runner.action_space:
@@ -238,10 +239,11 @@ def build_keymap(runner: Arc3Runner) -> tuple[dict[str, Any], list[dict[str, Any
         assigned.add(id(action))
 
     fallback = iter(FALLBACK_ACTION_KEYS)
+    reserved = {"g", "p", "r", "R", "l", "L", "a", "h", "s", "q", "w", "e", "v", "x", "c", "?", "."}
     for action in runner.action_space:
         if id(action) in assigned:
             continue
-        key = next(fallback, None)
+        key = next((k for k in fallback if k not in reserved), None)
         if key is None:
             raise RuntimeError("Too many legal actions for available fallback keys")
         mapping[key] = action
@@ -266,16 +268,14 @@ def choose_coordinate() -> tuple[int, int] | None:
 
 def print_controls(runner: Arc3Runner, rows: list[dict[str, Any]]) -> None:
     print("\nARC3 DEBUGGER")
-    print("Actions:", end=" ")
-    print("  ".join(f"({row['key']}) {action_name(row['action'])}" for row in rows))
-    print("Game: (Shift+←/→) Prev/Next  (Shift+↑/↓) Prev/Next Level")
+    print("Game: " + "  ".join(f"({row['key']}) {action_name(row['action'])}" for row in rows))
+    print("Select: (Shift+←/→) Game  (Shift+↑/↓) Level")
     print("Steps: (Ctrl+←/→) Prev/Next  (Ctrl+↑/↓) First/Latest")
+    print("Mode: (g) GPT  (p) Prolog  (1-6) Mode Command")
     print("Reset: (r) Reset Level  (R) Restart Game")
     print("Info: (L) Games/Levels  (l) Current  (a) Actions  (h) History  (s) Score  (?) Help")
-    print("Run: (Enter) Redraw  (p) Pause  (.) Step  (v) Replay")
-    print("Files: (w) Save History  (e) Export State")
-    print("Menus: (!) GPT  (@) Prolog  (Ctrl/Alt+1..5) Command  (Esc) Exit Menu")
-    print("Exit: (q) Quit  (Ctrl-C) Quit Now")
+    print("Run: (Enter) Redraw  (x) Pause  (.) Step  (v) Replay")
+    print("Files: (w) Save History  (e) Export State  (q) Quit")
 
 
 def list_games(runner: Arc3Runner, games: list[Any], selected_index: int) -> None:
@@ -299,42 +299,40 @@ def show_history(runner: Arc3Runner, cursor: int | None = None) -> None:
 
 
 
-CONTROL_MENUS = {
-    1: {
-        "title": "GPT Control Menu",
+CONTROL_MODES = {
+    "gpt": {
+        "title": "GPT",
         1: "Print/Edit GPT prompts",
-        2: "Send current image to GPT; return Prolog objects and Turtle form",
-        3: "Redraw game from GPT-generated Turtle",
-        4: "Attempt object-similarity matching with GPT",
-        5: "Print hypothetical rules from GPT",
+        2: "Current image → Prolog objects and Turtle form",
+        3: "Diff from previous image",
+        4: "Redraw game from generated Turtle",
+        5: "Redraw game from diff",
+        6: "Attempt object-similarity matching",
     },
-    2: {
-        "title": "Prolog Control Menu",
-        1: "Print/Edit Prolog description of Control Menu 2",
-        2: "Extract current image into Prolog objects and Turtle form",
-        3: "Redraw game from Turtle Prolog",
-        4: "Attempt object-similarity matching with Prolog",
-        5: "Print hypothetical rules from Prolog",
+    "prolog": {
+        "title": "Prolog",
+        1: "Print/Edit Prolog description",
+        2: "Current image → Prolog objects and Turtle form",
+        3: "Diff from previous image",
+        4: "Redraw game from generated Turtle",
+        5: "Redraw game from diff",
+        6: "Attempt object-similarity matching",
     },
 }
 
 
-def print_control_menu(menu_number: int) -> None:
-    menu = CONTROL_MENUS[menu_number]
-    print(f"\nMENU {menu_number}: {menu['title']}")
-    for number in range(1, 6):
-        print(f"(Ctrl/Alt+{number}) {menu[number]}")
-    print("(!) GPT  (@) Prolog  (Esc) Close")
+def print_mode_menu(mode: str) -> None:
+    menu = CONTROL_MODES[mode]
+    print(f"\n{menu['title']} MODE: " + "  ".join(f"({n}) {menu[n]}" for n in range(1, 7)))
 
 
-def dispatch_control_menu(runner: Arc3Runner, menu_number: int, command_number: int) -> None:
-    """Dispatch control-menu commands. Integration hooks are intentionally explicit."""
-    method_name = f"control_menu_{menu_number}_{command_number}"
+def dispatch_control_mode(runner: Arc3Runner, mode: str, command_number: int) -> None:
+    method_name = f"{mode}_command_{command_number}"
     method = getattr(runner, method_name, None)
     if callable(method):
         method()
         return
-    print(f"Not implemented yet: {CONTROL_MENUS[menu_number][command_number]}")
+    print(f"Not implemented yet: [{mode.upper()}] {CONTROL_MODES[mode][command_number]}")
 
 
 def main() -> None:
@@ -356,7 +354,7 @@ def main() -> None:
     )
     history_cursor: int | None = None
     paused = False
-    active_control_menu: int | None = None
+    active_control_mode: str | None = None
     action_mapping, action_rows = build_keymap(runner)
     print_controls(runner, action_rows)
 
@@ -378,8 +376,6 @@ def main() -> None:
             "CTRL_UP": "Ctrl+↑", "CTRL_DOWN": "Ctrl+↓",
             "CTRL_LEFT": "Ctrl+←", "CTRL_RIGHT": "Ctrl+→",
             " ": "Space", "\x1a": "Ctrl-Z", "\r": "Enter", "\n": "Enter",
-            "CTRL_1": "Ctrl/Alt+1", "CTRL_2": "Ctrl/Alt+2",
-            "CTRL_3": "Ctrl/Alt+3", "CTRL_4": "Ctrl/Alt+4", "CTRL_5": "Ctrl/Alt+5",
         }
         print(labels.get(key, key if key.isprintable() else repr(key)))
 
@@ -391,24 +387,23 @@ def main() -> None:
                 print_controls(runner, action_rows)
                 continue
 
-            if key == "!":
-                active_control_menu = 1
-                print_control_menu(active_control_menu)
+            if key == "g":
+                active_control_mode = "gpt"
+                print_mode_menu(active_control_mode)
                 continue
-            if key == "@":
-                active_control_menu = 2
-                print_control_menu(active_control_menu)
+            if key == "p":
+                active_control_mode = "prolog"
+                print_mode_menu(active_control_mode)
                 continue
-            if key in {"CTRL_1", "CTRL_2", "CTRL_3", "CTRL_4", "CTRL_5"}:
-                if active_control_menu is None:
-                    print("Select Control Menu 1 with Shift+1 (!) or Menu 2 with Shift+2 (@) first.")
+            if key in {"1", "2", "3", "4", "5", "6"}:
+                if active_control_mode is None:
+                    print("Select mode first: (g) GPT or (p) Prolog")
                     continue
-                command_number = int(key[-1])
-                dispatch_control_menu(runner, active_control_menu, command_number)
+                dispatch_control_mode(runner, active_control_mode, int(key))
                 continue
             if key == "\x1b":
-                active_control_menu = None
-                print("Control-menu mode cleared.")
+                active_control_mode = None
+                print("Mode cleared.")
                 continue
 
             if key == "L":
@@ -482,7 +477,7 @@ def main() -> None:
             if key in {"\r", "\n"}:
                 runner.redraw()
                 continue
-            if key == "p":
+            if key == "x":
                 paused = not paused
                 print("Paused." if paused else "Resumed.")
                 continue

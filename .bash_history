@@ -198,3 +198,12 @@ vi .gitattributes
 git add .gitattributes 
 git config --global core.fileMode false
 git status .
+git config --global core.fileMode false
+git status .
+git config core.fileMode false
+git status .
+git diff
+ls /opt/ -l
+cd /opt/arcprize/
+ks
+ls
