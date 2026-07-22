@@ -48,3 +48,6 @@ diff README.md
 git diff README.md 
 git add action_trees/
 git status .
+git commit -am "sample"
+git push
+git add action_trees/
