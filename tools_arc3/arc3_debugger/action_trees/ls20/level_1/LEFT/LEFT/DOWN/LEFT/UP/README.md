@@ -471,6 +471,9 @@ hypothesized_action_effect(action('ACTION1', {}),
 % Canonical object identities live in the level-wide registry.
 
 % State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
+
+% State-specific facts for this action-tree node.
 state_id(action6).
 incoming_action(action6, action('ACTION1', {})).
 previous_state(action6, action5).

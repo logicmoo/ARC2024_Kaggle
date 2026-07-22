@@ -490,6 +490,9 @@ hypothesis(green_status_block_records_successful_action_progress).
 % Canonical object identities live in the level-wide registry.
 
 % State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
+
+% State-specific facts for this action-tree node.
 state_id(action5).
 incoming_action(action5, action('ACTION3', {})).
 previous_state(action5, action4).

@@ -330,6 +330,9 @@ hypothesis(player_blue_tail_change_is_animation_or_occlusion, medium_confidence)
 % Canonical object identities live in the level-wide registry.
 
 % State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
+
+% State-specific facts for this action-tree node.
 state_id(action12).
 incoming_action(action12, action('ACTION4', {})).
 previous_state(action12, action11).

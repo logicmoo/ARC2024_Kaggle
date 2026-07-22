@@ -257,6 +257,9 @@
 % Canonical object identities live in the level-wide registry.
 
 % State-specific facts for this action-tree node.
+% Canonical object identities live in the level-wide registry.
+
+% State-specific facts for this action-tree node.
 state_id(action4).
 incoming_action(action4, action('ACTION2', {})).
 previous_state(action4, action3).
