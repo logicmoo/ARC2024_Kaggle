@@ -58,3 +58,7 @@ git commit -am "sample 3"
 git add action_trees/
 git commit -am "sample 4"
 git push
+git commit -am "sample 4"
+git push
+git diff .
+git add action_trees/
