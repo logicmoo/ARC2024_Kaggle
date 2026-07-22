@@ -64,3 +64,15 @@ git diff .
 git add action_trees/
 git commit -am "sample 5"
 git diff .
+git commit -am "big updates"
+git add action_trees/
+git status .
+rm -rf  action_trees/ls20/level_unknown/
+git add action_trees/
+rm -rf arc3_debugger_runs/
+git status .
+rm -rf  action_trees/ls20/level_1/LEFT/LEFT/DOWN/LEFT/UP/UP/UP/UP/RIGHT/arc3_debugger
+git status .
+git add python/
+git add action_trees/
+git status .
