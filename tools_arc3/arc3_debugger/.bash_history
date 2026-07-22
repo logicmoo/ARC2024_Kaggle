@@ -76,3 +76,8 @@ git status .
 git add python/
 git add action_trees/
 git status .
+git commit -am "u[pdated"
+git status .
+rm -rf  action_trees/ls20/level_1/arc3_debugger/
+git status .
+git diff .

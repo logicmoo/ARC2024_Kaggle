@@ -455,19 +455,21 @@ class Arc3Runner:
 
     def gpt_command_2(self) -> None:
         store, node = self._require_node()
-        result = self._analyzer().ensure_objects_and_differences(store, node)
-        print(
-            f"objects.pl: {result['objects_path']} "
-            f"({'GPT' if result['objects_called'] else 'cached'})"
+        result = self._analyzer().ensure_full_analysis(store, node)
+        ordered = (
+            ("object_registry.pl", result["registry_path"], result["registry_called"]),
+            ("objects.pl", result["objects_path"], result["objects_called"]),
+            ("differences.pl", result["differences_path"], result["differences_called"]),
+            ("turtle_from_image.pl", result["turtle_from_image_path"], result["turtle_from_image_called"]),
+            ("similarities.pl", result["similarities_path"], result["similarities_called"]),
+            ("turtle_from_diff.pl", result["turtle_from_diff_path"], result["turtle_from_diff_called"]),
+            ("rules.pl", result["rules_path"], result["rules_called"]),
         )
-        print(f"object_registry.pl: {result['registry_path']}")
-        if result["differences_path"] is not None:
-            print(
-                f"differences.pl: {result['differences_path']} "
-                f"({'GPT' if result['differences_called'] else 'cached'})"
-            )
-        else:
-            print("differences.pl: initial state has no parent")
+        for label, path, called in ordered:
+            if path is None:
+                print(f"{label}: no parent / not applicable")
+            else:
+                print(f"{label}: {path} ({'GPT' if called else 'cached'})")
         print(f"README.md: {node.readme_path}")
 
     def gpt_command_3(self) -> None:
@@ -478,16 +480,16 @@ class Arc3Runner:
     def gpt_command_4(self) -> None:
         store, node = self._require_node()
         output, called = self._analyzer().generate_single_artifact(
-            store, node, "redraw", "redraw.pl"
+            store, node, "redraw", "turtle_from_image.pl"
         )
-        print(f"redraw.pl: {output} ({'GPT' if called else 'cached'})")
+        print(f"turtle_from_image.pl: {output} ({'GPT' if called else 'cached'})")
 
     def gpt_command_5(self) -> None:
         store, node = self._require_node()
         output, called = self._analyzer().generate_pair_artifact(
-            store, node, "redraw_diff", "redraw_diff.pl"
+            store, node, "redraw_diff", "turtle_from_diff.pl"
         )
-        print(f"redraw_diff.pl: {output or 'no parent'} ({'GPT' if called else 'cached/no-op'})")
+        print(f"turtle_from_diff.pl: {output or 'no parent'} ({'GPT' if called else 'cached/no-op'})")
 
     def gpt_command_6(self) -> None:
         store, node = self._require_node()

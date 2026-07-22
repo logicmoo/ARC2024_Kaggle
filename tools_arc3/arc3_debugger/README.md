@@ -410,3 +410,19 @@ The intended workflow is:
 
 This README is meant to document the current agreed architecture as the project
 continues to evolve.
+
+
+## Initial friendly-ID bootstrap
+
+The initial level node no longer assumes that object IDs already exist. The first
+GPT analysis performs a dedicated identity-bootstrap pass against the level-start
+`image.png`. It writes the level-wide `object_registry.pl` before generating
+`objects.pl`.
+
+The bootstrap asks for both semantic objects and useful block-level structures,
+then normalizes the result into friendly `object_identity/3` facts. If a later
+objects response omits those declarations, the debugger automatically runs a
+repair pass instead of aborting with “no object_identity/3 facts.”
+
+After the registry exists, every state and every action-tree branch receives the
+same canonical names.

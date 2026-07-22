@@ -1,13 +1,19 @@
 # `ls20` level `1` — Initial state
 
+## Navigation
+
+**Level start**
+
+### Actions
+
+[`LEFT`](LEFT/README.md)
+
+---
+
 - **Full game ID:** `ls20`
 - **State:** `NOT_FINISHED`
 - **Image hash:** `9c879087889c0ade`
 - **Incoming action:** `initial`
-
-## Navigation
-
-- This is the level start.
 
 ## Image
 
@@ -16,6 +22,7 @@
 ## Files
 
 - [state.json](state.json)
+- [object_registry.pl](object_registry.pl)
 - [objects.pl](objects.pl)
 
 ## `objects.pl`
@@ -323,7 +330,3 @@ turtle_program(bottom_button_3,
     [penup, set_pos(620,610), setcolor(light_blue), pendown,
      fill_rect(20,20), penup]).
 ```
-
-## Actions
-
-- [`LEFT`](LEFT/README.md)
