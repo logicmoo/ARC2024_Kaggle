@@ -126,3 +126,7 @@ cd ..
 git status .
 git add  action_trees
 git status .
+git commit -am "checkpoint for debugger demo"
+git push
+git add_trees/ls20/level_1.dir/
+git add action_trees/ls20/level_1.dir/
