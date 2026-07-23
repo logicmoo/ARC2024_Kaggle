@@ -471,3 +471,134 @@ the node file.
 Generated READMEs still contain every local text artifact, but each artifact is
 inside a collapsible GitHub `<details>` section. The shared registry is embedded
 once in the level-start README and linked, rather than repeated, in descendants.
+
+## Restored interactive functionality
+
+The combined GPT workflow does not replace the debugger. The full keyboard UI remains available:
+
+- Arrow/Space/coordinate/undo game actions
+- Windows Console API support for Shift+Arrow and Ctrl+Arrow
+- Shift+Left/Right game cycling and Shift+Up/Down level cycling
+- Ctrl+Arrow recorded-step browsing
+- Reset level, restart game, redraw, pause, queued step, replay, history save, state export, scorecard, action listing, and help
+- GPT and Prolog modes
+- SWI-Prolog action-selection bridge
+
+`(g)` then `(2)` makes one combined GPT Responses API call. The response is split into `objects.pl`, `differences.pl`, `similarities.pl`, `turtle_from_image.pl`, `turtle_from_diff.pl`, and `rules.pl`; friendly identities are merged into the level-wide `object_registry.pl`, and current/parent READMEs are refreshed. Commands `(3)` through `(6)` remain available as targeted regeneration controls, but each uses the same combined request so the artifacts remain mutually consistent.
+
+
+## Jupyter notebooks
+
+Two notebooks are included and use the same restored runner, action tree, cache,
+persistent identities, and combined GPT workflow.
+
+### `notebooks/arc3_debugger.ipynb`
+
+Guided debugger workflow:
+
+- open a game and inspect legal actions,
+- execute standardized ARC3 actions,
+- inspect the current action-tree node,
+- run `(g)` then `(2)` as one combined GPT analysis,
+- inspect history,
+- save and export state,
+- replay actions,
+- reset or restart the environment.
+
+### `notebooks/arc3_runner.ipynb`
+
+Lower-level API workflow:
+
+- inspect the game catalog and legal action space,
+- script deterministic branches,
+- browse recorded steps,
+- invoke the combined GPT analysis programmatically,
+- inspect the Prolog snapshot,
+- replay actions and read the scorecard.
+
+Launch both with:
+
+```powershell
+jupyter lab
+```
+
+The notebooks do not replace the interactive keyboard debugger. They expose the
+same `Arc3Runner` API for scripted and notebook-based development.
+
+
+## Combined GPT performance
+
+The combined request is optimized for ARC frames:
+
+- images default to `detail=low` (override with `ARC3_GPT_IMAGE_DETAIL`);
+- only missing artifacts are requested unless regeneration is forced;
+- parent context includes the registry, incoming action, and parent objects without repeating parent differences;
+- output length defaults to 9,000 tokens;
+- reasoning effort defaults to `low`;
+- elapsed API time and requested artifact count are printed after each call.
+
+Windows overrides:
+
+```powershell
+$env:ARC3_GPT_IMAGE_DETAIL="low"
+$env:ARC3_GPT_REASONING_EFFORT="low"
+$env:ARC3_GPT_MAX_OUTPUT_TOKENS="9000"
+```
+
+## Windows action-tree path recovery
+
+If an older checkout leaves a regular file where `action_trees/<game>/level_<n>/`
+or an action directory should exist, startup no longer fails with WinError 183.
+The conflicting file is preserved as `*.conflict.bak` and the required directory
+is created automatically. A warning prints the backup path.
+
+## Windows UNC path fallback
+
+Some Windows UNC/WSL shares can report WinError 183 for a path even when Python
+cannot see, rename, or remove the colliding filesystem entry. The debugger no
+longer retries or modifies that blocked path. It transparently selects a sibling
+folder such as `level_1.dir`, prints the actual location, and stores the action
+tree there. Child action directories use the same fallback mechanism.
+
+
+## GPT quality profiles
+
+The combined call supports three quality profiles:
+
+```powershell
+$env:ARC3_GPT_QUALITY="fast"      # quickest, lower visual detail
+$env:ARC3_GPT_QUALITY="balanced"  # default; exact current image, cheaper parent image
+$env:ARC3_GPT_QUALITY="deep"      # highest detail and reasoning
+```
+
+`balanced` is now the default. It requires logical ARC cell coordinates rather than enlarged PNG pixels, comprehensive block/sub-object descriptions, exact topology and holes, evidence assertions, and faithful Turtle reconstruction. Individual settings can still override the profile with `ARC3_GPT_IMAGE_DETAIL`, `ARC3_GPT_PARENT_IMAGE_DETAIL`, `ARC3_GPT_REASONING_EFFORT`, and `ARC3_GPT_MAX_OUTPUT_TOKENS`.
+
+
+## GPT analysis levels 2, 3, and 4
+
+The GPT menu now exposes three combined-analysis depths rather than using keys
+3 and 4 only for individual artifacts:
+
+```text
+(2) Demo     low current image, low parent image, low reasoning, 12,000 output tokens
+(3) Deep     high current image, low parent image, medium reasoning, 22,000 output tokens
+(4) Extreme  high current image, high parent image, high reasoning, 32,000 output tokens
+```
+
+All three still make one combined GPT call and produce the same artifact bundle.
+Levels 3 and 4 force regeneration so deeper output replaces the demo version.
+Image detail, reasoning effort, and output-token length are independent settings.
+
+Per-level Windows overrides are supported:
+
+```powershell
+$env:ARC3_GPT_2_IMAGE_DETAIL="low"
+$env:ARC3_GPT_2_MAX_OUTPUT_TOKENS="12000"
+$env:ARC3_GPT_3_IMAGE_DETAIL="high"
+$env:ARC3_GPT_3_MAX_OUTPUT_TOKENS="22000"
+$env:ARC3_GPT_4_PARENT_IMAGE_DETAIL="high"
+$env:ARC3_GPT_4_REASONING_EFFORT="high"
+$env:ARC3_GPT_4_MAX_OUTPUT_TOKENS="32000"
+```
+
+The older global variables remain valid and override all levels when present.

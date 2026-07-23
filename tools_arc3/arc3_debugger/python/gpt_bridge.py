@@ -5,71 +5,56 @@ import json
 import os
 import re
 import subprocess
+import time
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from action_tree import ActionTreeStore, StateNode
 
+ARTIFACT_KEYS = {
+    "objects_pl": "objects.pl",
+    "differences_pl": "differences.pl",
+    "similarities_pl": "similarities.pl",
+    "turtle_from_image_pl": "turtle_from_image.pl",
+    "turtle_from_diff_pl": "turtle_from_diff.pl",
+    "rules_pl": "rules.pl",
+}
+PAIR_ONLY = {"differences.pl", "similarities.pl", "turtle_from_diff.pl"}
+
 
 def _data_url(path: Path) -> str:
-    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-    return f"data:image/png;base64,{encoded}"
+    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
 
 
-def _strip_fences(text: str) -> str:
+def _read(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() and path.stat().st_size else ""
+
+
+def _json_payload(text: str) -> dict[str, Any]:
     value = text.strip()
-    match = re.fullmatch(
-        r"```(?:prolog|pl)?\s*(.*?)\s*```",
-        value,
-        re.DOTALL | re.IGNORECASE,
-    )
-    return match.group(1).strip() + "\n" if match else value + "\n"
-
-
-def _read_if_present(path: Path) -> str:
-    if path.exists() and path.stat().st_size:
-        return path.read_text(encoding="utf-8")
-    return ""
-
-
-def _friendly_atom(value: str) -> str:
-    """Normalize a model-suggested friendly name into a Prolog atom."""
-    atom = re.sub(r"[^a-zA-Z0-9]+", "_", str(value).strip().lower()).strip("_")
-    if not atom:
-        atom = "unnamed_object"
-    if atom[0].isdigit():
-        atom = "object_" + atom
-    return atom
-
-
-def _extract_json_value(text: str) -> Any:
-    """Best-effort extraction of one JSON value from model output."""
-    value = text.strip()
-    value = re.sub(r"^```(?:json)?\s*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"^```(?:json)?\s*", "", value, flags=re.I)
     value = re.sub(r"\s*```$", "", value)
     try:
-        return json.loads(value)
+        result = json.loads(value)
     except json.JSONDecodeError:
-        pass
+        start, end = value.find("{"), value.rfind("}")
+        if start < 0 or end <= start:
+            raise RuntimeError("Combined GPT response was not parseable JSON")
+        result = json.loads(value[start : end + 1])
+    if not isinstance(result, dict):
+        raise RuntimeError("Combined GPT response must be one JSON object")
+    return result
 
-    for opener, closer in (("[", "]"), ("{", "}")):
-        start = value.find(opener)
-        end = value.rfind(closer)
-        if start >= 0 and end > start:
-            try:
-                return json.loads(value[start : end + 1])
-            except json.JSONDecodeError:
-                continue
-    raise RuntimeError("GPT identity bootstrap did not return parseable JSON")
+
+def _plain_prolog(value: Any) -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"^```(?:prolog|pl)?\s*", "", text, flags=re.I)
+    text = re.sub(r"\s*```$", "", text)
+    return text.strip()
 
 
 class GptArcAnalyzer:
-    """GPT-backed ARC analysis with persistent friendly object identities.
-
-    The level's ``object_registry.pl`` is the canonical identity memory. The
-    first analyzed frame chooses friendly names. Every later request receives
-    that registry and the parent state's objects, and must reuse those names.
-    """
+    """One-call GPT analysis that splits a structured bundle into Prolog files."""
 
     def __init__(
         self,
@@ -79,401 +64,242 @@ class GptArcAnalyzer:
         client: Any | None = None,
     ) -> None:
         self.prompts_path = Path(prompts_path).resolve()
-        self.model = model or os.environ.get("ARC3_GPT_MODEL") or "gpt-5.6"
+        self.model = model or os.environ.get("ARC3_GPT_MODEL", "gpt-5.6")
+        # Command-level profiles are selected by Arc3Runner. Environment
+        # variables can override each independent dimension.
+        self.analysis_profiles = {
+            2: {
+                "name": "demo",
+                "current_detail": "low",
+                "parent_detail": "low",
+                "tokens": 12000,
+                "reasoning": "low",
+            },
+            3: {
+                "name": "deep",
+                "current_detail": "high",
+                "parent_detail": "low",
+                "tokens": 22000,
+                "reasoning": "medium",
+            },
+            4: {
+                "name": "extreme",
+                "current_detail": "high",
+                "parent_detail": "high",
+                "tokens": 32000,
+                "reasoning": "high",
+            },
+        }
+        self.active_profile = dict(self.analysis_profiles[2])
         if client is not None:
             self.client = client
         else:
-            try:
-                from openai import OpenAI
-            except (ImportError, AttributeError) as exc:
-                raise RuntimeError(
-                    "The current OpenAI Python package does not provide the Responses API. "
-                    "Run: pip install --upgrade openai"
-                ) from exc
+            from openai import OpenAI
             self.client = OpenAI()
 
-    def prompts(self) -> dict[str, str]:
+    def configure_profile(self, level: int) -> dict[str, Any]:
+        if level not in self.analysis_profiles:
+            raise ValueError(f"Unknown GPT analysis level: {level}")
+        base = dict(self.analysis_profiles[level])
+        prefix = f"ARC3_GPT_{level}_"
+        base["current_detail"] = os.environ.get(
+            prefix + "IMAGE_DETAIL",
+            os.environ.get("ARC3_GPT_IMAGE_DETAIL", base["current_detail"]),
+        )
+        base["parent_detail"] = os.environ.get(
+            prefix + "PARENT_IMAGE_DETAIL",
+            os.environ.get("ARC3_GPT_PARENT_IMAGE_DETAIL", base["parent_detail"]),
+        )
+        base["reasoning"] = os.environ.get(
+            prefix + "REASONING_EFFORT",
+            os.environ.get("ARC3_GPT_REASONING_EFFORT", base["reasoning"]),
+        )
+        base["tokens"] = int(os.environ.get(
+            prefix + "MAX_OUTPUT_TOKENS",
+            os.environ.get("ARC3_GPT_MAX_OUTPUT_TOKENS", str(base["tokens"])),
+        ))
+        self.active_profile = base
+        return base
+
+    def prompts(self) -> dict[str, Any]:
         return json.loads(self.prompts_path.read_text(encoding="utf-8"))
 
     def edit_prompts(self) -> None:
         if os.name == "nt":
             os.startfile(self.prompts_path)  # type: ignore[attr-defined]
             return
-        editor = os.environ.get("EDITOR")
+        editor = os.environ.get("EDITOR") or os.environ.get("VISUAL")
         if editor:
             subprocess.run([editor, str(self.prompts_path)], check=False)
-            return
-        print(self.prompts_path.read_text(encoding="utf-8"))
-        print(f"Edit prompts at: {self.prompts_path}")
+        else:
+            print(self.prompts_path.read_text(encoding="utf-8"))
+            print(f"Edit prompts at: {self.prompts_path}")
 
-    def _respond(
-        self,
-        prompt: str,
-        images: Iterable[tuple[str, Path]],
-        *,
-        supplemental_text: str = "",
-    ) -> str:
-        full_prompt = prompt
-        if supplemental_text:
-            full_prompt += "\n\nPERSISTENT SYMBOLIC CONTEXT:\n" + supplemental_text
-        content: list[dict[str, Any]] = [
-            {"type": "input_text", "text": full_prompt}
+    def _context(self, store: ActionTreeStore, node: StateNode) -> str:
+        parent = store.parent_node(node)
+        metadata = store.metadata(node)
+        parts = [
+            "LEVEL object_registry.pl:\n"
+            + (store.registry_text() or "% Empty; assign friendly identities now."),
+            "INCOMING ACTION:\n"
+            + json.dumps(
+                {
+                    "action": metadata.get("incoming_action") or "initial",
+                    "data": metadata.get("action_data") or {},
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ),
         ]
-        for label, image_path in images:
-            content.append({"type": "input_text", "text": label})
-            content.append(
+        if parent is not None:
+            parts.append(
+                "PARENT objects.pl:\n"
+                + (_read(parent.objects_path) or "% unavailable")
+            )
+        return "\n\n".join(parts)
+
+    def _missing_artifact_keys(
+        self, store: ActionTreeStore, node: StateNode
+    ) -> list[str]:
+        parent = store.parent_node(node)
+        missing: list[str] = []
+        for key, filename in ARTIFACT_KEYS.items():
+            if parent is None and filename in PAIR_ONLY:
+                continue
+            path = node.path / filename
+            if not path.exists() or not path.stat().st_size:
+                missing.append(key)
+        return missing
+
+    def _request_bundle(
+        self,
+        store: ActionTreeStore,
+        node: StateNode,
+        requested_keys: list[str],
+    ) -> dict[str, Any]:
+        prompt = self.prompts()["combined"]
+        request_note = (
+            "\n\nRETURN ONLY THESE ARTIFACT KEYS: "
+            + ", ".join(["new_identities", *requested_keys])
+            + ". Omit unrequested artifact keys. Preserve exact logical-grid geometry and evidence; avoid display-pixel coordinates."
+        )
+        content: list[dict[str, Any]] = [
+            {
+                "type": "input_text",
+                "text": prompt
+                + request_note
+                + "\n\nPERSISTENT CONTEXT:\n"
+                + self._context(store, node),
+            }
+        ]
+        parent = store.parent_node(node)
+        if parent is not None:
+            content.extend(
+                [
+                    {"type": "input_text", "text": "Previous ARC3 state image:"},
+                    {
+                        "type": "input_image",
+                        "image_url": _data_url(parent.image_path),
+                        "detail": self.active_profile["parent_detail"],
+                    },
+                ]
+            )
+        content.extend(
+            [
+                {"type": "input_text", "text": "Current ARC3 state image:"},
                 {
                     "type": "input_image",
-                    "image_url": _data_url(image_path),
-                    "detail": "high",
-                }
-            )
+                    "image_url": _data_url(node.image_path),
+                    "detail": self.active_profile["current_detail"],
+                },
+            ]
+        )
+        started = time.perf_counter()
         response = self.client.responses.create(
             model=self.model,
             input=[{"role": "user", "content": content}],
+            reasoning={"effort": self.active_profile["reasoning"]},
+            max_output_tokens=self.active_profile["tokens"],
         )
-        output_text = getattr(response, "output_text", None)
-        if not output_text:
-            raise RuntimeError("OpenAI response contained no output_text")
-        return _strip_fences(output_text)
+        elapsed = time.perf_counter() - started
+        print(
+            f"GPT combined request: {elapsed:.1f}s "
+            f"({len(requested_keys)} artifacts, profile={self.active_profile['name']}, "
+            f"current={self.active_profile['current_detail']}, "
+            f"parent={self.active_profile['parent_detail']}, "
+            f"reasoning={self.active_profile['reasoning']}, "
+            f"max_tokens={self.active_profile['tokens']})"
+        )
+        output = getattr(response, "output_text", None)
+        if not output:
+            raise RuntimeError("Combined GPT response contained no output_text")
+        return _json_payload(output)
 
-    def _identity_context(
+    def _merge_new_identities(
         self,
         store: ActionTreeStore,
-        node: StateNode,
-        *,
-        include_current: bool = False,
-        include_differences: bool = False,
-    ) -> str:
-        metadata = store.metadata(node)
-        parent = store.parent_node(node)
-        sections: list[str] = [
-            "IDENTITY RULES:\n"
-            "- Friendly Prolog atoms are canonical object IDs for this entire level.\n"
-            "- Reuse an existing friendly ID whenever it denotes the same object.\n"
-            "- Never replace a friendly ID with obj_1, object_2, or another opaque ID.\n"
-            "- Never recycle an old ID for a different object.\n"
-            "- Create a new friendly ID only for a truly new object.\n"
-            "- Prefer semantic snake_case names such as blue_player, red_goal, "
-            "left_wall, yellow_key, moving_platform, or blue_square_2.\n"
-            "- Every visible object must have exactly one object_identity/3 fact."
-        ]
-
-        registry = store.registry_text()
-        sections.append(
-            "LEVEL object_registry.pl (canonical names from the beginning of the level):\n"
-            + (registry if registry else "% Empty: this is the first identity assignment.\n")
-        )
-
-        if parent is not None:
-            parent_objects = _read_if_present(parent.objects_path)
-            sections.append(
-                "PARENT objects.pl (reuse these names for surviving objects):\n"
-                + (parent_objects or "% Parent objects have not been analyzed yet.\n")
-            )
-
-        sections.append(
-            "INCOMING ACTION:\n"
-            f"action({metadata.get('incoming_action') or 'initial'}, "
-            f"{json.dumps(metadata.get('action_data') or {}, ensure_ascii=False)})."
-        )
-
-        if include_current:
-            current_objects = _read_if_present(node.objects_path)
-            if current_objects:
-                sections.append("CURRENT objects.pl:\n" + current_objects)
-
-        if include_differences:
-            differences = _read_if_present(node.differences_path)
-            if differences:
-                sections.append("CURRENT differences.pl:\n" + differences)
-
-        return "\n\n".join(sections)
-
-    def _initial_node(self, store: ActionTreeStore) -> StateNode:
-        image_path = store.level_root / "image.png"
-        if not image_path.exists():
-            raise RuntimeError(
-                "The level-start image.png is missing; cannot bootstrap friendly object names"
-            )
-        return StateNode(
-            path=store.level_root,
-            image_hash=store.image_hash(image_path.read_bytes()),
-        )
-
-    def ensure_identity_registry(
-        self,
-        store: ActionTreeStore,
-        *,
-        force: bool = False,
-    ) -> tuple[Path, bool]:
-        """Create canonical friendly IDs once, from the level's initial frame."""
-        existing = store.registry_identities()
-        if existing and not force:
-            return store.object_registry_path, False
-
-        initial = self._initial_node(store)
-        raw = self._respond(
-            self.prompts()["bootstrap_identities"],
-            [("Initial ARC3 level state:", initial.image_path)],
-            supplemental_text=(
-                "This is the one-time identity bootstrap for the entire level. "
-                "Include semantic whole objects and useful block-level objects."
-            ),
-        )
-
-        try:
-            payload = _extract_json_value(raw)
-        except RuntimeError:
-            repaired = self._respond(
-                self.prompts()["repair_identities"],
-                [("Initial ARC3 level state:", initial.image_path)],
-                supplemental_text="CANDIDATE OUTPUT TO NORMALIZE:\n" + raw,
-            )
-            payload = _extract_json_value(repaired)
-
-        if isinstance(payload, dict):
-            objects = payload.get("objects") or payload.get("identities") or []
-        else:
-            objects = payload
-        if not isinstance(objects, list) or not objects:
-            raise RuntimeError("GPT identity bootstrap returned no visible objects")
-
-        used: set[str] = set()
-        facts: list[str] = []
-        for index, item in enumerate(objects, start=1):
-            if isinstance(item, str):
-                item = {"id": item, "type": "object", "label": item.replace("_", " ")}
+        bundle: dict[str, Any],
+    ) -> None:
+        registry = store.registry_identities()
+        for item in bundle.get("new_identities") or []:
             if not isinstance(item, dict):
                 continue
-            label = str(item.get("label") or item.get("name") or item.get("id") or f"object {index}")
-            obj_type = _friendly_atom(str(item.get("type") or item.get("kind") or "object"))
-            base = _friendly_atom(str(item.get("id") or item.get("friendly_id") or label))
-            if store.OPAQUE_ID_RE.match(base):
-                base = _friendly_atom(f"{item.get('color', '')}_{obj_type}_{label}")
-            candidate = base
-            suffix = 2
-            while candidate in used:
-                candidate = f"{base}_{suffix}"
-                suffix += 1
-            used.add(candidate)
-            safe_label = label.replace("\\", "\\\\").replace("'", "\\'")
-            facts.append(f"object_identity({candidate}, {obj_type}, '{safe_label}').")
-
-        if not facts:
-            raise RuntimeError("GPT identity bootstrap produced no usable friendly names")
-
-        source = (
-            "% Canonical friendly object identities for this entire ARC3 level.\n"
-            "% Created once from the initial state; reuse these atoms in every branch.\n\n"
-            + "\n".join(facts)
-            + "\n"
-        )
-        # Validate before replacing a registry that might already exist.
-        store.validate_friendly_objects(source, initial)
-        store.object_registry_path.write_text(source, encoding="utf-8")
-        store.refresh_readme(initial)
-        return store.object_registry_path, True
-
-    def _write_registry_facts(
-        self,
-        store: ActionTreeStore,
-        facts: dict[str, str],
-    ) -> Path:
+            name = re.sub(r"[^a-zA-Z0-9_]", "_", str(item.get("id", "")).lower()).strip("_")
+            if not name or store.OPAQUE_ID_RE.match(name):
+                raise RuntimeError(f"Invalid friendly identity returned by GPT: {name or item!r}")
+            object_type = re.sub(r"[^a-zA-Z0-9_]", "_", str(item.get("type", "object")).lower()).strip("_") or "object"
+            label = str(item.get("label") or name.replace("_", " ")).replace("\\", "\\\\").replace("'", "\\'")
+            registry.setdefault(name, f"object_identity({name}, {object_type}, '{label}').")
+        if not registry:
+            raise RuntimeError("Combined GPT analysis returned no friendly object identities")
         lines = [
             "% Canonical friendly object identities for this entire ARC3 level.",
-            "% Names are created once and reused from the beginning to the end.",
+            "% Names are stable across every action-tree branch.",
             "",
+            *[registry[name] for name in sorted(registry)],
         ]
-        lines.extend(facts[name] for name in sorted(facts))
-        store.object_registry_path.write_text(
-            "\n".join(lines) + "\n",
-            encoding="utf-8",
-        )
-        return store.object_registry_path
+        store.object_registry_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    def _repair_objects_output(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        candidate: str,
-    ) -> tuple[str, bool]:
-        """Repair only when the candidate uses bad IDs or cannot be normalized."""
-        repaired = self._respond(
-            self.prompts()["repair_objects"],
-            [("Current ARC3 state:", node.image_path)],
-            supplemental_text=(
-                self._identity_context(store, node)
-                + "\n\nCANDIDATE objects.pl TO NORMALIZE:\n"
-                + candidate
-            ),
-        )
-        return repaired, True
-
-    def _normalize_objects_output(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        candidate: str,
-        *,
-        allow_gpt_repair: bool = True,
-    ) -> tuple[str, bool]:
-        """Keep canonical identities once in object_registry.pl.
-
-        Node objects.pl files contain only state-specific facts plus a relative
-        ensure_loaded/1 reference to the shared registry. Legacy repeated identity
-        declarations are migrated into the registry and removed from the node.
-        """
-        self.ensure_identity_registry(store, force=False)
-        text = _strip_fences(candidate)
-        repair_called = False
-
-        if store.opaque_tokens(text) and allow_gpt_repair:
-            text, repair_called = self._repair_objects_output(store, node, text)
-            text = _strip_fences(text)
-
-        remaining_opaque = store.opaque_tokens(text)
-        if remaining_opaque:
-            raise RuntimeError(
-                "Could not normalize objects.pl because opaque IDs remain: "
-                + ", ".join(remaining_opaque)
-            )
-
+    def _normalize_objects(self, store: ActionTreeStore, node: StateNode, source: str) -> str:
+        text = _plain_prolog(source)
+        if store.OPAQUE_TOKEN_RE.search(text):
+            raise RuntimeError("Combined GPT objects output contains opaque numbered IDs")
         registry = store.registry_identities()
-
-        # Accept legacy object_identity/3 declarations and the new compact
-        # new_object_identity/3 convention, then store them only in the registry.
-        candidate_facts = store.identity_facts(text)
-        candidate_facts.update(store.new_identity_facts(text))
-
-        for name, fact in candidate_facts.items():
-            if store.OPAQUE_ID_RE.match(name):
-                raise RuntimeError(f"Opaque object identity is not allowed: {name}")
+        for name, fact in store.identity_facts(text).items():
             registry.setdefault(name, fact)
-
-        if not registry:
-            raise RuntimeError(
-                "object_registry.pl is empty after identity bootstrap."
-            )
-
-        self._write_registry_facts(store, registry)
-
-        body_lines: list[str] = []
+        for name, fact in store.new_identity_facts(text).items():
+            registry.setdefault(name, fact)
+        if registry:
+            lines = [
+                "% Canonical friendly object identities for this entire ARC3 level.",
+                "% Names are stable across every action-tree branch.",
+                "",
+                *[registry[name] for name in sorted(registry)],
+            ]
+            store.object_registry_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        body = []
         for line in text.splitlines():
-            if store.FRIENDLY_ID_RE.match(line):
+            if store.FRIENDLY_ID_RE.match(line) or store.NEW_FRIENDLY_ID_RE.match(line) or store.REGISTRY_LOAD_RE.match(line):
                 continue
-            if store.NEW_FRIENDLY_ID_RE.match(line):
-                continue
-            if store.REGISTRY_LOAD_RE.match(line):
-                continue
-            body_lines.append(line)
+            body.append(line)
+        ref = store.registry_reference(node)
+        return (
+            "% Canonical identities are loaded from the level registry.\n"
+            f":- ensure_loaded('{ref}').\n\n"
+            "% State-specific facts for this action-tree node.\n"
+            + ("\n".join(body).strip() or "% No additional state-specific facts.")
+            + "\n"
+        )
 
-        body = "\n".join(body_lines).strip()
-        registry_ref = store.registry_reference(node)
-
-        normalized_lines = [
-            "% Canonical object identities live in the level-wide registry.",
-            f":- ensure_loaded('{registry_ref}').",
-            "",
-            "% State-specific facts for this action-tree node.",
-        ]
-        if body:
-            normalized_lines.append(body)
-        else:
-            normalized_lines.append("% No additional state-specific facts.")
-
-        normalized = "\n".join(normalized_lines).rstrip() + "\n"
-        store.validate_friendly_objects(normalized, node)
-        return normalized, repair_called
-
-    def ensure_objects(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        *,
-        force: bool = False,
-    ) -> tuple[Path, bool]:
-        output = node.objects_path
-
-        self.ensure_identity_registry(store, force=False)
-
+    def _cache_complete(self, store: ActionTreeStore, node: StateNode) -> bool:
         parent = store.parent_node(node)
-        if parent is not None:
-            self.ensure_objects(store, parent, force=False)
-
-        # Old or partially generated cached files are normalized in place instead
-        # of causing every descendant analysis to fail.
-        if output.exists() and output.stat().st_size and not force:
-            existing = output.read_text(encoding="utf-8")
-            normalized, repair_called = self._normalize_objects_output(
-                store,
-                node,
-                existing,
-                allow_gpt_repair=True,
-            )
-            if normalized != existing:
-                output.write_text(normalized, encoding="utf-8")
-            store.update_registry_from_objects(node)
-            store.refresh_readme(node)
-            if parent is not None:
-                store.refresh_readme(parent)
-            return output, repair_called
-
-        candidate = self._respond(
-            self.prompts()["objects"],
-            [("Current ARC3 state:", node.image_path)],
-            supplemental_text=self._identity_context(store, node),
-        )
-        normalized, repair_called = self._normalize_objects_output(
-            store,
-            node,
-            candidate,
-            allow_gpt_repair=True,
-        )
-        output.write_text(normalized, encoding="utf-8")
-        store.update_registry_from_objects(node)
-        store.refresh_readme(node)
-        if parent is not None:
-            store.refresh_readme(parent)
-
-        # A primary objects call was made, regardless of whether a repair call was
-        # also necessary.
-        return output, True
-
-    def ensure_differences(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        *,
-        force: bool = False,
-    ) -> tuple[Path | None, bool]:
-        parent = store.parent_node(node)
-        if parent is None:
-            store.refresh_readme(node)
-            return None, False
-
-        output = node.differences_path
-        if output.exists() and output.stat().st_size and not force:
-            return output, False
-
-        self.ensure_objects(store, parent, force=False)
-        self.ensure_objects(store, node, force=False)
-        text = self._respond(
-            self.prompts()["differences"],
-            [
-                ("Previous ARC3 state:", parent.image_path),
-                ("Current ARC3 state:", node.image_path),
-            ],
-            supplemental_text=self._identity_context(
-                store,
-                node,
-                include_current=True,
-            ),
-        )
-        output.write_text(text, encoding="utf-8")
-        store.refresh_readme(node)
-        store.refresh_readme(parent)
-        return output, True
+        for filename in ARTIFACT_KEYS.values():
+            if parent is None and filename in PAIR_ONLY:
+                continue
+            path = node.path / filename
+            if not path.exists() or not path.stat().st_size:
+                return False
+        return store.object_registry_path.exists() and bool(store.registry_identities())
 
     def ensure_full_analysis(
         self,
@@ -481,114 +307,71 @@ class GptArcAnalyzer:
         node: StateNode,
         *,
         force: bool = False,
+        analysis_level: int = 2,
     ) -> dict[str, Any]:
-        """Generate every standard symbolic artifact, reusing nonempty caches."""
-        registry_path, registry_called = self.ensure_identity_registry(store, force=False)
-        objects_path, objects_called = self.ensure_objects(store, node, force=force)
-        differences_path, differences_called = self.ensure_differences(
-            store, node, force=force
-        )
-        turtle_image_path, turtle_image_called = self.generate_single_artifact(
-            store, node, "redraw", "turtle_from_image.pl", force=force
-        )
-        similarities_path, similarities_called = self.generate_pair_artifact(
-            store, node, "similarity", "similarities.pl", force=force
-        )
-        turtle_diff_path, turtle_diff_called = self.generate_pair_artifact(
-            store, node, "redraw_diff", "turtle_from_diff.pl", force=force
-        )
-        rules_path, rules_called = self.generate_single_artifact(
-            store, node, "rules", "rules.pl", force=force
-        )
+        self.configure_profile(analysis_level)
         parent = store.parent_node(node)
+        if not force and self._cache_complete(store, node):
+            store.refresh_readme(node)
+            if parent is not None:
+                store.refresh_readme(parent)
+            return self._result(store, node, called=False)
+
+        requested_keys = self._missing_artifact_keys(store, node)
+        if force:
+            requested_keys = [
+                key for key, filename in ARTIFACT_KEYS.items()
+                if not (parent is None and filename in PAIR_ONLY)
+            ]
+        bundle = self._request_bundle(store, node, requested_keys)
+        self._merge_new_identities(store, bundle)
+
+        for key, filename in ARTIFACT_KEYS.items():
+            if key not in requested_keys:
+                continue
+            text = _plain_prolog(bundle.get(key, ""))
+            if filename == "objects.pl":
+                text = self._normalize_objects(store, node, text)
+            if parent is None and filename in PAIR_ONLY and not text:
+                continue
+            (node.path / filename).write_text(text + ("" if text.endswith("\n") else "\n"), encoding="utf-8")
+
         store.refresh_readme(node)
         if parent is not None:
             store.refresh_readme(parent)
-        return {
-            "registry_path": registry_path,
-            "registry_called": registry_called,
-            "objects_path": objects_path,
-            "objects_called": objects_called,
-            "differences_path": differences_path,
-            "differences_called": differences_called,
-            "turtle_from_image_path": turtle_image_path,
-            "turtle_from_image_called": turtle_image_called,
-            "similarities_path": similarities_path,
-            "similarities_called": similarities_called,
-            "turtle_from_diff_path": turtle_diff_path,
-            "turtle_from_diff_called": turtle_diff_called,
-            "rules_path": rules_path,
-            "rules_called": rules_called,
-        }
+        return self._result(store, node, called=True)
 
-    # Backward-compatible name retained for external callers.
-    def ensure_objects_and_differences(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        *,
-        force: bool = False,
-    ) -> dict[str, Any]:
-        return self.ensure_full_analysis(store, node, force=force)
-
-    def generate_single_artifact(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        prompt_name: str,
-        filename: str,
-        *,
-        force: bool = False,
-    ) -> tuple[Path, bool]:
-        output = node.path / filename
-        if output.exists() and output.stat().st_size and not force:
-            return output, False
-        self.ensure_objects(store, node, force=False)
-        text = self._respond(
-            self.prompts()[prompt_name],
-            [("Current ARC3 state:", node.image_path)],
-            supplemental_text=self._identity_context(
-                store,
-                node,
-                include_current=True,
-                include_differences=True,
-            ),
-        )
-        output.write_text(text, encoding="utf-8")
-        store.refresh_readme(node)
-        return output, True
-
-    def generate_pair_artifact(
-        self,
-        store: ActionTreeStore,
-        node: StateNode,
-        prompt_name: str,
-        filename: str,
-        *,
-        force: bool = False,
-    ) -> tuple[Path | None, bool]:
+    def _result(self, store: ActionTreeStore, node: StateNode, *, called: bool) -> dict[str, Any]:
         parent = store.parent_node(node)
-        if parent is None:
-            return None, False
-        output = node.path / filename
-        if output.exists() and output.stat().st_size and not force:
-            return output, False
-        self.ensure_objects(store, parent, force=False)
-        self.ensure_objects(store, node, force=False)
-        self.ensure_differences(store, node, force=False)
-        text = self._respond(
-            self.prompts()[prompt_name],
-            [
-                ("Previous ARC3 state:", parent.image_path),
-                ("Current ARC3 state:", node.image_path),
-            ],
-            supplemental_text=self._identity_context(
-                store,
-                node,
-                include_current=True,
-                include_differences=True,
-            ),
-        )
-        output.write_text(text, encoding="utf-8")
-        store.refresh_readme(node)
-        return output, True
+        result: dict[str, Any] = {
+            "registry_path": store.object_registry_path,
+            "registry_called": called,
+        }
+        mapping = {
+            "objects": "objects.pl",
+            "differences": "differences.pl",
+            "similarities": "similarities.pl",
+            "turtle_from_image": "turtle_from_image.pl",
+            "turtle_from_diff": "turtle_from_diff.pl",
+            "rules": "rules.pl",
+        }
+        for prefix, filename in mapping.items():
+            path = node.path / filename
+            applicable = not (parent is None and filename in PAIR_ONLY)
+            result[f"{prefix}_path"] = path if applicable and path.exists() else None
+            result[f"{prefix}_called"] = called and applicable
+        return result
+
+    # Targeted commands remain available, but each regeneration still uses the
+    # same combined request so all artifacts remain mutually consistent.
+    def ensure_differences(self, store: ActionTreeStore, node: StateNode, *, force: bool = True):
+        result = self.ensure_full_analysis(store, node, force=force)
+        return result["differences_path"], result["differences_called"]
+
+    def generate_single_artifact(self, store: ActionTreeStore, node: StateNode, prompt_name: str, filename: str, *, force: bool = True):
+        result = self.ensure_full_analysis(store, node, force=force)
+        path = node.path / filename
+        return (path if path.exists() else None), result.get(filename.replace(".pl", "") + "_called", result["registry_called"])
+
+    def generate_pair_artifact(self, store: ActionTreeStore, node: StateNode, prompt_name: str, filename: str, *, force: bool = True):
+        return self.generate_single_artifact(store, node, prompt_name, filename, force=force)

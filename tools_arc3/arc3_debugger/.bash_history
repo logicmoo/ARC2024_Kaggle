@@ -105,3 +105,24 @@ git push
 git add action_trees/
 git commit -am "new sample 3"
 git push
+git commit -am "new sample 3"
+git push
+git diff .
+git diff . > missing.txt
+grep jyp . -R
+grep jyp . -r
+grep jup . -r
+cd arc3_debugger/
+ls
+ls examples/
+ls notebooks/
+git diff .
+cd arc3_debugger
+git diff .
+git diff . > changes.txt
+git diff .
+git status .
+cd ..
+git status .
+git add  action_trees
+git status .

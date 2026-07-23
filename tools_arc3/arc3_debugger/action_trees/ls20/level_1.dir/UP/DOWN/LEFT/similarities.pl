@@ -1,0 +1,9 @@
+correspondence(parent,current,green_structure,green_structure,unchanged).
+correspondence(parent,current,central_hole,central_hole,unchanged).
+correspondence(parent,current,top_glyph,top_glyph,unchanged).
+correspondence(parent,current,base_glyph,base_glyph,translated(-5,0)).
+correspondence(parent,current,player_cursor,player_cursor,unchanged).
+correspondence(parent,current,hud_panel,hud_panel,unchanged).
+correspondence(parent,current,status_track,status_track,revealed_under_marker).
+correspondence(parent,current,status_pips,status_pips,unchanged).
+correspondence(parent,current,status_marker,status_marker,removed).

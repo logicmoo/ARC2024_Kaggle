@@ -303,9 +303,9 @@ CONTROL_MODES = {
     "gpt": {
         "title": "GPT",
         1: "Print/Edit GPT prompts",
-        2: "Full state analysis → all .pl artifacts",
-        3: "Recompute differences.pl",
-        4: "Recompute turtle_from_image.pl",
+        2: "Demo analysis (low image / low reasoning / 12k tokens)",
+        3: "Deep analysis (high current image / medium reasoning / 22k tokens)",
+        4: "Extreme analysis (high both images / high reasoning / 32k tokens)",
         5: "Recompute turtle_from_diff.pl",
         6: "Recompute similarities.pl",
     },

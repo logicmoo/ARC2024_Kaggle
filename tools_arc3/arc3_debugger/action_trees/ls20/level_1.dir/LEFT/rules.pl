@@ -1,0 +1,11 @@
+observed_rule(action3_effect,moves(base_glyph,delta(-40,0))).
+observed_rule(action3_status_effect,creates(status_marker,rect(104,488,8,16))).
+hypothetical_rule(base_glyph_traversal,action3,moves_along(green_structure,bottom_bar,left,40)).
+hypothetical_rule(status_progress,action3,advances_status_track(green,8)).
+evidence(base_glyph_traversal,base_glyph,delta(-40,0)).
+evidence(base_glyph_traversal,current_position,rect(232,360,40,40)).
+evidence(status_progress,status_marker,rect(104,488,8,16)).
+supported_by(base_glyph_traversal,base_glyph_translation).
+supported_by(status_progress,status_marker_appearance).
+contradicted_by(base_glyph_traversal,none).
+contradicted_by(status_progress,none).

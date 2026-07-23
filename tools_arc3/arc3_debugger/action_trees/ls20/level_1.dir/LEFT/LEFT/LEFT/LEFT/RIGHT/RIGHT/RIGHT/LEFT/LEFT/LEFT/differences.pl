@@ -1,0 +1,15 @@
+changed(base_glyph).
+removed_region(base_glyph,rect(24,45,28,46),gray).
+removed_region(base_glyph,rect(24,47,28,49),dark_red).
+added_region(base_glyph,rect(19,45,23,46),gray).
+retained_region(base_glyph,rect(20,47,23,49),dark_red).
+added_region(base_glyph,rect(19,47,19,49),dark_red).
+changed(status_marker).
+added_region(status_marker,rect(22,61,22,62),green).
+unchanged(green_structure).
+unchanged(central_hole).
+unchanged(top_glyph).
+unchanged(player_cursor).
+unchanged(hud_panel).
+unchanged(status_pips).
+unchanged(status_track).

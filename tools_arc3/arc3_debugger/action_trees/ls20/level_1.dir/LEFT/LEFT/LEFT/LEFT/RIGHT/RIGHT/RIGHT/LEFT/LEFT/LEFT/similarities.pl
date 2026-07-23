@@ -1,0 +1,11 @@
+corresponds(parent(green_structure),current(green_structure),identical).
+corresponds(parent(central_hole),current(central_hole),identical).
+corresponds(parent(top_glyph),current(top_glyph),identical).
+corresponds(parent(player_cursor),current(player_cursor),identical).
+corresponds(parent(hud_panel),current(hud_panel),identical).
+corresponds(parent(status_pips),current(status_pips),identical).
+corresponds(parent(status_track),current(status_track),identical_extent).
+corresponds(parent(base_glyph),current(base_glyph),transformed).
+corresponds(parent(status_marker),current(status_marker),extended_right).
+shares_anchor(parent(base_glyph),current(base_glyph),point(19,49)).
+shares_left_endpoint(parent(status_marker),current(status_marker),point(13,61)).

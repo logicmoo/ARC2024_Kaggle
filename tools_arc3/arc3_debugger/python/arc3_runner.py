@@ -453,29 +453,30 @@ class Arc3Runner:
     def gpt_command_1(self) -> None:
         self._analyzer().edit_prompts()
 
-    def gpt_command_2(self) -> None:
+    def _run_gpt_analysis_level(self, level: int) -> None:
         store, node = self._require_node()
-        print(f"Full GPT analysis: {node.path}")
+        labels = {2: "demo", 3: "deep", 4: "extreme"}
+        print(f"GPT {labels[level]} analysis (level {level}): {node.path}")
         try:
-            result = self._analyzer().ensure_full_analysis(store, node)
+            result = self._analyzer().ensure_full_analysis(
+                store,
+                node,
+                force=(level > 2),
+                analysis_level=level,
+            )
         except Exception as exc:
             expected = (
-                "object_registry.pl",
-                "objects.pl",
-                "differences.pl",
-                "turtle_from_image.pl",
-                "similarities.pl",
-                "turtle_from_diff.pl",
-                "rules.pl",
+                "object_registry.pl", "objects.pl", "differences.pl",
+                "turtle_from_image.pl", "similarities.pl",
+                "turtle_from_diff.pl", "rules.pl",
             )
             completed = [
-                name
-                for name in expected
+                name for name in expected
                 if (store.level_root / name).exists() or (node.path / name).exists()
             ]
             detail = ", ".join(completed) if completed else "none"
             raise RuntimeError(
-                f"Full analysis stopped. Files already created or cached: {detail}. "
+                f"GPT level {level} analysis stopped. Files present: {detail}. "
                 f"Cause: {exc}"
             ) from exc
 
@@ -490,23 +491,23 @@ class Arc3Runner:
         )
         for label, path, called in ordered:
             if path is None:
-                print(f"{label}: not applicable at the level root")
+                print(f"{label}: not applicable at level root")
             else:
-                print(f"{label}: {path} ({'generated/repaired' if called else 'cached'})")
+                print(f"{label}: {path} ({'generated' if called else 'cached'})")
         print(f"README.md: {node.readme_path}")
-        print("Full GPT analysis complete.")
+        print(f"GPT level {level} analysis complete.")
+
+    def gpt_command_2(self) -> None:
+        """Fast demo analysis: low image detail, low reasoning, moderate tokens."""
+        self._run_gpt_analysis_level(2)
 
     def gpt_command_3(self) -> None:
-        store, node = self._require_node()
-        output, called = self._analyzer().ensure_differences(store, node)
-        print(f"differences.pl: {output or 'no parent'} ({'GPT' if called else 'cached/no-op'})")
+        """Deep analysis: high current image detail and larger token budget."""
+        self._run_gpt_analysis_level(3)
 
     def gpt_command_4(self) -> None:
-        store, node = self._require_node()
-        output, called = self._analyzer().generate_single_artifact(
-            store, node, "redraw", "turtle_from_image.pl"
-        )
-        print(f"turtle_from_image.pl: {output} ({'GPT' if called else 'cached'})")
+        """Extreme analysis: high detail for both images and maximum budget."""
+        self._run_gpt_analysis_level(4)
 
     def gpt_command_5(self) -> None:
         store, node = self._require_node()

@@ -1,0 +1,5 @@
+turtle_program(patch_parent_to_current,
+    [set_color(green),fill_rect(29,45,5,5),
+     set_color(gray),fill_rect(34,45,5,2),
+     set_color(dark_red),fill_rect(34,47,5,3),
+     set_color(green),fill_rect(19,61,1,2)]).

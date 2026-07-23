@@ -1,0 +1,10 @@
+moved(base_glyph,rect(272,360,40,40),rect(232,360,40,40),delta(-40,0)).
+removed_color(status_track,dark_gray,rect(104,488,8,16)).
+added(status_marker,rect(104,488,8,16),green).
+geometry_changed(status_track,rect(104,488,336,16),rect(112,488,328,16)).
+unchanged(green_structure).
+unchanged(central_hole).
+unchanged(top_glyph).
+unchanged(player_cursor).
+unchanged(hud_panel).
+unchanged(status_pips).

@@ -1,0 +1,29 @@
+{
+  "state": "NOT_FINISHED",
+  "observation": {
+    "game_id": "s5i5-18d95033",
+    "state": "NOT_FINISHED",
+    "levels_completed": 0,
+    "win_levels": 8,
+    "action_input": {
+      "id": "RESET",
+      "data": {},
+      "reasoning": null
+    },
+    "guid": "53ef980e-4ec0-421d-881c-68aa55af50a9",
+    "full_reset": true,
+    "available_actions": [
+      6
+    ]
+  },
+  "step_count": 0,
+  "game_id": "s5i5-18d95033",
+  "game_directory": "s5i5",
+  "level": "1",
+  "image_hash": "b56a04cf465a3fdd",
+  "incoming_action": null,
+  "action_directory": null,
+  "action_data": {},
+  "parent_node": null,
+  "action_path": []
+}

@@ -1,0 +1,34 @@
+turtle_from_image(current_frame,Program) :-
+    turtle_program(current_frame_from_image,Program).
+
+turtle_program(current_frame_from_image,[
+    clear(yellow),
+    fill_rect(gray,0,0,4,52),
+    fill_rect(green,32,8,9,1),
+    fill_rect(green,32,16,9,1),
+    fill_rect(green,32,9,1,7),
+    fill_rect(green,40,9,1,7),
+    fill_rect(gray,33,9,7,7),
+    fill_rect(green,34,17,5,8),
+    fill_rect(green,14,25,40,5),
+    fill_rect(green,14,30,15,10),
+    fill_rect(green,34,30,20,15),
+    fill_rect(green,19,40,5,5),
+    fill_rect(green,19,45,35,5),
+    fill_rect(yellow,29,30,5,10),
+    fill_rect(yellow,24,40,10,5),
+    fill_cells(dark_red,[cell(35,11),cell(36,11),cell(37,11),cell(37,12),cell(35,13),cell(37,13)]),
+    fill_cells(blue,[cell(20,32),cell(21,33)]),
+    fill_cells(black,[cell(21,31),cell(21,32),cell(22,32)]),
+    fill_rect(gray,34,45,5,2),
+    fill_rect(dark_red,34,47,5,3),
+    fill_rect(gray,1,53,10,10),
+    fill_rect(dark_red,3,55,6,2),
+    fill_rect(dark_red,3,57,2,4),
+    fill_rect(dark_red,7,59,2,2),
+    fill_rect(gray,12,60,52,4),
+    fill_rect(dark_gray,13,61,42,2),
+    fill_rect(cyan,56,61,2,2),
+    fill_rect(cyan,59,61,2,2),
+    fill_rect(cyan,62,61,2,2)
+]).

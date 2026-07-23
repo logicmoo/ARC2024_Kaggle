@@ -1,0 +1,16 @@
+action(current,'ACTION3').
+changed(base_glyph,translation(-5,0)).
+previous_geometry(base_glyph,rect(34,45,5,5)).
+current_geometry(base_glyph,rect(29,45,5,5)).
+recolored_region(rect(34,45,5,5),base_glyph_colors,green).
+changed(status_marker,removed).
+previous_geometry(status_marker,rect(13,61,2,2)).
+current_state(status_marker,absent).
+recolored_region(rect(13,61,2,2),green,gray).
+unchanged(green_structure).
+unchanged(central_hole).
+unchanged(top_glyph).
+unchanged(player_cursor).
+unchanged(hud_panel).
+unchanged(status_pips).
+expanded_visible_region(status_track,rect(13,61,2,2)).

@@ -25,6 +25,54 @@ def _rel_link(source_dir: Path, target: Path) -> str:
     return Path(os.path.relpath(target, source_dir)).as_posix()
 
 
+def _alternate_directory(path: Path) -> Path:
+    """Return the first unused sibling directory name without touching a conflict."""
+    candidates = [path.with_name(path.name + ".dir")]
+    candidates.extend(path.with_name(path.name + f".dir{index}") for index in range(2, 1000))
+    for candidate in candidates:
+        if not os.path.lexists(candidate):
+            return candidate
+        if os.path.isdir(candidate):
+            return candidate
+    raise RuntimeError(f"Could not allocate fallback directory beside: {path}")
+
+
+def _ensure_directory(path: Path) -> Path:
+    """Create a directory and return the actual usable path.
+
+    Windows UNC/WSL shares can expose an entry that raises WinError 183 while
+    remaining invisible to ``exists()``, ``lexists()``, and rename attempts.
+    In that case the blocked name is left untouched and a sibling ``.dir`` path
+    is used.  The returned path must always be used by callers.
+    """
+    requested = Path(path)
+
+    # Resolve/create the parent first. If a parent itself required a fallback,
+    # continue beneath that actual parent rather than the unusable requested one.
+    if requested != requested.parent:
+        actual_parent = _ensure_directory(requested.parent)
+        requested = actual_parent / requested.name
+
+    if os.path.isdir(requested):
+        return requested
+
+    try:
+        os.mkdir(requested)
+        return requested
+    except FileExistsError:
+        if os.path.isdir(requested):
+            return requested
+
+    fallback = _alternate_directory(requested)
+    if not os.path.isdir(fallback):
+        os.mkdir(fallback)
+    print(
+        "warning: action-tree path is blocked by a non-directory or UNC "
+        f"filesystem entry; using {fallback} instead of {requested}"
+    )
+    return fallback
+
+
 @dataclass(frozen=True)
 class StateNode:
     path: Path
@@ -91,16 +139,14 @@ class ActionTreeStore:
         game_id: str,
         level: str | int,
     ) -> None:
-        self.root = Path(root).resolve()
+        self.root = _ensure_directory(Path(root).resolve())
         self.game_id = str(game_id)
         self.game_dir_name = _game_slug(self.game_id)
         self.level = str(level)
-        self.level_root = (
-            self.root
-            / self.game_dir_name
-            / f"level_{_slug(self.level)}"
+        self.game_root = _ensure_directory(self.root / self.game_dir_name)
+        self.level_root = _ensure_directory(
+            self.game_root / f"level_{_slug(self.level)}"
         )
-        self.level_root.mkdir(parents=True, exist_ok=True)
 
     @property
     def object_registry_path(self) -> Path:
@@ -178,7 +224,7 @@ class ActionTreeStore:
         incoming_action: str | None,
         action_data: Mapping[str, Any] | None,
     ) -> StateNode:
-        path.mkdir(parents=True, exist_ok=True)
+        path = _ensure_directory(path)
         image_hash = self.image_hash(png_bytes)
         image_path = path / "image.png"
 
