@@ -9,12 +9,12 @@
     "levels_completed": 0,
     "win_levels": 7,
     "action_input": {
-      "id": "RESET",
+      "id": "ACTION1",
       "data": {},
       "reasoning": null
     },
     "guid": "0d3344cb-1e3f-402f-8f0e-a937582f5f1a",
-    "full_reset": true,
+    "full_reset": false,
     "available_actions": [
       1,
       2,
@@ -22,13 +22,16 @@
       4
     ]
   },
-  "step_count": 0,
+  "step_count": 1,
   "game_id": "ls20",
   "game_directory": "ls20",
-  "image_hash": "9c879087889c0ade",
-  "incoming_action": null,
-  "action_directory": null,
+  "image_hash": "30e866672d329f7d",
+  "incoming_action": "ACTION1",
+  "action_directory": "UP",
   "action_data": {},
-  "parent_node": null,
-  "action_path": []
+  "parent_node": "..",
+  "action_path": [
+    "DOWN",
+    "UP"
+  ]
 }

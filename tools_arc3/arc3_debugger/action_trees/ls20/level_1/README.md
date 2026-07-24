@@ -6,7 +6,7 @@
 
 ### Actions
 
-[`LEFT`](LEFT/README.md) · [`UP`](UP/README.md)
+[`DOWN`](DOWN/README.md) · [`LEFT`](LEFT/README.md) · [`UP`](UP/README.md)
 
 ---
 
@@ -49,7 +49,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "dd7c8ad1-3442-407d-a2b3-f24587a00d9e",
+    "guid": "0d3344cb-1e3f-402f-8f0e-a937582f5f1a",
     "full_reset": true,
     "available_actions": [
       1,

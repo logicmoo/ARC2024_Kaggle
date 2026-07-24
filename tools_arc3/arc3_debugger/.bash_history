@@ -243,3 +243,12 @@ git add    prolog/test_turtle_dsl.pl
 git add  README_WEB_TERMINAL_FIX.md
 rm  arc3_debugger.zip
 git status .
+git commit -am "dsl tests"
+git push
+swipl prolog/test_turtle_dsl.pl 
+swipl prolog/run_tests.pl 
+swipl prolog/demo_task.pl 
+ls prolog/
+swipl prolog/test_turtle_dsl.pl 
+git status .
+git add action_trees/
