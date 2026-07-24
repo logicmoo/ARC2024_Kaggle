@@ -13,6 +13,7 @@ import arc_agi
 
 from action_tree import ActionTreeStore, StateNode
 from image_codec import extract_latest_frame, frame_to_png_bytes
+from project_paths import action_trees_root, prompts_root, prompts_path
 
 try:
     from arcengine import GameAction, GameState
@@ -92,11 +93,13 @@ class Arc3Runner:
         self.game_id = game_id
         self.render_mode = render_mode
         self.capture_terminal = capture_terminal
-        self.tree_root = Path(
-            tree_root
-            or os.environ.get("ARC3_TREE_ROOT")
-            or Path(__file__).resolve().parents[1] / "action_trees"
-        ).resolve()
+        self.prompts_root = prompts_root()
+        self.environment_files = self.prompts_root  # compatibility alias
+        self.tree_root = (
+            Path(tree_root).expanduser().resolve()
+            if tree_root is not None
+            else action_trees_root()
+        )
         self.arc = (
             arc_agi.Arcade(arc_api_key=arc_api_key)
             if arc_api_key
@@ -108,6 +111,8 @@ class Arc3Runner:
         self.tree_store: ActionTreeStore | None = None
         self.current_node: StateNode | None = None
         self._gpt_analyzer: Any = None
+        self._detected_level: int = 1
+        self._level_source: str = "default"
         self.open()
 
     def _make_environment(self) -> Any:
@@ -123,6 +128,7 @@ class Arc3Runner:
             raise RuntimeError(f"Failed to create ARC3 environment: {self.game_id}")
         self.current_observation = getattr(self.env, "observation_space", None)
         self.records.clear()
+        self._refresh_level_detection(allow_win_inference=False)
         self._start_action_tree()
         return self.env
 
@@ -218,6 +224,7 @@ class Arc3Runner:
             raise ValueError(f"{action_name(resolved)} is complex and requires x and y.")
 
         parent_node = self.current_node
+        previous_state_name = self.state_name()
         stream = io.StringIO()
         manager = (
             contextlib.redirect_stdout(stream)
@@ -234,6 +241,7 @@ class Arc3Runner:
                     reasoning=dict(reasoning),
                 )
 
+        previous_level = self._detected_level
         self.current_observation = observation
         terminal_output = stream.getvalue()
         state_value = getattr(observation, "state", None) if observation is not None else None
@@ -242,7 +250,18 @@ class Arc3Runner:
             if state_value is not None
             else None
         )
-        node = self._capture_transition(parent_node, action_name(resolved), payload)
+        self._refresh_level_detection(
+            allow_win_inference=(state_name == "WIN" and previous_state_name != "WIN")
+        )
+        if self._detected_level != previous_level:
+            print(
+                f"level transition detected: {previous_level} -> "
+                f"{self._detected_level} ({self._level_source})"
+            )
+            self._start_action_tree()
+            node = self.current_node
+        else:
+            node = self._capture_transition(parent_node, action_name(resolved), payload)
         self.records.append(
             StepRecord(
                 step=len(self.records),
@@ -262,6 +281,7 @@ class Arc3Runner:
         self.current_observation = result
         if clear_history:
             self.records.clear()
+        self._refresh_level_detection(allow_win_inference=False)
         self._start_action_tree()
         return result
 
@@ -283,6 +303,7 @@ class Arc3Runner:
 
     def save_history(self, path: str | Path) -> Path:
         output = Path(path)
+        output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(
             json.dumps(self.history(), indent=2, ensure_ascii=False),
             encoding="utf-8",
@@ -304,13 +325,129 @@ class Arc3Runner:
     def scorecard(self) -> Any:
         return self.arc.get_scorecard()
 
+    @staticmethod
+    def _coerce_level(value: Any, *, zero_based: bool = False) -> int | None:
+        if isinstance(value, bool) or value is None:
+            return None
+        if isinstance(value, str):
+            text = value.strip().lower()
+            if text.startswith("level_"):
+                text = text[6:]
+            elif text.startswith("level "):
+                text = text[6:]
+            try:
+                value = int(text)
+            except ValueError:
+                return None
+        if isinstance(value, (int, float)) and int(value) == value:
+            number = int(value)
+            if zero_based:
+                number += 1
+            return number if number >= 1 else None
+        return None
+
+    def _find_level_candidates(self, value: Any, source: str, depth: int = 0) -> list[tuple[int, int, str]]:
+        if value is None or depth > 5:
+            return []
+        candidates: list[tuple[int, int, str]] = []
+        key_priority = {
+            "current_level_number": 100,
+            "level_number": 95,
+            "current_level": 90,
+            "level": 85,
+            "level_id": 80,
+            "level_index": 75,
+            "current_level_index": 75,
+        }
+        if isinstance(value, (list, tuple)):
+            for index, child in enumerate(value):
+                candidates.extend(
+                    self._find_level_candidates(child, f"{source}[{index}]", depth + 1)
+                )
+            return candidates
+        if isinstance(value, Mapping):
+            items = value.items()
+        elif hasattr(value, "model_dump"):
+            try:
+                items = value.model_dump().items()
+            except Exception:
+                items = ()
+        elif hasattr(value, "__dict__"):
+            items = ((k, v) for k, v in vars(value).items() if not k.startswith("_"))
+        else:
+            return candidates
+        for key, child in items:
+            name = str(key).lower()
+            if name in key_priority:
+                level = self._coerce_level(child, zero_based=name.endswith("_index"))
+                if level is not None:
+                    candidates.append((key_priority[name] - depth, level, f"{source}.{key}"))
+            if depth < 5 and isinstance(child, (Mapping, list, tuple)):
+                candidates.extend(
+                    self._find_level_candidates(child, f"{source}.{key}", depth + 1)
+                )
+        return candidates
+
+    def _completed_level_from_scorecard(self) -> int | None:
+        try:
+            score = self.scorecard()
+        except Exception:
+            return None
+        data = _jsonable(score)
+        best = None
+        stack = [data]
+        while stack:
+            item = stack.pop()
+            if isinstance(item, Mapping):
+                for key, value in item.items():
+                    name = str(key).lower()
+                    if name in {"levels_completed", "completed_levels", "level_wins", "levels_won"}:
+                        if isinstance(value, int) and not isinstance(value, bool):
+                            best = max(best or 0, value)
+                        elif isinstance(value, (list, tuple)):
+                            best = max(best or 0, len(value))
+                    stack.append(value)
+            elif isinstance(item, (list, tuple)):
+                stack.extend(item)
+        return best
+
+    def _refresh_level_detection(self, *, allow_win_inference: bool) -> None:
+        candidates: list[tuple[int, int, str]] = []
+        candidates.extend(self._find_level_candidates(self.current_observation, "observation"))
+        candidates.extend(self._find_level_candidates(self.env, "environment"))
+        try:
+            candidates.extend(self._find_level_candidates(self.scorecard(), "scorecard"))
+        except Exception:
+            pass
+        explicit_level = None
+        explicit_source = None
+        if candidates:
+            _, explicit_level, explicit_source = max(
+                candidates, key=lambda item: (item[0], item[1])
+            )
+            if explicit_level > self._detected_level or not allow_win_inference:
+                self._detected_level = explicit_level
+                self._level_source = explicit_source
+                return
+
+        completed = self._completed_level_from_scorecard()
+        if completed is not None and completed + 1 > self._detected_level:
+            self._detected_level = completed + 1
+            self._level_source = "scorecard.completed_levels+1"
+            return
+
+        if allow_win_inference and self.is_win():
+            self._detected_level += 1
+            stale = f"; stale explicit={explicit_level} from {explicit_source}" if explicit_level else ""
+            self._level_source = "inferred_after_win" + stale
+            return
+
+        if explicit_level is not None:
+            self._detected_level = explicit_level
+            self._level_source = explicit_source or "explicit"
+
     def current_level_label(self) -> str:
-        for obj in (self.current_observation, self.env):
-            for attr in ("level", "level_index", "current_level", "level_number"):
-                value = getattr(obj, attr, None) if obj is not None else None
-                if value is not None:
-                    return str(value)
-        return "1"
+        return str(self._detected_level)
 
     def current_selection_summary(self) -> str:
         node = str(self.current_node.path) if self.current_node else "none"
@@ -328,6 +465,9 @@ class Arc3Runner:
                 result = method(target)
                 self.current_observation = result
                 self.records.clear()
+                self._detected_level = max(1, int(target))
+                self._level_source = f"manual:{name}"
+                self._refresh_level_detection(allow_win_inference=False)
                 self._start_action_tree()
                 return result
         raise RuntimeError("This environment does not expose direct level selection")
@@ -371,6 +511,7 @@ class Arc3Runner:
         payload = {
             "game_id": self.game_id,
             "level": self.current_level_label(),
+            "level_source": self._level_source,
             "state": self.state_name(),
             "tree_node": str(self.current_node.path) if self.current_node else None,
             "image": str(self.current_node.image_path) if self.current_node else None,
@@ -382,6 +523,8 @@ class Arc3Runner:
     def _state_payload(self) -> dict[str, Any]:
         return {
             "state": self.state_name(),
+            "level": self.current_level_label(),
+            "level_source": self._level_source,
             "observation": _jsonable(self.current_observation),
             "step_count": len(self.records),
         }
@@ -446,8 +589,7 @@ class Arc3Runner:
         if self._gpt_analyzer is None:
             from gpt_bridge import GptArcAnalyzer
 
-            prompts_path = Path(__file__).resolve().parents[1] / "prompts" / "gpt_prompts.json"
-            self._gpt_analyzer = GptArcAnalyzer(prompts_path)
+            self._gpt_analyzer = GptArcAnalyzer(prompts_path())
         return self._gpt_analyzer
 
     def gpt_command_1(self) -> None:

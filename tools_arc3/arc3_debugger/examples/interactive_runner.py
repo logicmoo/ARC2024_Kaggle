@@ -11,6 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "python"))
 
 from arc3_runner import Arc3Runner, action_name, is_complex_action
+from project_paths import exports_root, histories_root
 
 KEY_SEQUENCES = {
     "\x1b[A": "UP",
@@ -490,11 +491,13 @@ def main() -> None:
                 print("Replay complete.")
                 continue
             if key == "w":
-                output = runner.save_history(Path.cwd() / f"{runner.game_id}_history.json")
+                level_root = runner.tree_store.level_root if runner.tree_store else runner.tree_root / runner.game_id / f"level_{runner.current_level_label()}"
+                output = runner.save_history(histories_root(level_root) / f"{runner.game_id}_history.json")
                 print(f"Saved history: {output}")
                 continue
             if key == "e":
-                output = runner.export_state(Path.cwd() / f"{runner.game_id}_state.json")
+                level_root = runner.tree_store.level_root if runner.tree_store else runner.tree_root / runner.game_id / f"level_{runner.current_level_label()}"
+                output = runner.export_state(exports_root(level_root) / f"{runner.game_id}_state.json")
                 print(f"Exported state: {output}")
                 continue
 

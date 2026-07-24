@@ -1,6 +1,20 @@
 # ARC3 Debugger
 
-A debugger / runner for ARC-AGI-3 built around:
+## Shared prompt and action-tree directories
+
+All frontends use the same project-relative roots:
+
+```text
+arc3_debugger/
+├── prompts/
+│   └── gpt_prompts.json
+└── action_trees/
+    └── <game>/
+        └── level_<n>/
+            ├── histories/
+            ├── exports/
+            └── ... state and action branches ...
+```
 
 ```text
 Jupyter or CLI
@@ -13,6 +27,10 @@ Jupyter or CLI
 
 This project is intended to make ARC3 states easy to browse, replay, analyze,
 and compare across deterministic action branches.
+
+Prompts remain in `prompts/`. Generated state artifacts, histories, and exports
+remain attached to their corresponding level under `action_trees/`. Override
+these roots with `ARC3_PROMPTS_ROOT` and `ARC3_TREE_ROOT` when needed.
 
 ---
 
@@ -673,6 +691,28 @@ ARC3_WEB_TOKEN
 Each browser connection receives its own isolated debugger process and action
 history. Closing the tab terminates that terminal process; saved action-tree
 files remain on disk.
+
+
+## Runtime file placement
+
+Prompts remain static under `prompts/`, while all generated material is attached to the relevant action-tree level:
+
+```text
+arc3_debugger/
+├── prompts/
+│   └── gpt_prompts.json
+└── action_trees/
+    └── ls20/
+        └── level_1/
+            ├── histories/
+            ├── exports/
+            ├── README.md
+            ├── image.png
+            ├── state.json
+            └── ... action branches ...
+```
+
+The `w` command saves history beneath the active level's `histories/` directory. The `e` command saves state beneath the active level's `exports/` directory. The code uses the actual `ActionTreeStore.level_root`, so Windows/UNC fallback names such as `level_1.dir` are respected automatically.
 
 ---
 

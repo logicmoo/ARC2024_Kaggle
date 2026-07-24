@@ -204,6 +204,8 @@ def create_app(
         env.setdefault("COLORTERM", "truecolor")
         env["PYTHONUNBUFFERED"] = "1"
         env["ARC3_WEB_TERMINAL"] = "1"
+        env.setdefault("ARC3_PROMPTS_ROOT", str(PROJECT_ROOT / "prompts"))
+        env.setdefault("ARC3_TREE_ROOT", str(PROJECT_ROOT / "action_trees"))
 
         argv = [
             sys.executable,

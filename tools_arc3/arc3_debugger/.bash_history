@@ -144,3 +144,29 @@ git add .idea/
 git status .
 git add environment_files/
 git status .
+git commit -am "environment_files/"
+git status .
+git mv action_trees/ environment_files/
+git status .
+git add webui/
+du venv
+du venv -h
+pip -m venv venv-win
+python -m venv venv-win
+du venv-win/
+du venv-win/ -h
+rm -rf venv-win/
+python -m venv venv-win
+rm -rf venv-win/
+du venv-win/ -h
+git status .
+du venv-win/ -h
+du .venv/ -h
+du venv-win/ -h
+git add venv
+git add "naughty to add windows venv .. sorry"
+git add venv
+"naughty to add windows venv .. sorry"
+git commit  -m "naughty to add windows venv .. sorry"
+git status .
+git add run_webui.py
