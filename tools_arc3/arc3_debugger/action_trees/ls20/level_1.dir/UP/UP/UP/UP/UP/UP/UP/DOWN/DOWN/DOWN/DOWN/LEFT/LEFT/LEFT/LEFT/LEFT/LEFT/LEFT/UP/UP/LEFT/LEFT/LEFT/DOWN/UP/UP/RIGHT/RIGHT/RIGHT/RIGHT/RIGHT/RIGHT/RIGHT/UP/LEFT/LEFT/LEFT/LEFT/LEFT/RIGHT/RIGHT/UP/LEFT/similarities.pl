@@ -1,0 +1,10 @@
+correspondence(previous,current,green_structure,green_structure,exact_geometry_and_color).
+correspondence(previous,current,central_hole,central_hole,exact_geometry_and_color).
+correspondence(previous,current,player_cursor,player_cursor,exact_geometry_and_color).
+correspondence(previous,current,hud_panel,hud_panel,exact_geometry_and_color).
+correspondence(previous,current,status_pips,status_pips,exact_geometry_and_color).
+correspondence(previous,current,status_track,status_track,same_track_with_one_cell_progress).
+correspondence(previous,current,status_marker,status_marker,rightward_extension).
+correspondence(previous,current,top_glyph,top_glyph,exact_geometry_and_color).
+correspondence(previous,current,base_glyph,base_glyph,exact_geometry_and_color).
+correspondence(previous,current,left_boundary_bar,left_boundary_bar,exact_geometry_and_color).

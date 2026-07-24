@@ -1,0 +1,34 @@
+{
+  "state": "NOT_FINISHED",
+  "observation": {
+    "game_id": "lf52-271a04aa",
+    "state": "NOT_FINISHED",
+    "levels_completed": 0,
+    "win_levels": 10,
+    "action_input": {
+      "id": "RESET",
+      "data": {},
+      "reasoning": null
+    },
+    "guid": "a026cfd1-fa4d-4146-a35c-087756805afa",
+    "full_reset": true,
+    "available_actions": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7
+    ]
+  },
+  "step_count": 0,
+  "game_id": "lf52-271a04aa",
+  "game_directory": "lf52",
+  "level": "1",
+  "image_hash": "e7ccf73e5eaee12c",
+  "incoming_action": null,
+  "action_directory": null,
+  "action_data": {},
+  "parent_node": null,
+  "action_path": []
+}

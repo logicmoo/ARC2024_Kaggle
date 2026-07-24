@@ -1,0 +1,15 @@
+action_transition('ACTION2',parent,current).
+changed(base_glyph).
+recolored_region(rectangle(19,25,23,29),gray_and_dark_red,green).
+added_region(base_glyph,rectangle(19,30,23,34),dark_red).
+removed_object(player_cursor).
+removed_region(player_cursor,rectangle(20,31,22,33),black_and_blue).
+changed(hud_panel).
+changed_region(hud_panel,rectangle(3,55,8,60),dark_red).
+removed_object(status_marker).
+recolored_region(rectangle(13,61,15,62),green,gray).
+unchanged(green_structure).
+unchanged(central_hole).
+unchanged(top_glyph).
+unchanged(status_track).
+unchanged(status_pips).

@@ -130,3 +130,17 @@ git commit -am "checkpoint for debugger demo"
 git push
 git add_trees/ls20/level_1.dir/
 git add action_trees/ls20/level_1.dir/
+git commit -am "checkpoint for debugger demo"
+git status .
+find -name "*.bak" 
+find -name "*.bak"  =delete
+find -name "*.bak" -delete
+git status .
+git add  action_trees/
+git status .
+vi .gitignore 
+git status .
+git add .idea/
+git status .
+git add environment_files/
+git status .

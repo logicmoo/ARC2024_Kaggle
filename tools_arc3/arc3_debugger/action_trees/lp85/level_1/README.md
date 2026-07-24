@@ -43,7 +43,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "7fc6f926-ba6d-4875-9c7f-2018972951af",
+    "guid": "27af905f-00b2-4313-9c2f-e7fb3a113e12",
     "full_reset": true,
     "available_actions": [
       6

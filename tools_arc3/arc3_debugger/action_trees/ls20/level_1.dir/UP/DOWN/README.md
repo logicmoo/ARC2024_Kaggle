@@ -10,7 +10,7 @@
 
 ---
 
-- **Full game ID:** `ls20-9607627b`
+- **Full game ID:** `ls20`
 - **State:** `NOT_FINISHED`
 - **Image hash:** `d80b4064d523fef3`
 - **Incoming action:** `ACTION2`
@@ -45,7 +45,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "d46666b7-b4f5-4774-a990-f778a3ac050a",
+    "guid": "a4ccfb21-7263-43bb-bbcc-e1925e2aca14",
     "full_reset": false,
     "available_actions": [
       1,
@@ -55,7 +55,7 @@
     ]
   },
   "step_count": 1,
-  "game_id": "ls20-9607627b",
+  "game_id": "ls20",
   "game_directory": "ls20",
   "level": "1",
   "image_hash": "d80b4064d523fef3",

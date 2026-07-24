@@ -1,0 +1,9 @@
+correspondence(parent:green_structure,current:green_structure,identity).
+correspondence(parent:central_hole,current:central_hole,identity).
+correspondence(parent:top_glyph,current:top_glyph,identity).
+correspondence(parent:base_glyph,current:base_glyph,transformed_and_shifted).
+correspondence(parent:hud_panel,current:hud_panel,updated_interface_glyph).
+correspondence(parent:status_track,current:status_track,identity_except_removed_marker_overlay).
+correspondence(parent:status_pips,current:status_pips,identity).
+no_current_correspondent(parent:player_cursor).
+no_current_correspondent(parent:status_marker).

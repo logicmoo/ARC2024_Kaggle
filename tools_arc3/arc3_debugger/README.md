@@ -602,3 +602,211 @@ $env:ARC3_GPT_4_MAX_OUTPUT_TOKENS="32000"
 ```
 
 The older global variables remain valid and override all levels when present.
+
+## Browser ANSI terminal
+
+The browser UI exposes the **same** `examples/interactive_runner.py` debugger
+through an ANSI terminal. It does not duplicate or replace the debugger logic.
+
+```text
+Browser xterm.js terminal
+        ⇅ WebSocket
+FastAPI web server
+        ⇅ PTY / Windows ConPTY
+examples/interactive_runner.py
+        ↓
+Arc3Runner → arc_agi.Arcade
+```
+
+### Start locally on Windows
+
+```powershell
+cd arc3_debugger
+pip install -r requirements.txt
+python run_webui.py --game ls20
+```
+
+Open:
+
+```text
+http://127.0.0.1:8765/
+```
+
+The browser terminal supports the same controls as the local console, including
+ANSI rendering, arrows, Space, GPT/Prolog mode commands, replay, history, and
+file operations. Xterm.js sends terminal input to the Python process through a
+WebSocket. On Windows, `pywinpty` uses ConPTY to preserve terminal behavior.
+
+### Expose it to another computer
+
+Binding to a non-loopback address requires an access token:
+
+```powershell
+$env:ARC3_WEB_TOKEN="choose-a-long-random-token"
+python run_webui.py --host 0.0.0.0 --port 8765 --game ls20
+```
+
+The browser will display a token field. Do not expose the raw terminal directly
+to the public internet. Use a trusted network or an HTTPS reverse proxy in front
+of the FastAPI server.
+
+### Web-server options
+
+```text
+--host          bind address; default 127.0.0.1
+--port          TCP port; default 8765
+--game          initial ARC3 game; default ls20
+--render-mode   toolkit render mode; default terminal
+--token         required WebSocket token
+```
+
+Equivalent environment variables are:
+
+```text
+ARC3_WEB_HOST
+ARC3_WEB_PORT
+ARC3_WEB_GAME
+ARC3_WEB_RENDER_MODE
+ARC3_WEB_TOKEN
+```
+
+Each browser connection receives its own isolated debugger process and action
+history. Closing the tab terminates that terminal process; saved action-tree
+files remain on disk.
+
+---
+
+## Exposing the Local Web Interface to the Internet
+
+The ARC3 debugger or another locally hosted web application can be made temporarily accessible through a public HTTPS URL using either **Cloudflare Tunnel** or **ngrok**.
+
+These tools create an outbound connection from the Windows computer to a public proxy. This normally avoids the need to configure router port forwarding, obtain a static public IP address, or open inbound firewall ports.
+
+> **Security warning:** Anyone who knows the generated public URL may be able to access the application. Do not expose an unrestricted shell, file browser, Prolog execution endpoint, administrative interface, API keys, or private data without authentication.
+
+### Option 1: Cloudflare Tunnel
+
+Download `cloudflared` for Windows:
+
+https://developers.cloudflare.com/tunnel/downloads/
+
+After installation, open a new PowerShell window and verify that it is available:
+
+```powershell
+cloudflared --version
+```
+
+To expose a web application running locally on port `8080`:
+
+```powershell
+cloudflared tunnel --url http://localhost:8080
+```
+
+For an application running on port `5000`:
+
+```powershell
+cloudflared tunnel --url http://localhost:5000
+```
+
+Cloudflare will display a temporary public HTTPS address similar to:
+
+```text
+https://random-words.trycloudflare.com
+```
+
+Keep the PowerShell window open while the tunnel is in use. Closing `cloudflared` will close the public tunnel.
+
+If the web application is running on another computer on the same LAN, specify that computer's LAN IP address:
+
+```powershell
+cloudflared tunnel --url http://192.168.1.50:8080
+```
+
+Replace `192.168.1.50` and `8080` with the correct LAN address and port.
+
+### Option 2: ngrok
+
+Download ngrok for Windows:
+
+https://ngrok.com/download/
+
+After installation, open PowerShell and verify that it is available:
+
+```powershell
+ngrok version
+```
+
+ngrok requires a free account and authentication token. Copy the token from the ngrok dashboard and configure it:
+
+```powershell
+ngrok config add-authtoken YOUR_AUTH_TOKEN
+```
+
+Replace `YOUR_AUTH_TOKEN` with the actual token.
+
+To expose a local application running on port `8080`:
+
+```powershell
+ngrok http 8080
+```
+
+For port `5000`:
+
+```powershell
+ngrok http 5000
+```
+
+ngrok will display a public HTTPS address similar to:
+
+```text
+https://example-name.ngrok-free.app
+```
+
+Keep ngrok running for as long as the public URL is needed.
+
+### Windows Firewall
+
+The tunnel program generally requires only an outbound Internet connection. If Windows Defender Firewall displays a permission prompt, allow access on the appropriate network type.
+
+The local web server must also be running and listening on the selected port before starting the tunnel.
+
+You can test the local application first:
+
+```text
+http://localhost:8080
+```
+
+Then start the tunnel:
+
+```powershell
+cloudflared tunnel --url http://localhost:8080
+```
+
+or:
+
+```powershell
+ngrok http 8080
+```
+
+### Running the Tunnel in the Background
+
+For temporary development and debugging, leave the PowerShell window open.
+
+For a permanent deployment, configure a named Cloudflare Tunnel or install the tunnel process as a Windows service. A permanent public deployment should use:
+
+* A fixed hostname
+* HTTPS
+* User authentication
+* Access restrictions
+* Application-level authorization
+* Logging and request limits
+
+### Recommended Quick Start
+
+For a temporary ARC3 debugger demonstration, Cloudflare Quick Tunnel requires the least configuration:
+
+```powershell
+cloudflared tunnel --url http://localhost:8080
+```
+
+Copy the generated `https://...trycloudflare.com` address and provide it to the person who needs to access the debugger.

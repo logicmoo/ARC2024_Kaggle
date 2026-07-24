@@ -6,11 +6,11 @@
 
 ### Actions
 
-[`LEFT`](LEFT/README.md)
+[`LEFT`](LEFT/README.md) · [`UP`](UP/README.md)
 
 ---
 
-- **Full game ID:** `ls20-9607627b`
+- **Full game ID:** `ls20`
 - **State:** `NOT_FINISHED`
 - **Image hash:** `dc12b25accade37f`
 - **Incoming action:** `ACTION3`
@@ -45,7 +45,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "3758e2ba-d1de-4e0a-b087-a75755f5f5c6",
+    "guid": "cce92f71-96a0-45c5-b7d7-d8b66521ca4d",
     "full_reset": false,
     "available_actions": [
       1,
@@ -55,7 +55,7 @@
     ]
   },
   "step_count": 2,
-  "game_id": "ls20-9607627b",
+  "game_id": "ls20",
   "game_directory": "ls20",
   "level": "1",
   "image_hash": "dc12b25accade37f",
