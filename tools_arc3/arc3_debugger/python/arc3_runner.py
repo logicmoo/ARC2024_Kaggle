@@ -113,6 +113,7 @@ class Arc3Runner:
         self._gpt_analyzer: Any = None
         self._detected_level: int = 1
         self._level_source: str = "default"
+        self._pending_level_after_win: int | None = None
         self.open()
 
     def _make_environment(self) -> Any:
@@ -250,10 +251,24 @@ class Arc3Runner:
             if state_value is not None
             else None
         )
-        self._refresh_level_detection(
-            allow_win_inference=(state_name == "WIN" and previous_state_name != "WIN")
-        )
+        newly_won = state_name == "WIN" and previous_state_name != "WIN"
+        if newly_won:
+            # Keep the winning frame in the level that was actually won.  Merely
+            # seeing WIN is not proof that ARC3 has loaded the next level yet.
+            self._pending_level_after_win = max(
+                self._pending_level_after_win or 0, previous_level + 1
+            )
+        self._refresh_level_detection(allow_win_inference=False)
+        if (
+            self._detected_level == previous_level
+            and self._pending_level_after_win is not None
+            and state_name not in (None, "WIN")
+        ):
+            self._detected_level = self._pending_level_after_win
+            self._level_source = "inferred_after_win_new_state"
+            self._pending_level_after_win = None
         if self._detected_level != previous_level:
+            self._pending_level_after_win = None
             print(
                 f"level transition detected: {previous_level} -> "
                 f"{self._detected_level} ({self._level_source})"
@@ -281,7 +296,16 @@ class Arc3Runner:
         self.current_observation = result
         if clear_history:
             self.records.clear()
+        previous_level = self._detected_level
         self._refresh_level_detection(allow_win_inference=False)
+        if (
+            self._detected_level == previous_level
+            and self._pending_level_after_win is not None
+            and self.state_name() != "WIN"
+        ):
+            self._detected_level = self._pending_level_after_win
+            self._level_source = "inferred_after_win_reset"
+            self._pending_level_after_win = None
         self._start_action_tree()
         return result
 
@@ -432,15 +456,19 @@ class Arc3Runner:
 
         completed = self._completed_level_from_scorecard()
         if completed is not None and completed + 1 > self._detected_level:
-            self._detected_level = completed + 1
-            self._level_source = "scorecard.completed_levels+1"
-            return
-
-        if allow_win_inference and self.is_win():
-            self._detected_level += 1
-            stale = f"; stale explicit={explicit_level} from {explicit_source}" if explicit_level else ""
-            self._level_source = "inferred_after_win" + stale
-            return
+            candidate = completed + 1
+            if self.is_win():
+                # A completed-level count may update before the toolkit has replaced
+                # the winning frame. Remember the likely next level, but do not put
+                # the old WIN frame into the next level's action tree.
+                self._pending_level_after_win = max(
+                    self._pending_level_after_win or 0, candidate
+                )
+            else:
+                self._detected_level = candidate
+                self._level_source = "scorecard.completed_levels+1"
+                self._pending_level_after_win = None
+                return
 
         if explicit_level is not None:
             self._detected_level = explicit_level
@@ -512,6 +540,7 @@ class Arc3Runner:
             "game_id": self.game_id,
             "level": self.current_level_label(),
             "level_source": self._level_source,
+            "next_level_expected": self._pending_level_after_win,
             "state": self.state_name(),
             "tree_node": str(self.current_node.path) if self.current_node else None,
             "image": str(self.current_node.image_path) if self.current_node else None,
@@ -525,6 +554,7 @@ class Arc3Runner:
             "state": self.state_name(),
             "level": self.current_level_label(),
             "level_source": self._level_source,
+            "next_level_expected": self._pending_level_after_win,
             "observation": _jsonable(self.current_observation),
             "step_count": len(self.records),
         }

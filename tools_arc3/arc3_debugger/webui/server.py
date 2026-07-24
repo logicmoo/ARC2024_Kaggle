@@ -194,8 +194,8 @@ def create_app(
             return
 
         game = websocket.query_params.get("game") or app.state.default_game
-        rows = int(websocket.query_params.get("rows") or 32)
-        cols = int(websocket.query_params.get("cols") or 120)
+        rows = int(websocket.query_params.get("rows") or os.environ.get("ARC3_WEB_ROWS", "100"))
+        cols = int(websocket.query_params.get("cols") or os.environ.get("ARC3_WEB_COLS", "320"))
 
         await websocket.accept()
 

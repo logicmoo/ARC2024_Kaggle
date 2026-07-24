@@ -126,19 +126,21 @@ The debugger has two symbolic-analysis modes:
 (p)  Prolog mode
 ```
 
-The selected mode then uses plain number keys:
+The selected mode then uses plain number keys. In GPT mode, keys `(2)`, `(3)`,
+and `(4)` run the same combined artifact pipeline at increasing depth:
 
 ```text
 (1)  Edit / inspect prompt or description context
-(2)  Full analysis pipeline
-(3)  Recompute diff only
-(4)  Recompute turtle-from-image only
-(5)  Recompute turtle-from-diff only
-(6)  Recompute similarities only
+(2)  Demo combined analysis
+(3)  Deep combined analysis
+(4)  Extreme combined analysis
+(5)  Recompute turtle-from-diff using the combined request
+(6)  Recompute similarities using the combined request
 ```
 
-The important part is that **mode command (2)** is the main command. You should
-not need to press 2, 3, 4, 5, and 6 one by one for a new state.
+Command `(2)` is the normal demonstration path. Commands `(3)` and `(4)` force
+a deeper regeneration of the same mutually consistent artifact bundle. You do
+not need to invoke every number for a newly encountered state.
 
 ---
 
@@ -579,17 +581,22 @@ folder such as `level_1.dir`, prints the actual location, and stores the action
 tree there. Child action directories use the same fallback mechanism.
 
 
-## GPT quality profiles
+## GPT quality configuration
 
-The combined call supports three quality profiles:
+The primary interface is the `(2)`, `(3)`, and `(4)` analysis-depth menu described
+below. The older named quality profiles remain available only as compatibility
+settings for scripts and advanced configuration:
 
 ```powershell
-$env:ARC3_GPT_QUALITY="fast"      # quickest, lower visual detail
-$env:ARC3_GPT_QUALITY="balanced"  # default; exact current image, cheaper parent image
-$env:ARC3_GPT_QUALITY="deep"      # highest detail and reasoning
+$env:ARC3_GPT_QUALITY="fast"
+$env:ARC3_GPT_QUALITY="balanced"
+$env:ARC3_GPT_QUALITY="deep"
 ```
 
-`balanced` is now the default. It requires logical ARC cell coordinates rather than enlarged PNG pixels, comprehensive block/sub-object descriptions, exact topology and holes, evidence assertions, and faithful Turtle reconstruction. Individual settings can still override the profile with `ARC3_GPT_IMAGE_DETAIL`, `ARC3_GPT_PARENT_IMAGE_DETAIL`, `ARC3_GPT_REASONING_EFFORT`, and `ARC3_GPT_MAX_OUTPUT_TOKENS`.
+The menu level normally selects image detail, reasoning effort, and output-token
+budget together. Advanced users can override those dimensions independently with
+`ARC3_GPT_IMAGE_DETAIL`, `ARC3_GPT_PARENT_IMAGE_DETAIL`,
+`ARC3_GPT_REASONING_EFFORT`, and `ARC3_GPT_MAX_OUTPUT_TOKENS`.
 
 
 ## GPT analysis levels 2, 3, and 4
@@ -692,6 +699,35 @@ Each browser connection receives its own isolated debugger process and action
 history. Closing the tab terminates that terminal process; saved action-tree
 files remain on disk.
 
+### Browser terminal dimensions
+
+The browser terminal defaults to a dense 10-pixel monospace font and requests
+approximately 160 columns by 52 rows before fitting itself to the browser
+window. Every browser resize is sent back to PTY/ConPTY, so the Python debugger
+sees the real terminal dimensions and can render large ARC3 worlds without
+unnecessary wrapping. Server-side fallback dimensions can be changed with:
+
+```powershell
+$env:ARC3_WEB_COLS="320"
+$env:ARC3_WEB_ROWS="100"
+```
+
+Maximizing the browser window or using full-screen mode provides the most room.
+
+
+
+## Safe level-transition detection
+
+A `WIN` result completes the current level but does not, by itself, prove that
+the ARC3 toolkit has already loaded the next level. The debugger therefore keeps
+the winning frame and its final transition inside the level that was actually
+won. It records the likely next level as `next_level_expected`, then advances the
+action-tree root only after an explicit level identifier changes or a genuine
+post-win/reset state appears.
+
+This prevents a level 1 winning frame from being written as the initial image or
+object registry for `level_2/`. The detected source is stored in `state.json` and
+exports through `level_source`.
 
 ## Runtime file placement
 
@@ -850,3 +886,49 @@ cloudflared tunnel --url http://localhost:8080
 ```
 
 Copy the generated `https://...trycloudflare.com` address and provide it to the person who needs to access the debugger.
+
+
+## Ultra-dense browser terminal
+
+The browser terminal defaults to approximately **320 columns by 100 rows** with
+a 6-pixel monospace font. The xterm fit addon then uses the entire available
+browser area and reports the resulting dimensions to PTY/ConPTY. Override the
+starting dimensions when needed:
+
+```powershell
+$env:ARC3_WEB_COLS="360"
+$env:ARC3_WEB_ROWS="120"
+python run_webui.py --game ls20
+```
+
+## Motion-based Turtle output and pen thickness
+
+GPT-generated Turtle programs use movement instructions rather than direct block
+placement. The canonical drawing vocabulary is:
+
+```prolog
+penup.
+pendown.
+set_pos(X, Y).
+setcolor(Color).
+pen_width(Width).  % Width is 1..4 logical cells
+fwd(Distance).
+rot(Degrees).
+set_cell.
+```
+
+`set_pos/2` establishes a starting point or begins a disconnected stroke. Shape
+geometry should then be traced with `fwd/1` and `rot/1`. Generated programs must
+not use `rect/4`, `fill/1`, direct four-coordinate block commands, or large lists
+of unrelated cell placements. Filled areas are drawn as scan-line strokes, with
+`pen_width/1` used whenever a width from 1 through 4 paints the exact target
+cells.
+
+A thick stroke is defined as equivalent to its parallel one-cell strokes. The
+Prolog test suite checks horizontal and vertical width-4 strokes against four
+width-1 lines:
+
+```powershell
+swipl -q -s prolog/test_turtle_dsl.pl -g run_tests,halt
+```
+

@@ -9,19 +9,19 @@
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
     html, body { width: 100%; height: 100%; margin: 0; background: #0b0e14; color: #e6edf3; font-family: system-ui, sans-serif; }
-    body { display: grid; grid-template-rows: auto 1fr auto; }
-    header { display: flex; gap: .75rem; align-items: center; padding: .6rem .8rem; border-bottom: 1px solid #30363d; background: #161b22; }
+    body { display: grid; grid-template-rows: auto 1fr; }
+    header { display: flex; gap: .75rem; align-items: center; padding: .2rem .4rem; border-bottom: 1px solid #30363d; background: #161b22; }
     header strong { white-space: nowrap; }
     label { display: flex; gap: .35rem; align-items: center; color: #8b949e; }
-    input, button { background: #0d1117; color: #e6edf3; border: 1px solid #30363d; border-radius: .35rem; padding: .35rem .55rem; }
+    input, button { background: #0d1117; color: #e6edf3; border: 1px solid #30363d; border-radius: .35rem; padding: .15rem .3rem; }
     input[name="game"] { width: 8rem; }
     input[name="token"] { width: 13rem; }
     button { cursor: pointer; }
     button:hover { border-color: #58a6ff; }
     #status { margin-left: auto; font-size: .85rem; color: #8b949e; }
-    #terminal-shell { min-height: 0; padding: .5rem; }
+    #terminal-shell { min-height: 0; padding: 0; overflow: hidden; }
     #terminal { width: 100%; height: 100%; }
-    footer { padding: .35rem .8rem; border-top: 1px solid #30363d; background: #161b22; color: #8b949e; font-size: .8rem; }
+    footer { display: none; }
     @media (max-width: 720px) {
       header { flex-wrap: wrap; }
       #status { width: 100%; margin-left: 0; }
@@ -43,19 +43,29 @@
   <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
   <script>
+    const DEFAULT_COLS = 320;
+    const DEFAULT_ROWS = 100;
+
     const terminal = new Terminal({
+      cols: DEFAULT_COLS,
+      rows: DEFAULT_ROWS,
       cursorBlink: true,
       convertEol: false,
-      scrollback: 5000,
+      scrollback: 10000,
       fontFamily: 'Cascadia Mono, Consolas, monospace',
-      fontSize: 14,
+      fontSize: 6,
+      lineHeight: 1.0,
+      letterSpacing: 0,
       theme: { background: '#0b0e14', foreground: '#e6edf3', cursor: '#58a6ff' }
     });
     const fitAddon = new FitAddon.FitAddon();
     terminal.loadAddon(fitAddon);
     terminal.open(document.getElementById('terminal'));
-    fitAddon.fit();
-    terminal.focus();
+    function fitTerminal() {
+      fitAddon.fit();
+      terminal.focus();
+    }
+    requestAnimationFrame(fitTerminal);
 
     const gameInput = document.getElementById('game');
     const tokenInput = document.getElementById('token');
@@ -93,8 +103,8 @@
       const scheme = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const params = new URLSearchParams({
         game: gameInput.value.trim() || 'ls20',
-        cols: String(terminal.cols),
-        rows: String(terminal.rows)
+        cols: String(terminal.cols || DEFAULT_COLS),
+        rows: String(terminal.rows || DEFAULT_ROWS)
       });
       if (tokenInput.value) params.set('token', tokenInput.value);
       socket = new WebSocket(`${scheme}//${location.host}/ws/terminal?${params}`);
@@ -118,7 +128,7 @@
     interruptButton.addEventListener('click', () => send({ type: 'signal', name: 'INT' }));
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { fitAddon.fit(); sendResize(); }, 80);
+      resizeTimer = setTimeout(() => { fitTerminal(); sendResize(); }, 80);
     });
     gameInput.addEventListener('keydown', event => {
       if (event.key === 'Enter') connect();

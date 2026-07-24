@@ -10,6 +10,8 @@ initial_state(state{
     turtle_y: 0,
     direction: east,
     pen: up,
+    pen_width: 1,
+    color: default,
     cells: []
 }).
 

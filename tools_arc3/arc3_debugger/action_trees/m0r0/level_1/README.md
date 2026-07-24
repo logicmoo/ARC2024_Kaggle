@@ -33,6 +33,8 @@
 ````json
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
   "observation": {
     "game_id": "m0r0-492f87ba",
     "state": "NOT_FINISHED",
@@ -43,7 +45,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "cafae77f-7f1f-4525-8f8b-83851d852ca1",
+    "guid": "7770743d-dd65-4762-96a8-7624c67ec5f0",
     "full_reset": true,
     "available_actions": [
       1,
@@ -57,7 +59,6 @@
   "step_count": 0,
   "game_id": "m0r0-492f87ba",
   "game_directory": "m0r0",
-  "level": "1",
   "image_hash": "1f775d08af1f6d0f",
   "incoming_action": null,
   "action_directory": null,

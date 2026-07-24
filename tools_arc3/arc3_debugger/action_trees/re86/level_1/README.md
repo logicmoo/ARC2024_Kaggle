@@ -33,6 +33,8 @@
 ````json
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
   "observation": {
     "game_id": "re86-8af5384d",
     "state": "NOT_FINISHED",
@@ -43,7 +45,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "9b5d19d7-b3f8-4b5e-9a79-7e8f2d024283",
+    "guid": "22ba2a6f-eb83-4fbd-a776-602cb18d4873",
     "full_reset": true,
     "available_actions": [
       1,
@@ -56,7 +58,6 @@
   "step_count": 0,
   "game_id": "re86-8af5384d",
   "game_directory": "re86",
-  "level": "1",
   "image_hash": "f8378d0c0f0e262b",
   "incoming_action": null,
   "action_directory": null,

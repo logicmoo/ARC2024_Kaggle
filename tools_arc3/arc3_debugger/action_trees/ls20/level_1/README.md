@@ -6,7 +6,7 @@
 
 ### Actions
 
-[`LEFT`](LEFT/README.md)
+[`LEFT`](LEFT/README.md) · [`UP`](UP/README.md)
 
 ---
 
@@ -23,18 +23,22 @@
 
 - [image.png](image.png)
 - [state.json](state.json)
-- [object_registry.pl](object_registry.pl)
+- [object_registry.pl](object_registry.pl) — shared level registry (24 canonical identities)
 - [objects.pl](objects.pl)
 - [rules.pl](rules.pl)
 - [turtle_from_image.pl](turtle_from_image.pl)
 
 ## Embedded files
 
-### [`state.json`](state.json)
+<details>
+<summary><code>state.json</code></summary>
 
 ````json
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
+  "next_level_expected": null,
   "observation": {
     "game_id": "ls20-9607627b",
     "state": "NOT_FINISHED",
@@ -45,7 +49,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "0a4ebbd7-be9c-415b-8e24-130817c122cc",
+    "guid": "a9c5822f-e997-49ad-8bd8-c3c0705d22a8",
     "full_reset": true,
     "available_actions": [
       1,
@@ -57,7 +61,6 @@
   "step_count": 0,
   "game_id": "ls20",
   "game_directory": "ls20",
-  "level": "1",
   "image_hash": "9c879087889c0ade",
   "incoming_action": null,
   "action_directory": null,
@@ -67,7 +70,12 @@
 }
 ````
 
-### [`object_registry.pl`](object_registry.pl)
+[Open `state.json`](state.json)
+
+</details>
+
+<details>
+<summary><code>object_registry.pl</code></summary>
 
 ````prolog
 % Canonical friendly object identities for this entire ARC3 level.
@@ -99,7 +107,12 @@ object_identity(yellow_inner_cavity, hole, 'yellow stepped cavity enclosed withi
 object_identity(yellow_playfield, background, 'yellow playfield background').
 ````
 
-### [`objects.pl`](objects.pl)
+[Open `object_registry.pl`](object_registry.pl)
+
+</details>
+
+<details>
+<summary><code>objects.pl</code></summary>
 
 ````prolog
 % Canonical friendly object identities for this entire ARC3 level.
@@ -524,7 +537,12 @@ turtle_program(bottom_button_3,
      fill_rect(20,20), penup]).
 ````
 
-### [`rules.pl`](rules.pl)
+[Open `objects.pl`](objects.pl)
+
+</details>
+
+<details>
+<summary><code>rules.pl</code></summary>
 
 ````prolog
 evidence(ev_initial_action,
@@ -795,7 +813,12 @@ hypothetical_rule(non_player_objects_remain_fixed_during_plain_motion,
                       caveat(no_noninitial_transition_has_been_observed))).
 ````
 
-### [`turtle_from_image.pl`](turtle_from_image.pl)
+[Open `rules.pl`](rules.pl)
+
+</details>
+
+<details>
+<summary><code>turtle_from_image.pl</code></summary>
 
 ````prolog
 object_identity(black_player_head, player_component, 'black upper portion of the player marker').
@@ -1048,3 +1071,7 @@ turtle_program(right_cyan_status_cell,
      fill_rect(20, 20),
      penup]).
 ````
+
+[Open `turtle_from_image.pl`](turtle_from_image.pl)
+
+</details>

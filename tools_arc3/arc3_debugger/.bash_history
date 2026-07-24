@@ -221,3 +221,15 @@ git checkout prompts/
 git diff 
 git status .
 git diff README.md
+git commit -am "action tree catchup"
+git push
+ls
+find -name "*.bak"
+find -name "*.bak" -delete 
+git status .
+git diff  action_trees/ls20/level_1/README.md
+git status .
+git diff  environment_files/ls20/9607627b/metadata.json
+git status .
+git add   action_trees/ls20/level_1/UP/
+git commit -a "lots of changes"

@@ -1,5 +1,7 @@
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
   "observation": {
     "game_id": "sb26-7fbdac44",
     "state": "NOT_FINISHED",
@@ -10,7 +12,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "2d370cd1-5587-4076-9bfb-31110349f9cc",
+    "guid": "f07f7e16-00ee-4881-a179-572715cae6f8",
     "full_reset": true,
     "available_actions": [
       5,
@@ -21,7 +23,6 @@
   "step_count": 0,
   "game_id": "sb26-7fbdac44",
   "game_directory": "sb26",
-  "level": "1",
   "image_hash": "3c5d8bc51957c1a7",
   "incoming_action": null,
   "action_directory": null,
