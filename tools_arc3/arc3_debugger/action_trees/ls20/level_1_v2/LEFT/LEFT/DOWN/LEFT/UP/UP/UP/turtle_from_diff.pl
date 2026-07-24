@@ -1,0 +1,10 @@
+turtle_patch(action7, action8,
+    [object_patch(bottom_center_gate,
+        [penup, set_pos(19,35), setcolor(green), pendown, fill_rect(5,5),
+         penup, set_pos(19,30), setcolor(light_gray), pendown, fill_rect(5,2),
+         penup, set_pos(19,32), setcolor(burgundy), pendown, fill_rect(5,3)]),
+     object_patch(lower_left_burgundy_glyph,
+        [penup, set_pos(3,55), setcolor(light_gray), pendown, fill_rect(6,6),
+         penup, set_pos(3,55), setcolor(burgundy), pendown, fill_rect(6,2),
+         penup, set_pos(7,57), pendown, fill_rect(2,4),
+         penup, set_pos(3,59), pendown, fill_rect(2,2)])]).

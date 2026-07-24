@@ -170,3 +170,54 @@ git add venv
 git commit  -m "naughty to add windows venv .. sorry"
 git status .
 git add run_webui.py
+git commit -am run_webui.py
+git push
+git status .
+vi .gitignore 
+git status .
+rm changes.txt missing.txt 
+rm -rf notebooks/environment_files/
+git status .
+rm ls20*
+git status .
+ls action_trees/.gitkeep 
+mv environment_files/gpt_prompts.json prompts/gpt_prompts.json
+ls
+git status .
+cat  prompts/README.md
+git add prompts/README.md 
+git status .
+git add  environment_files/README.md
+mv environment_files/action_trees/* action_trees/
+rmdir environment_files/action_trees/
+ls -l environment_files/action_trees/
+rmdir environment_files/action_trees/
+ls environment_files/action_trees/
+ls environment_files/action_trees/ -a
+rm environment_files/action_trees/.bash_history 
+rmdir environment_files/action_trees/
+ls
+git status .
+git add action_trees/
+git add environment_files/
+git status .
+git add  python/project_paths.py
+git commit  python/project_paths.py
+git status .
+cat .env.example
+git add .env.example
+find ATTT
+mv ATTT/ls20/level_1/ action_trees/ls20/level_1
+mv atttt/ls20/level_1_v2/ action_trees/ls20/level_1_v2
+git add  action_trees/ls20/
+ls
+rm -rf ATTT
+rm -rf atttt/
+git status .
+rm -rf venv-win/
+git status .
+git diff 
+git checkout prompts/
+git diff 
+git status .
+git diff README.md
