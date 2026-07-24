@@ -932,3 +932,10 @@ width-1 lines:
 swipl -q -s prolog/test_turtle_dsl.pl -g run_tests,halt
 ```
 
+## Git-friendly prompt files
+
+Editable GPT prompts remain under `prompts/gpt_prompts.json`. Each prompt is
+stored as an array of physical lines so GitHub shows useful line-by-line diffs.
+The loader joins and normalizes those lines at runtime; legacy JSON string values
+are still accepted.
+

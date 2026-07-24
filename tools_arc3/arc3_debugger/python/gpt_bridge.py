@@ -121,8 +121,38 @@ class GptArcAnalyzer:
         self.active_profile = base
         return base
 
-    def prompts(self) -> dict[str, Any]:
-        return json.loads(self.prompts_path.read_text(encoding="utf-8"))
+    @staticmethod
+    def _normalize_prompt(value: Any, *, key: str) -> str:
+        """Normalize Git-friendly prompt representations into API text.
+
+        Prompts may be stored either as a legacy JSON string or as an array of
+        physical lines.  The array form keeps GitHub diffs readable: changing
+        one prompt line changes one JSON line instead of one enormous escaped
+        string.
+        """
+        if isinstance(value, str):
+            text = value
+        elif isinstance(value, list) and all(isinstance(line, str) for line in value):
+            text = "\n".join(value)
+        else:
+            raise ValueError(
+                f"Prompt {key!r} must be a string or an array of strings; "
+                f"got {type(value).__name__}"
+            )
+
+        # Normalize editor/platform differences without altering intentional
+        # blank lines or internal indentation.
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        return "\n".join(line.rstrip() for line in text.split("\n")).strip("\n")
+
+    def prompts(self) -> dict[str, str]:
+        raw = json.loads(self.prompts_path.read_text(encoding="utf-8"))
+        if not isinstance(raw, dict):
+            raise ValueError("Prompt file must contain a JSON object")
+        return {
+            str(key): self._normalize_prompt(value, key=str(key))
+            for key, value in raw.items()
+        }
 
     def edit_prompts(self) -> None:
         if os.name == "nt":

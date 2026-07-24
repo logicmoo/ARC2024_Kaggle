@@ -233,3 +233,5 @@ git diff  environment_files/ls20/9607627b/metadata.json
 git status .
 git add   action_trees/ls20/level_1/UP/
 git commit -a "lots of changes"
+git commit -am "lots of changes"
+git status .
