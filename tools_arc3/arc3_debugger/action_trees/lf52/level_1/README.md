@@ -33,6 +33,9 @@
 ````json
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
+  "next_level_expected": null,
   "observation": {
     "game_id": "lf52-271a04aa",
     "state": "NOT_FINISHED",
@@ -43,7 +46,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "a026cfd1-fa4d-4146-a35c-087756805afa",
+    "guid": "8d10b135-737d-45f0-bdc0-4f6069447912",
     "full_reset": true,
     "available_actions": [
       1,
@@ -57,7 +60,6 @@
   "step_count": 0,
   "game_id": "lf52-271a04aa",
   "game_directory": "lf52",
-  "level": "1",
   "image_hash": "e7ccf73e5eaee12c",
   "incoming_action": null,
   "action_directory": null,

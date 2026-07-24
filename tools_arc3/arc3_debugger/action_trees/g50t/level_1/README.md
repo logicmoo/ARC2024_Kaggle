@@ -33,6 +33,9 @@
 ````json
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
+  "next_level_expected": null,
   "observation": {
     "game_id": "g50t-5849a774",
     "state": "NOT_FINISHED",
@@ -43,7 +46,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "a3374661-9655-4f84-b400-343dc52e1a5e",
+    "guid": "611200d1-05d5-4cf1-930b-c20b6b286cac",
     "full_reset": true,
     "available_actions": [
       1,
@@ -56,7 +59,6 @@
   "step_count": 0,
   "game_id": "g50t-5849a774",
   "game_directory": "g50t",
-  "level": "1",
   "image_hash": "901a2d1c60e378b8",
   "incoming_action": null,
   "action_directory": null,

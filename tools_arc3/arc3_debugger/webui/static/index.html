@@ -6,25 +6,147 @@
   <title>ARC3 Debugger</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; background: #0b0e14; color: #e6edf3; font-family: system-ui, sans-serif; }
-    body { display: grid; grid-template-rows: auto 1fr; }
-    header { display: flex; gap: .75rem; align-items: center; padding: .2rem .4rem; border-bottom: 1px solid #30363d; background: #161b22; }
-    header strong { white-space: nowrap; }
-    label { display: flex; gap: .35rem; align-items: center; color: #8b949e; }
-    input, button { background: #0d1117; color: #e6edf3; border: 1px solid #30363d; border-radius: .35rem; padding: .15rem .3rem; }
-    input[name="game"] { width: 8rem; }
-    input[name="token"] { width: 13rem; }
-    button { cursor: pointer; }
-    button:hover { border-color: #58a6ff; }
-    #status { margin-left: auto; font-size: .85rem; color: #8b949e; }
-    #terminal-shell { min-height: 0; padding: 0; overflow: hidden; }
-    #terminal { width: 100%; height: 100%; }
-    footer { display: none; }
+    :root {
+      color-scheme: dark;
+      --terminal-font-size: 16px;
+      --terminal-line-height: 1.15;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: #0b0e14;
+      color: #e6edf3;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+
+    header {
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+      padding: .6rem .8rem;
+      border-bottom: 1px solid #30363d;
+      background: #161b22;
+    }
+
+    header strong {
+      white-space: nowrap;
+    }
+
+    label {
+      display: flex;
+      gap: .35rem;
+      align-items: center;
+      color: #8b949e;
+    }
+
+    input,
+    button {
+      background: #0d1117;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: .35rem;
+      padding: .35rem .55rem;
+    }
+
+    input[name="game"] {
+      width: 8rem;
+    }
+
+    input[name="token"] {
+      width: 13rem;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: #58a6ff;
+    }
+
+    #status {
+      margin-left: auto;
+      font-size: .85rem;
+      color: #8b949e;
+    }
+
+    /*
+     * The viewport scrolls around a large terminal surface.
+     * The terminal itself is never scaled down to fit the browser.
+     */
+    #terminal-shell {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      padding: .5rem;
+      scrollbar-gutter: stable both-edges;
+      background: #0b0e14;
+    }
+
+    /*
+     * JavaScript calculates this surface from the fixed terminal geometry.
+     * It intentionally remains larger than many browser windows.
+     */
+    #terminal-stage {
+      position: relative;
+      width: 1900px;
+      height: 1400px;
+      min-width: 1900px;
+      min-height: 1400px;
+    }
+
+    #terminal {
+      width: 100%;
+      height: 100%;
+      font-size: var(--terminal-font-size);
+      line-height: var(--terminal-line-height);
+      transform: none !important;
+      zoom: 1 !important;
+    }
+
+    #terminal .xterm,
+    #terminal .xterm-screen,
+    #terminal .xterm-rows {
+      transform: none !important;
+      zoom: 1 !important;
+    }
+
+    #terminal canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      transform: none !important;
+    }
+
+    footer {
+      padding: .35rem .8rem;
+      border-top: 1px solid #30363d;
+      background: #161b22;
+      color: #8b949e;
+      font-size: .8rem;
+    }
+
     @media (max-width: 720px) {
-      header { flex-wrap: wrap; }
-      #status { width: 100%; margin-left: 0; }
+      header {
+        flex-wrap: wrap;
+      }
+
+      #status {
+        width: 100%;
+        margin-left: 0;
+      }
     }
   </style>
 </head>
@@ -37,35 +159,69 @@
     <button id="interrupt" type="button">Ctrl-C</button>
     <span id="status">Disconnected</span>
   </header>
-  <main id="terminal-shell"><div id="terminal"></div></main>
-  <footer>Existing Python debugger over WebSocket + PTY. Press <strong>?</strong> for controls.</footer>
+
+  <main id="terminal-shell">
+    <div id="terminal-stage">
+      <div id="terminal"></div>
+    </div>
+  </main>
+
+  <footer>
+    Fixed 180-column × 70-row terminal at 16 px. Scroll the browser viewport;
+    the debugger is never compressed to fit.
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
   <script>
-    const DEFAULT_COLS = 320;
-    const DEFAULT_ROWS = 100;
+    const DEBUGGER_COLUMNS = 180;
+    const DEBUGGER_ROWS = 70;
+    const DEBUGGER_FONT_SIZE = 16;
+    const DEBUGGER_LINE_HEIGHT = 1.15;
+
+    const terminalStage = document.getElementById('terminal-stage');
 
     const terminal = new Terminal({
-      cols: DEFAULT_COLS,
-      rows: DEFAULT_ROWS,
+      cols: DEBUGGER_COLUMNS,
+      rows: DEBUGGER_ROWS,
       cursorBlink: true,
       convertEol: false,
-      scrollback: 10000,
-      fontFamily: 'Cascadia Mono, Consolas, monospace',
-      fontSize: 6,
-      lineHeight: 1.0,
+      scrollback: 5000,
+      fontFamily: '"Cascadia Mono", Consolas, "Courier New", monospace',
+      fontSize: DEBUGGER_FONT_SIZE,
+      lineHeight: DEBUGGER_LINE_HEIGHT,
       letterSpacing: 0,
-      theme: { background: '#0b0e14', foreground: '#e6edf3', cursor: '#58a6ff' }
+      theme: {
+        background: '#0b0e14',
+        foreground: '#e6edf3',
+        cursor: '#58a6ff'
+      }
     });
-    const fitAddon = new FitAddon.FitAddon();
-    terminal.loadAddon(fitAddon);
-    terminal.open(document.getElementById('terminal'));
-    function fitTerminal() {
-      fitAddon.fit();
-      terminal.focus();
+
+    /*
+     * Give xterm a physical surface large enough for the requested rows and
+     * columns. Increasing rows or columns enlarges this surface rather than
+     * shrinking the font.
+     */
+    function sizeTerminalSurface() {
+      const probe = document.createElement('canvas').getContext('2d');
+      probe.font = `${DEBUGGER_FONT_SIZE}px "Cascadia Mono", Consolas, "Courier New", monospace`;
+
+      const measuredCellWidth = Math.ceil(probe.measureText('M').width + 1);
+      const measuredCellHeight = Math.ceil(DEBUGGER_FONT_SIZE * DEBUGGER_LINE_HEIGHT);
+
+      const width = Math.max(1900, DEBUGGER_COLUMNS * measuredCellWidth + 32);
+      const height = Math.max(1400, DEBUGGER_ROWS * measuredCellHeight + 32);
+
+      terminalStage.style.width = `${width}px`;
+      terminalStage.style.minWidth = `${width}px`;
+      terminalStage.style.height = `${height}px`;
+      terminalStage.style.minHeight = `${height}px`;
     }
-    requestAnimationFrame(fitTerminal);
+
+    sizeTerminalSurface();
+    terminal.open(document.getElementById('terminal'));
+    terminal.resize(DEBUGGER_COLUMNS, DEBUGGER_ROWS);
+    terminal.focus();
 
     const gameInput = document.getElementById('game');
     const tokenInput = document.getElementById('token');
@@ -73,17 +229,25 @@
     const status = document.getElementById('status');
     const connectButton = document.getElementById('connect');
     const interruptButton = document.getElementById('interrupt');
-    let socket = null;
-    let resizeTimer = null;
 
-    function setStatus(text) { status.textContent = text; }
+    let socket = null;
+
+    function setStatus(text) {
+      status.textContent = text;
+    }
+
     function send(payload) {
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(payload));
       }
     }
-    function sendResize() {
-      send({ type: 'resize', cols: terminal.cols, rows: terminal.rows });
+
+    function sendFixedSize() {
+      send({
+        type: 'resize',
+        cols: DEBUGGER_COLUMNS,
+        rows: DEBUGGER_ROWS
+      });
     }
 
     async function loadConfig() {
@@ -98,44 +262,69 @@
         socket.close();
         socket = null;
       }
+
       terminal.reset();
+      terminal.resize(DEBUGGER_COLUMNS, DEBUGGER_ROWS);
       terminal.writeln('\x1b[90mConnecting to ARC3 debugger...\x1b[0m');
+
       const scheme = location.protocol === 'https:' ? 'wss:' : 'ws:';
       const params = new URLSearchParams({
         game: gameInput.value.trim() || 'ls20',
-        cols: String(terminal.cols || DEFAULT_COLS),
-        rows: String(terminal.rows || DEFAULT_ROWS)
+        cols: String(DEBUGGER_COLUMNS),
+        rows: String(DEBUGGER_ROWS)
       });
-      if (tokenInput.value) params.set('token', tokenInput.value);
-      socket = new WebSocket(`${scheme}//${location.host}/ws/terminal?${params}`);
+
+      if (tokenInput.value) {
+        params.set('token', tokenInput.value);
+      }
+
+      socket = new WebSocket(
+        `${scheme}//${location.host}/ws/terminal?${params}`
+      );
 
       socket.addEventListener('open', () => {
-        setStatus('Connected');
+        setStatus(`Connected — ${DEBUGGER_COLUMNS}×${DEBUGGER_ROWS} at ${DEBUGGER_FONT_SIZE}px`);
         connectButton.textContent = 'Reconnect';
-        sendResize();
+        sendFixedSize();
         terminal.focus();
       });
+
       socket.addEventListener('message', event => terminal.write(event.data));
+
       socket.addEventListener('close', event => {
         setStatus(`Disconnected (${event.code})`);
         connectButton.textContent = 'Connect';
       });
-      socket.addEventListener('error', () => setStatus('Connection error'));
+
+      socket.addEventListener('error', () => {
+        setStatus('Connection error');
+      });
     }
 
     terminal.onData(data => send({ type: 'input', data }));
     connectButton.addEventListener('click', connect);
-    interruptButton.addEventListener('click', () => send({ type: 'signal', name: 'INT' }));
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { fitTerminal(); sendResize(); }, 80);
+    interruptButton.addEventListener('click', () => {
+      send({ type: 'signal', name: 'INT' });
     });
+
+    /*
+     * Deliberately do not call FitAddon or resize the terminal when the browser
+     * window changes size. The surrounding shell supplies both scrollbars.
+     */
+    window.addEventListener('resize', () => {
+      sizeTerminalSurface();
+    });
+
     gameInput.addEventListener('keydown', event => {
-      if (event.key === 'Enter') connect();
+      if (event.key === 'Enter') {
+        connect();
+      }
     });
 
     loadConfig().then(connect).catch(error => {
-      terminal.writeln(`\r\n\x1b[31mUnable to load configuration: ${error}\x1b[0m`);
+      terminal.writeln(
+        `\r\n\x1b[31mUnable to load configuration: ${error}\x1b[0m`
+      );
     });
   </script>
 </body>

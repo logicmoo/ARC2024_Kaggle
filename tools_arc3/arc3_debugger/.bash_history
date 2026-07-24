@@ -235,3 +235,11 @@ git add   action_trees/ls20/level_1/UP/
 git commit -a "lots of changes"
 git commit -am "lots of changes"
 git status .
+git commit -am "push"
+git push
+git status .
+git add  prolog/run_tests.pl
+git add    prolog/test_turtle_dsl.pl
+git add  README_WEB_TERMINAL_FIX.md
+rm  arc3_debugger.zip
+git status .

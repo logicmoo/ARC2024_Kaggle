@@ -33,6 +33,9 @@
 ````json
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
+  "next_level_expected": null,
   "observation": {
     "game_id": "lp85-305b61c3",
     "state": "NOT_FINISHED",
@@ -43,7 +46,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "27af905f-00b2-4313-9c2f-e7fb3a113e12",
+    "guid": "eea2af5f-4fa2-4bd4-ae59-c18c576d26a2",
     "full_reset": true,
     "available_actions": [
       6
@@ -52,7 +55,6 @@
   "step_count": 0,
   "game_id": "lp85-305b61c3",
   "game_directory": "lp85",
-  "level": "1",
   "image_hash": "f5d3b17b0f19ba39",
   "incoming_action": null,
   "action_directory": null,

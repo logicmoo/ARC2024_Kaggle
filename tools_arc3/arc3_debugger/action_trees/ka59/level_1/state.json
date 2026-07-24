@@ -1,5 +1,8 @@
 {
   "state": "NOT_FINISHED",
+  "level": "1",
+  "level_source": "default",
+  "next_level_expected": null,
   "observation": {
     "game_id": "ka59-38d34dbb",
     "state": "NOT_FINISHED",
@@ -10,7 +13,7 @@
       "data": {},
       "reasoning": null
     },
-    "guid": "872abbef-3b64-46ac-89a1-f38abd6789e3",
+    "guid": "0fea4478-51ef-41f6-b27b-2446436051d5",
     "full_reset": true,
     "available_actions": [
       1,
@@ -23,7 +26,6 @@
   "step_count": 0,
   "game_id": "ka59-38d34dbb",
   "game_directory": "ka59",
-  "level": "1",
   "image_hash": "75130443383a4e06",
   "incoming_action": null,
   "action_directory": null,
