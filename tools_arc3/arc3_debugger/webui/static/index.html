@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ARC3 Debugger</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; background: #0b0e14; color: #e6edf3; font-family: system-ui, sans-serif; }
+    body { display: grid; grid-template-rows: auto 1fr auto; }
+    header { display: flex; gap: .75rem; align-items: center; padding: .6rem .8rem; border-bottom: 1px solid #30363d; background: #161b22; }
+    header strong { white-space: nowrap; }
+    label { display: flex; gap: .35rem; align-items: center; color: #8b949e; }
+    input, button { background: #0d1117; color: #e6edf3; border: 1px solid #30363d; border-radius: .35rem; padding: .35rem .55rem; }
+    input[name="game"] { width: 8rem; }
+    input[name="token"] { width: 13rem; }
+    button { cursor: pointer; }
+    button:hover { border-color: #58a6ff; }
+    #status { margin-left: auto; font-size: .85rem; color: #8b949e; }
+    #terminal-shell { min-height: 0; padding: .5rem; }
+    #terminal { width: 100%; height: 100%; }
+    footer { padding: .35rem .8rem; border-top: 1px solid #30363d; background: #161b22; color: #8b949e; font-size: .8rem; }
+    @media (max-width: 720px) {
+      header { flex-wrap: wrap; }
+      #status { width: 100%; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>ARC3 ANSI Debugger</strong>
+    <label>Game <input name="game" id="game" value="ls20" autocomplete="off"></label>
+    <label id="token-label" hidden>Token <input name="token" id="token" type="password" autocomplete="off"></label>
+    <button id="connect" type="button">Connect</button>
+    <button id="interrupt" type="button">Ctrl-C</button>
+    <span id="status">Disconnected</span>
+  </header>
+  <main id="terminal-shell"><div id="terminal"></div></main>
+  <footer>Existing Python debugger over WebSocket + PTY. Press <strong>?</strong> for controls.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+  <script>
+    const terminal = new Terminal({
+      cursorBlink: true,
+      convertEol: false,
+      scrollback: 5000,
+      fontFamily: 'Cascadia Mono, Consolas, monospace',
+      fontSize: 14,
+      theme: { background: '#0b0e14', foreground: '#e6edf3', cursor: '#58a6ff' }
+    });
+    const fitAddon = new FitAddon.FitAddon();
+    terminal.loadAddon(fitAddon);
+    terminal.open(document.getElementById('terminal'));
+    fitAddon.fit();
+    terminal.focus();
+
+    const gameInput = document.getElementById('game');
+    const tokenInput = document.getElementById('token');
+    const tokenLabel = document.getElementById('token-label');
+    const status = document.getElementById('status');
+    const connectButton = document.getElementById('connect');
+    const interruptButton = document.getElementById('interrupt');
+    let socket = null;
+    let resizeTimer = null;
+
+    function setStatus(text) { status.textContent = text; }
+    function send(payload) {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(payload));
+      }
+    }
+    function sendResize() {
+      send({ type: 'resize', cols: terminal.cols, rows: terminal.rows });
+    }
+
+    async function loadConfig() {
+      const response = await fetch('/api/config');
+      const config = await response.json();
+      gameInput.value = config.default_game || 'ls20';
+      tokenLabel.hidden = !config.token_required;
+    }
+
+    function connect() {
+      if (socket) {
+        socket.close();
+        socket = null;
+      }
+      terminal.reset();
+      terminal.writeln('\x1b[90mConnecting to ARC3 debugger...\x1b[0m');
+      const scheme = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const params = new URLSearchParams({
+        game: gameInput.value.trim() || 'ls20',
+        cols: String(terminal.cols),
+        rows: String(terminal.rows)
+      });
+      if (tokenInput.value) params.set('token', tokenInput.value);
+      socket = new WebSocket(`${scheme}//${location.host}/ws/terminal?${params}`);
+
+      socket.addEventListener('open', () => {
+        setStatus('Connected');
+        connectButton.textContent = 'Reconnect';
+        sendResize();
+        terminal.focus();
+      });
+      socket.addEventListener('message', event => terminal.write(event.data));
+      socket.addEventListener('close', event => {
+        setStatus(`Disconnected (${event.code})`);
+        connectButton.textContent = 'Connect';
+      });
+      socket.addEventListener('error', () => setStatus('Connection error'));
+    }
+
+    terminal.onData(data => send({ type: 'input', data }));
+    connectButton.addEventListener('click', connect);
+    interruptButton.addEventListener('click', () => send({ type: 'signal', name: 'INT' }));
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { fitAddon.fit(); sendResize(); }, 80);
+    });
+    gameInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') connect();
+    });
+
+    loadConfig().then(connect).catch(error => {
+      terminal.writeln(`\r\n\x1b[31mUnable to load configuration: ${error}\x1b[0m`);
+    });
+  </script>
+</body>
+</html>
