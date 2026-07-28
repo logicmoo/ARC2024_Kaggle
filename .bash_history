@@ -207,3 +207,9 @@ ls /opt/ -l
 cd /opt/arcprize/
 ks
 ls
+ls /opt/ -l
+cd /opt/arcprize/
+cd ..
+git mv kaggle_arc_nb.ipynb kaggle_arc1_2_nb.ipynb
+git add kaggle_arc3_nb.ipynb 
+git push

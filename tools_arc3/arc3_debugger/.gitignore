@@ -4,6 +4,7 @@ __pycache__/
 *.bak
 build/
 dist/
+.bash_history
 wheels/
 *.egg-info
 .ipynb_checkpoints/

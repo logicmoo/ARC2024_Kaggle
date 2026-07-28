@@ -252,3 +252,12 @@ ls prolog/
 swipl prolog/test_turtle_dsl.pl 
 git status .
 git add action_trees/
+git commit -am prolog/test_turtle_dsl.pl 
+git push
+swipl prolog/turtle_dsl.pl
+swipl prolog/arc3_debugger.pl 
+git status 
+swipl   prolog/test_wide_pen_visual.pl
+ls
+cd arc3_debugger
+vi .gitignore 
